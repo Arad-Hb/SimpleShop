@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دسته‌بندی‌ها — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="categories">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">دسته‌بندی‌ها</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <h1>مدیریت دسته‌بندی‌ها</h1>
+        <a href="category-form.html" class="btn btn-primary">
+          <i class="bi bi-plus-lg"></i> دسته‌بندی جدید
+        </a>
+      </div>
+
+      <div class="filter-bar">
+        <div class="flex-grow-1" style="min-width:200px">
+          <label class="form-label" for="search-input">جستجو</label>
+          <input type="search" class="form-control" id="search-input" placeholder="نام یا توضیحات...">
+        </div>
+        <div style="min-width:140px">
+          <label class="form-label" for="status-filter">وضعیت</label>
+          <select class="form-select" id="status-filter">
+            <option value="all">همه</option>
+            <option value="active">فعال</option>
+            <option value="inactive">غیرفعال</option>
+          </select>
+        </div>
+        <div style="min-width:120px">
+          <label class="form-label" for="page-size-select">تعداد در صفحه</label>
+          <select class="form-select" id="page-size-select">
+            <option value="5">۵</option>
+            <option value="10" selected>۱۰</option>
+            <option value="25">۲۵</option>
+            <option value="50">۵۰</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="table-responsive">
+          <table class="table admin-table mb-0" id="categories-table">
+            <thead>
+              <tr>
+                <th data-sort="id">شناسه</th>
+                <th data-sort="name">نام</th>
+                <th data-sort="description">توضیحات</th>
+                <th data-sort="sortOrder">ترتیب</th>
+                <th data-sort="isActive">وضعیت</th>
+                <th data-sort="productCount">محصولات</th>
+                <th data-sort="createdAt">تاریخ ایجاد</th>
+                <th class="text-center">عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="categories-tbody"></tbody>
+          </table>
+        </div>
+        <div class="card-body border-top">
+          <div class="pagination-wrapper">
+            <div class="text-muted small" id="pagination-info"></div>
+            <div id="pagination-container"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/categories.js"></script>
+</body>
+</html>

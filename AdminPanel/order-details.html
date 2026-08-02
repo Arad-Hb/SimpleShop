@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>جزئیات سفارش — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+  <style>
+    .status-timeline { position: relative; padding-right: 1.5rem; }
+    .status-timeline::before {
+      content: '';
+      position: absolute;
+      right: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .status-timeline-item {
+      position: relative;
+      padding-bottom: 1.25rem;
+      padding-right: 1.5rem;
+    }
+    .status-timeline-item::before {
+      content: '';
+      position: absolute;
+      right: -1.5rem;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid var(--surface);
+      box-shadow: 0 0 0 2px var(--primary);
+    }
+    .status-timeline-item:last-child { padding-bottom: 0; }
+    .order-print-header { display: none; }
+    @media print {
+      .order-print-header { display: block; margin-bottom: 1rem; }
+    }
+  </style>
+</head>
+<body data-page="orders">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar no-print" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header no-print">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">جزئیات سفارش</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav no-print" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div id="order-not-found" class="error-page d-none">
+        <h1>404</h1>
+        <p class="text-muted">سفارش مورد نظر یافت نشد.</p>
+        <a href="orders.html" class="btn btn-primary">بازگشت به لیست سفارش‌ها</a>
+      </div>
+
+      <div id="order-content" class="d-none">
+        <div class="page-header no-print">
+          <h1 id="order-title">سفارش</h1>
+          <div class="d-flex gap-2">
+            <button type="button" class="btn btn-outline-secondary" id="print-btn"><i class="bi bi-printer"></i> چاپ</button>
+            <a href="orders.html" class="btn btn-outline-primary"><i class="bi bi-arrow-right"></i> بازگشت</a>
+          </div>
+        </div>
+
+        <div class="order-print-header">
+          <h2 data-shop-name>فروشگاه</h2>
+          <p class="mb-0 text-muted" id="print-order-number"></p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="content-card mb-4">
+              <div class="card-header"><i class="bi bi-box-seam"></i> آیتم‌های سفارش</div>
+              <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>محصول</th>
+                      <th>تعداد</th>
+                      <th>قیمت واحد</th>
+                      <th>جمع</th>
+                    </tr>
+                  </thead>
+                  <tbody id="order-items-body"></tbody>
+                  <tfoot id="order-items-foot"></tfoot>
+                </table>
+              </div>
+            </div>
+
+            <div class="content-card mb-4 no-print">
+              <div class="card-header"><i class="bi bi-clock-history"></i> تاریخچه وضعیت</div>
+              <div class="card-body">
+                <div class="status-timeline" id="status-history"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="content-card mb-4">
+              <div class="card-header"><i class="bi bi-info-circle"></i> اطلاعات سفارش</div>
+              <div class="card-body">
+                <dl class="row mb-0 small">
+                  <dt class="col-5 text-muted">شماره سفارش</dt>
+                  <dd class="col-7" id="info-orderNumber">—</dd>
+                  <dt class="col-5 text-muted">مشتری</dt>
+                  <dd class="col-7" id="info-customer">—</dd>
+                  <dt class="col-5 text-muted">تاریخ ثبت</dt>
+                  <dd class="col-7" id="info-createdAt">—</dd>
+                  <dt class="col-5 text-muted">گیرنده</dt>
+                  <dd class="col-7" id="info-recipient">—</dd>
+                  <dt class="col-5 text-muted">موبایل گیرنده</dt>
+                  <dd class="col-7" id="info-recipientMobile">—</dd>
+                  <dt class="col-5 text-muted">آدرس</dt>
+                  <dd class="col-7" id="info-address">—</dd>
+                  <dt class="col-5 text-muted">کد پستی</dt>
+                  <dd class="col-7" id="info-postalCode">—</dd>
+                  <dt class="col-5 text-muted">یادداشت مشتری</dt>
+                  <dd class="col-7" id="info-customerNote">—</dd>
+                </dl>
+              </div>
+            </div>
+
+            <div class="content-card mb-4 no-print">
+              <div class="card-header"><i class="bi bi-sliders"></i> مدیریت وضعیت</div>
+              <div class="card-body">
+                <div class="mb-3">
+                  <label for="order-status" class="form-label">وضعیت سفارش</label>
+                  <select class="form-select" id="order-status">
+                    <option value="pending">در انتظار</option>
+                    <option value="processing">در حال پردازش</option>
+                    <option value="shipped">ارسال شده</option>
+                    <option value="delivered">تحویل شده</option>
+                    <option value="cancelled">لغو شده</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="payment-status" class="form-label">وضعیت پرداخت</label>
+                  <select class="form-select" id="payment-status">
+                    <option value="unpaid">پرداخت نشده</option>
+                    <option value="paid">پرداخت شده</option>
+                    <option value="refunded">مرجوعی</option>
+                  </select>
+                </div>
+                <div class="mb-3">
+                  <label for="admin-note" class="form-label">یادداشت مدیر</label>
+                  <textarea class="form-control" id="admin-note" rows="3" placeholder="یادداشت داخلی..."></textarea>
+                </div>
+                <button type="button" class="btn btn-primary w-100" id="save-order-btn">
+                  <i class="bi bi-check-lg"></i> ذخیره تغییرات
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/orders.js"></script>
+</body>
+</html>

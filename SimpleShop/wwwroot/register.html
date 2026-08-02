@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت‌نام | SimpleShop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">SimpleShop</a>
+            <div class="nav-links"><a href="/">بازگشت به فروشگاه</a></div>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="container">
+            <div class="card auth-box">
+                <h2 style="margin-bottom:1.5rem;text-align:center">ثبت‌نام مشتری</h2>
+                <div id="alert-box" class="alert"></div>
+                <form onsubmit="register(event)">
+                    <div class="form-group">
+                        <label>نام کامل</label>
+                        <input type="text" id="fullName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>نام کاربری</label>
+                        <input type="text" id="username" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ایمیل</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>رمز عبور</label>
+                        <input type="password" id="password" class="form-control" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>تلفن</label>
+                        <input type="text" id="phone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>آدرس</label>
+                        <input type="text" id="address" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%">ثبت‌نام</button>
+                </form>
+                <p style="text-align:center;margin-top:1rem">
+                    حساب دارید؟ <a href="/login.html">ورود</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        async function register(e) {
+            e.preventDefault();
+            try {
+                const data = await api('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        fullName: document.getElementById('fullName').value,
+                        username: document.getElementById('username').value,
+                        email: document.getElementById('email').value,
+                        password: document.getElementById('password').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value
+                    })
+                });
+                Auth.save(data.token, {
+                    username: data.username,
+                    role: data.role,
+                    fullName: data.fullName,
+                    customerId: data.customerId
+                });
+                window.location.href = '/';
+            } catch (err) {
+                showAlert(err.message, 'danger');
+            }
+        }
+    </script>
+</body>
+</html>

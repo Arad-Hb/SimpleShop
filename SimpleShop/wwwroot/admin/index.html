@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل مدیریت | SimpleShop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">SimpleShop</a>
+            <div class="nav-links">
+                <a href="/">فروشگاه</a>
+                <a href="#" onclick="Auth.logout();return false">خروج</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="container admin-layout">
+            <aside class="admin-sidebar card">
+                <a href="/admin/" class="active">داشبورد</a>
+                <a href="/admin/categories.html">دسته‌بندی‌ها</a>
+                <a href="/admin/products.html">محصولات</a>
+                <a href="/admin/suppliers.html">تأمین‌کنندگان</a>
+                <a href="/admin/customers.html">مشتریان</a>
+                <a href="/admin/orders.html">سفارش‌ها</a>
+            </aside>
+            <main class="admin-content">
+                <h1 class="page-title">داشبورد</h1>
+                <div id="stats" class="stats-grid"></div>
+                <div class="card">
+                    <h3 style="margin-bottom:1rem">محصولات کم‌موجودی</h3>
+                    <table>
+                        <thead><tr><th>محصول</th><th>دسته</th><th>موجودی</th></tr></thead>
+                        <tbody id="low-stock"></tbody>
+                    </table>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!Auth.isAdmin()) { window.location.href = '/login.html'; return; }
+            loadDashboard();
+        });
+
+        async function loadDashboard() {
+            const report = await api('/reports/summary');
+            document.getElementById('stats').innerHTML = `
+                <div class="card stat-card"><div class="value">${report.totalOrders}</div><div class="label">تعداد سفارش</div></div>
+                <div class="card stat-card"><div class="value">${formatPrice(report.totalSales)}</div><div class="label">مجموع فروش</div></div>
+                <div class="card stat-card"><div class="value">${report.lowStockProducts.length}</div><div class="label">محصول کم‌موجود</div></div>
+            `;
+            document.getElementById('low-stock').innerHTML = report.lowStockProducts.length
+                ? report.lowStockProducts.map(p => `<tr><td>${p.name}</td><td>${p.categoryName}</td><td>${p.stock}</td></tr>`).join('')
+                : '<tr><td colspan="3">محصول کم‌موجودی وجود ندارد.</td></tr>';
+        }
+    </script>
+</body>
+</html>

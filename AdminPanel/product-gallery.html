@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>گالری محصولات — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="product-gallery">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">گالری محصولات</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <h1>مدیریت گالری تصاویر</h1>
+        <a href="products.html" class="btn btn-outline-secondary"><i class="bi bi-arrow-right"></i> بازگشت به محصولات</a>
+      </div>
+
+      <div class="content-card mb-4">
+        <div class="card-header">انتخاب محصول</div>
+        <div class="card-body">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label class="form-label">فیلتر دسته‌بندی</label>
+              <select class="form-select" id="gallery-category-filter">
+                <option value="">همه دسته‌بندی‌ها</option>
+              </select>
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">محصول</label>
+              <div id="product-dropdown"></div>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">جست‌وجوی سریع</label>
+              <input type="search" class="form-control" id="gallery-product-search" placeholder="نام یا کد محصول...">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="product-info-panel" class="content-card mb-4 d-none">
+        <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+          <span id="selected-product-name">—</span>
+          <span class="badge bg-secondary" id="selected-product-sku"></span>
+        </div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-3 align-items-center mb-3">
+            <img id="selected-primary-thumb" class="table-img" src="" alt="" hidden>
+            <div>
+              <div class="text-muted small">دسته‌بندی: <span id="selected-product-category">—</span></div>
+              <div class="text-muted small">تعداد تصاویر: <span id="selected-image-count">۰</span></div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="btn-save-gallery">
+            <i class="bi bi-check-lg"></i> ذخیره تغییرات گالری
+          </button>
+        </div>
+      </div>
+
+      <div id="gallery-workspace" class="content-card d-none">
+        <div class="card-header">گالری تصاویر</div>
+        <div class="card-body">
+          <div class="drop-zone mb-3" id="gallery-drop-zone" tabindex="0">
+            <i class="bi bi-cloud-upload display-6 d-block mb-2"></i>
+            <p class="mb-1">افزودن تصاویر جدید</p>
+            <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت</p>
+            <input type="file" id="gallery-file-input" class="visually-hidden" accept="image/jpeg,image/png,image/webp" multiple>
+          </div>
+          <div id="gallery-upload-progress" class="progress mb-3 d-none" style="height: 6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+          </div>
+          <div class="gallery-grid" id="gallery-grid"></div>
+        </div>
+      </div>
+
+      <div id="gallery-empty" class="empty-state content-card">
+        <div class="card-body">
+          <i class="bi bi-images"></i>
+          <h5>محصولی انتخاب نشده</h5>
+          <p>برای مدیریت گالری، یک محصول از لیست بالا انتخاب کنید.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/product-gallery.js"></script>
+</body>
+</html>

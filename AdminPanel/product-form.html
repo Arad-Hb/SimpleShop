@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فرم محصول — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="products">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title" id="form-page-title">ثبت محصول</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <form id="product-form" novalidate>
+        <ul class="nav nav-tabs mb-3" id="product-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-main-btn" data-bs-toggle="tab" data-bs-target="#tab-main" type="button" role="tab" data-tab="main">اطلاعات اصلی</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-gallery-btn" data-bs-toggle="tab" data-bs-target="#tab-gallery" type="button" role="tab" data-tab="gallery">گالری تصاویر</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-seo-btn" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab" data-tab="seo">تنظیمات SEO</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link d-none" id="tab-system-btn" data-bs-toggle="tab" data-bs-target="#tab-system" type="button" role="tab" data-tab="system">اطلاعات سیستمی</button>
+          </li>
+        </ul>
+
+        <div class="tab-content content-card">
+          <div class="card-body">
+            <!-- Tab 1: Main -->
+            <div class="tab-pane fade show active" id="tab-main" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-8">
+                  <div class="mb-3">
+                    <label class="form-label" for="name">نام محصول <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" name="name" required maxlength="200">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="sku">کد محصول (SKU) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="sku" name="sku" required maxlength="50">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="categoryId">دسته‌بندی <span class="text-danger">*</span></label>
+                    <select class="form-select" id="categoryId" name="categoryId" required>
+                      <option value="">انتخاب کنید...</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="supplierId">تأمین‌کننده <span class="text-danger">*</span></label>
+                    <select class="form-select" id="supplierId" name="supplierId" required>
+                      <option value="">انتخاب کنید...</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="price">قیمت فروش (تومان) <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="price" name="price" min="0" step="1000" required>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="discountPrice">قیمت با تخفیف</label>
+                    <input type="number" class="form-control" id="discountPrice" name="discountPrice" min="0" step="1000">
+                    <div class="form-text">اختیاری — باید کمتر از قیمت اصلی باشد</div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="stock">موجودی فعلی <span class="text-danger">*</span></label>
+                    <input type="number" class="form-control" id="stock" name="stock" min="0" required>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="minimumStock">حداقل موجودی (هشدار)</label>
+                    <input type="number" class="form-control" id="minimumStock" name="minimumStock" min="0" value="5">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3 pt-4">
+                    <div class="form-check form-switch">
+                      <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                      <label class="form-check-label" for="isActive">محصول فعال و قابل نمایش</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="mb-3">
+                    <label class="form-label" for="description">توضیحات کامل</label>
+                    <textarea class="form-control" id="description" name="description" rows="5" maxlength="5000"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Gallery -->
+            <div class="tab-pane fade" id="tab-gallery" role="tabpanel">
+              <div id="gallery-error" class="alert alert-danger d-none" role="alert"></div>
+              <div class="drop-zone mb-3" id="gallery-drop-zone" tabindex="0">
+                <i class="bi bi-cloud-upload display-6 d-block mb-2"></i>
+                <p class="mb-1">تصاویر را اینجا بکشید و رها کنید یا کلیک کنید</p>
+                <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت — چند تصویر</p>
+                <input type="file" id="gallery-file-input" class="visually-hidden" accept="image/jpeg,image/png,image/webp" multiple>
+              </div>
+              <div id="gallery-upload-progress" class="progress mb-3 d-none" style="height: 6px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+              </div>
+              <div class="gallery-grid" id="gallery-grid"></div>
+              <p class="text-muted small mt-2" id="gallery-hint">حداقل یک تصویر اصلی الزامی است.</p>
+            </div>
+
+            <!-- Tab 3: SEO -->
+            <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="slug">شناسه URL (Slug) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="slug" name="slug" dir="ltr" required>
+                    <div class="form-text">به‌صورت خودکار از نام محصول ساخته می‌شود</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="metaTitle">عنوان SEO</label>
+                    <input type="text" class="form-control" id="metaTitle" name="metaTitle" maxlength="70">
+                    <div class="form-text"><span id="metaTitle-count">۰</span> / ۶۰ کاراکتر <span id="metaTitle-warn" class="text-warning d-none">— طول پیشنهادی ۳۰–۶۰</span></div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="mb-3">
+                    <label class="form-label" for="metaDescription">توضیحات SEO</label>
+                    <textarea class="form-control" id="metaDescription" name="metaDescription" rows="3" maxlength="320"></textarea>
+                    <div class="form-text"><span id="metaDescription-count">۰</span> / ۱۶۰ کاراکتر <span id="metaDescription-warn" class="text-warning d-none">— طول پیشنهادی ۱۲۰–۱۶۰</span></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="keywords">کلمات کلیدی</label>
+                    <input type="text" class="form-control" id="keywords" name="keywords" placeholder="با ویرگول جدا کنید">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="canonicalUrl">آدرس Canonical</label>
+                    <input type="url" class="form-control" id="canonicalUrl" name="canonicalUrl" dir="ltr" placeholder="https://...">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="ogTitle">عنوان Open Graph</label>
+                    <input type="text" class="form-control" id="ogTitle" name="ogTitle" maxlength="100">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="ogDescription">توضیحات Open Graph</label>
+                    <input type="text" class="form-control" id="ogDescription" name="ogDescription" maxlength="200">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="ogImageFile">تصویر Open Graph</label>
+                    <input type="file" class="form-control" id="ogImageFile" accept="image/jpeg,image/png,image/webp">
+                    <div id="og-image-preview" class="mt-2"></div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3 pt-2">
+                    <div class="form-check mb-2">
+                      <input class="form-check-input" type="checkbox" id="seoIndex" name="seoIndex" checked>
+                      <label class="form-check-label" for="seoIndex">Index — نمایش در موتور جست‌وجو</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="seoFollow" name="seoFollow" checked>
+                      <label class="form-check-label" for="seoFollow">Follow — دنبال‌کردن لینک‌ها</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="seo-preview mb-3">
+                    <div class="small text-muted mb-1">پیش‌نمایش گوگل</div>
+                    <div class="seo-title" id="seo-preview-title">عنوان محصول</div>
+                    <div class="seo-url" id="seo-preview-url">https://shop.example/product/slug</div>
+                    <div class="seo-desc" id="seo-preview-desc">توضیحات SEO محصول...</div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="seo-preview mb-3">
+                    <div class="small text-muted mb-1">پیش‌نمایش Open Graph</div>
+                    <div id="og-preview-image" class="bg-light rounded mb-2 text-center py-4 text-muted small">بدون تصویر</div>
+                    <div class="fw-semibold" id="og-preview-title">عنوان OG</div>
+                    <div class="text-muted small" id="og-preview-desc">توضیحات OG</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 4: System -->
+            <div class="tab-pane fade" id="tab-system" role="tabpanel">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">شناسه محصول</label>
+                  <input type="text" class="form-control" id="sys-id" readonly disabled>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">تاریخ ایجاد</label>
+                  <input type="text" class="form-control" id="sys-createdAt" readonly disabled>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">آخرین ویرایش</label>
+                  <input type="text" class="form-control" id="sys-updatedAt" readonly disabled>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">میانگین امتیاز</label>
+                  <input type="text" class="form-control" id="sys-rating" readonly disabled>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">تعداد نظرات تأییدشده</label>
+                  <input type="text" class="form-control" id="sys-reviewCount" readonly disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body border-top d-flex flex-wrap gap-2 justify-content-between">
+            <a href="products.html" class="btn btn-outline-secondary">انصراف</a>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-danger d-none" id="btn-deactivate">غیرفعال‌سازی</button>
+              <button type="button" class="btn btn-outline-danger d-none" id="btn-delete">حذف محصول</button>
+              <button type="submit" class="btn btn-primary" id="btn-submit">
+                <span class="submit-text">ذخیره محصول</span>
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/product-form.js"></script>
+</body>
+</html>

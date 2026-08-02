@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مشتریان — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="customers">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">مشتریان</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <h1>مدیریت مشتریان</h1>
+        <a href="customer-form.html" class="btn btn-primary"><i class="bi bi-person-plus"></i> مشتری جدید</a>
+      </div>
+
+      <form id="filter-form" class="filter-bar">
+        <div class="flex-grow-1" style="min-width:160px">
+          <label class="form-label" for="filter-name">نام / نام خانوادگی</label>
+          <input type="search" class="form-control form-control-sm" id="filter-name" name="name" placeholder="جستجو...">
+        </div>
+        <div style="min-width:140px">
+          <label class="form-label" for="filter-mobile">موبایل</label>
+          <input type="search" class="form-control form-control-sm" id="filter-mobile" name="mobile" placeholder="09...">
+        </div>
+        <div style="min-width:160px">
+          <label class="form-label" for="filter-email">ایمیل</label>
+          <input type="search" class="form-control form-control-sm" id="filter-email" name="email" placeholder="email@...">
+        </div>
+        <div style="min-width:130px">
+          <label class="form-label" for="filter-nationalId">کد ملی</label>
+          <input type="search" class="form-control form-control-sm" id="filter-nationalId" name="nationalId" placeholder="10 رقم">
+        </div>
+        <div style="min-width:120px">
+          <label class="form-label" for="filter-active">وضعیت</label>
+          <select class="form-select form-select-sm" id="filter-active" name="active">
+            <option value="">همه</option>
+            <option value="true">فعال</option>
+            <option value="false">غیرفعال</option>
+          </select>
+        </div>
+        <div style="min-width:140px">
+          <label class="form-label" for="filter-orders">سفارش</label>
+          <select class="form-select form-select-sm" id="filter-orders" name="hasOrders">
+            <option value="">همه</option>
+            <option value="yes">دارای سفارش</option>
+            <option value="no">بدون سفارش</option>
+          </select>
+        </div>
+        <div style="min-width:160px">
+          <label class="form-label" for="filter-sort">مرتب‌سازی</label>
+          <select class="form-select form-select-sm" id="filter-sort" name="sort">
+            <option value="createdAt-desc">جدیدترین عضویت</option>
+            <option value="createdAt-asc">قدیمی‌ترین عضویت</option>
+            <option value="orderCount-desc">بیشترین سفارش</option>
+            <option value="totalPurchase-desc">بیشترین خرید</option>
+            <option value="lastName-asc">نام (الفبا)</option>
+          </select>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> اعمال</button>
+          <button type="reset" class="btn btn-outline-secondary btn-sm" id="reset-filters">پاک کردن</button>
+        </div>
+      </form>
+
+      <div class="content-card">
+        <div class="table-responsive">
+          <table class="table admin-table mb-0">
+            <thead>
+              <tr>
+                <th>نام</th>
+                <th>نام کاربری</th>
+                <th>موبایل</th>
+                <th>ایمیل</th>
+                <th>کد ملی</th>
+                <th>سفارش‌ها</th>
+                <th>مجموع خرید</th>
+                <th>وضعیت</th>
+                <th>تاریخ عضویت</th>
+                <th class="no-print">عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="customers-body"></tbody>
+          </table>
+        </div>
+        <div class="card-body border-top">
+          <div class="pagination-wrapper">
+            <span class="text-muted small" id="pagination-info"></span>
+            <div id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/customers.js"></script>
+</body>
+</html>

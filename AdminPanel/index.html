@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="dashboard">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">داشبورد</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <!-- آمار کلی -->
+      <div class="row g-3 mb-4" id="stats-grid">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-value" data-stat="totalProducts">—</div>
+            <div class="stat-label">کل محصولات</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-check-circle"></i></div>
+            <div class="stat-value" data-stat="activeProducts">—</div>
+            <div class="stat-label">محصولات فعال</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon info"><i class="bi bi-tags"></i></div>
+            <div class="stat-value" data-stat="categories">—</div>
+            <div class="stat-label">دسته‌بندی‌ها</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-truck"></i></div>
+            <div class="stat-value" data-stat="suppliers">—</div>
+            <div class="stat-label">تأمین‌کنندگان</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon info"><i class="bi bi-people"></i></div>
+            <div class="stat-value" data-stat="customers">—</div>
+            <div class="stat-label">مشتریان</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-cart-check"></i></div>
+            <div class="stat-value" data-stat="orders">—</div>
+            <div class="stat-label">سفارش‌ها</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-calendar-day"></i></div>
+            <div class="stat-value" data-stat="todayOrders">—</div>
+            <div class="stat-label">سفارش امروز</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-currency-exchange"></i></div>
+            <div class="stat-value" data-stat="totalSales" style="font-size:1.25rem">—</div>
+            <div class="stat-label">فروش کل (تحویل‌شده)</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon warning"><i class="bi bi-chat-square-text"></i></div>
+            <div class="stat-value" data-stat="pendingReviews">—</div>
+            <div class="stat-label">نظرات در انتظار</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon warning"><i class="bi bi-exclamation-triangle"></i></div>
+            <div class="stat-value" data-stat="lowStock">—</div>
+            <div class="stat-label">موجودی کم</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon danger"><i class="bi bi-x-circle"></i></div>
+            <div class="stat-value" data-stat="outOfStock">—</div>
+            <div class="stat-label">ناموجود</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- دسترسی سریع -->
+      <div class="content-card mb-4">
+        <div class="card-header"><i class="bi bi-lightning-charge"></i> دسترسی سریع</div>
+        <div class="card-body">
+          <div class="d-flex flex-wrap gap-2" id="quick-actions">
+            <a href="products.html" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> محصول جدید</a>
+            <a href="orders.html" class="btn btn-outline-primary"><i class="bi bi-cart-check"></i> سفارش‌ها</a>
+            <a href="customers.html" class="btn btn-outline-primary"><i class="bi bi-person-plus"></i> مشتریان</a>
+            <a href="reviews.html" class="btn btn-outline-warning"><i class="bi bi-chat-dots"></i> بررسی نظرات</a>
+            <a href="reports.html" class="btn btn-outline-secondary"><i class="bi bi-bar-chart-line"></i> گزارش‌ها</a>
+            <a href="settings.html" class="btn btn-outline-secondary"><i class="bi bi-gear"></i> تنظیمات</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- نمودارها -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+          <div class="content-card h-100">
+            <div class="card-header"><i class="bi bi-bar-chart"></i> فروش ماهانه</div>
+            <div class="card-body">
+              <div class="chart-bar-container" id="monthly-sales-chart" aria-label="نمودار فروش ماهانه"></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="content-card h-100">
+            <div class="card-header"><i class="bi bi-pie-chart"></i> وضعیت سفارش‌ها</div>
+            <div class="card-body d-flex flex-column align-items-center">
+              <div id="order-status-donut" class="donut-chart mb-3"></div>
+              <div id="order-status-legend" class="w-100"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- جداول -->
+      <div class="row g-4">
+        <div class="col-xl-6">
+          <div class="content-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-clock-history"></i> آخرین سفارش‌ها</span>
+              <a href="orders.html" class="btn btn-sm btn-link">مشاهده همه</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table admin-table mb-0">
+                <thead>
+                  <tr>
+                    <th>شماره</th>
+                    <th>مشتری</th>
+                    <th>مبلغ</th>
+                    <th>وضعیت</th>
+                    <th>تاریخ</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-orders-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-6">
+          <div class="content-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-exclamation-triangle"></i> موجودی کم</span>
+              <a href="products.html" class="btn btn-sm btn-link">مشاهده همه</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table admin-table mb-0">
+                <thead>
+                  <tr>
+                    <th>محصول</th>
+                    <th>موجودی</th>
+                    <th>حداقل</th>
+                    <th>وضعیت</th>
+                  </tr>
+                </thead>
+                <tbody id="low-stock-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="content-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-chat-square-text"></i> نظرات در انتظار تأیید</span>
+              <a href="reviews.html" class="btn btn-sm btn-link">مشاهده همه</a>
+            </div>
+            <div class="table-responsive">
+              <table class="table admin-table mb-0">
+                <thead>
+                  <tr>
+                    <th>محصول</th>
+                    <th>مشتری</th>
+                    <th>امتیاز</th>
+                    <th>عنوان</th>
+                    <th>تاریخ</th>
+                  </tr>
+                </thead>
+                <tbody id="pending-reviews-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

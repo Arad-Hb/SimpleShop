@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سفارش‌ها | SimpleShop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">SimpleShop</a>
+            <div class="nav-links">
+                <a href="/">محصولات</a>
+                <a href="/cart.html">سبد خرید</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="container">
+            <h1 class="page-title">سفارش‌های من</h1>
+            <div id="orders"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!Auth.isCustomer()) { window.location.href = '/login.html'; return; }
+            loadOrders();
+        });
+
+        async function loadOrders() {
+            const orders = await api('/orders/my');
+            const container = document.getElementById('orders');
+
+            if (!orders.length) {
+                container.innerHTML = '<div class="card"><p>هنوز سفارشی ثبت نکرده‌اید.</p></div>';
+                return;
+            }
+
+            container.innerHTML = orders.map(o => `
+                <div class="card" style="margin-bottom:1rem">
+                    <div style="display:flex;justify-content:space-between;margin-bottom:.8rem">
+                        <strong>سفارش #${o.id}</strong>
+                        <span class="badge badge-${o.status.toLowerCase()}">${o.status}</span>
+                    </div>
+                    <p style="color:var(--muted);font-size:.9rem">${formatDate(o.orderDate)}</p>
+                    <p>مبلغ: <strong>${formatPrice(o.totalAmount)}</strong></p>
+                    <table style="margin-top:.8rem">
+                        <thead><tr><th>محصول</th><th>تعداد</th><th>قیمت</th></tr></thead>
+                        <tbody>${o.items.map(i => `
+                            <tr><td>${i.productName}</td><td>${i.quantity}</td><td>${formatPrice(i.unitPrice)}</td></tr>
+                        `).join('')}</tbody>
+                    </table>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

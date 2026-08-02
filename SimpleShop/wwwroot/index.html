@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه ساده | SimpleShop</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">SimpleShop</a>
+            <div class="nav-links">
+                <a href="/">محصولات</a>
+                <a href="/cart.html" id="nav-cart" style="display:none">سبد خرید</a>
+                <a href="/orders.html" id="nav-orders" style="display:none">سفارش‌ها</a>
+                <a href="/admin/" id="nav-admin" style="display:none">پنل مدیریت</a>
+                <a href="/login.html" id="nav-login">ورود</a>
+                <a href="/register.html" id="nav-register">ثبت‌نام</a>
+                <span id="nav-user" style="display:none"></span>
+                <a href="#" onclick="Auth.logout(); return false;" id="nav-logout" style="display:none">خروج</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page">
+        <div class="container">
+            <div id="alert-box" class="alert"></div>
+            <h1 class="page-title">محصولات</h1>
+
+            <div class="filters card">
+                <div class="form-group">
+                    <label>جست‌وجو</label>
+                    <input type="text" id="search" class="form-control" placeholder="نام محصول...">
+                </div>
+                <div class="form-group">
+                    <label>دسته‌بندی</label>
+                    <select id="category" class="form-control">
+                        <option value="">همه</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>حداقل قیمت</label>
+                    <input type="number" id="minPrice" class="form-control" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>حداکثر قیمت</label>
+                    <input type="number" id="maxPrice" class="form-control" placeholder="∞">
+                </div>
+                <div class="form-group">
+                    <label>مرتب‌سازی</label>
+                    <select id="sortBy" class="form-control">
+                        <option value="name">نام</option>
+                        <option value="price">قیمت</option>
+                        <option value="stock">موجودی</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ترتیب</label>
+                    <select id="sortDir" class="form-control">
+                        <option value="asc">صعودی</option>
+                        <option value="desc">نزولی</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="loadProducts()">اعمال فیلتر</button>
+            </div>
+
+            <div id="products" class="grid"></div>
+            <div id="pagination" class="pagination"></div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+    <script>
+        let currentPage = 1;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateNavLinks();
+            loadCategories();
+            loadProducts();
+        });
+
+        function updateNavLinks() {
+            const user = Auth.getUser();
+            if (user) {
+                document.getElementById('nav-logout').style.display = 'inline';
+                document.getElementById('nav-login').style.display = 'none';
+                document.getElementById('nav-register').style.display = 'none';
+            }
+        }
+
+        async function loadCategories() {
+            const cats = await api('/categories');
+            const sel = document.getElementById('category');
+            cats.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                sel.appendChild(opt);
+            });
+        }
+
+        async function loadProducts(page = 1) {
+            currentPage = page;
+            const params = new URLSearchParams({
+                page,
+                pageSize: 12,
+                search: document.getElementById('search').value,
+                categoryId: document.getElementById('category').value,
+                minPrice: document.getElementById('minPrice').value,
+                maxPrice: document.getElementById('maxPrice').value,
+                sortBy: document.getElementById('sortBy').value,
+                sortDir: document.getElementById('sortDir').value
+            });
+
+            Object.keys(Object.fromEntries(params)).forEach(k => {
+                if (!params.get(k)) params.delete(k);
+            });
+
+            const result = await api('/products?' + params);
+            const container = document.getElementById('products');
+            container.innerHTML = '';
+
+            if (!result.items.length) {
+                container.innerHTML = '<p>محصولی یافت نشد.</p>';
+                return;
+            }
+
+            result.items.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'card product-card';
+                card.innerHTML = `
+                    <h3>${p.name}</h3>
+                    <p class="category">${p.categoryName}</p>
+                    <p class="price">${formatPrice(p.price)}</p>
+                    <p class="stock">موجودی: ${p.stock}</p>
+                    <p style="font-size:.85rem;color:var(--muted);margin:.5rem 0">${p.description || ''}</p>
+                    ${Auth.isCustomer() && p.stock > 0
+                        ? `<button class="btn btn-primary btn-sm" onclick="addToCart(${p.id})">افزودن به سبد</button>`
+                        : p.stock === 0 ? '<span style="color:var(--danger)">ناموجود</span>' : ''}
+                `;
+                container.appendChild(card);
+            });
+
+            renderPagination(result);
+        }
+
+        function renderPagination(result) {
+            const el = document.getElementById('pagination');
+            el.innerHTML = '';
+            for (let i = 1; i <= result.totalPages; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'btn ' + (i === result.page ? 'btn-primary' : 'btn-outline');
+                btn.textContent = i;
+                btn.onclick = () => loadProducts(i);
+                el.appendChild(btn);
+            }
+        }
+
+        async function addToCart(productId) {
+            try {
+                await api('/cart', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
+                showAlert('محصول به سبد خرید اضافه شد.', 'success');
+            } catch (e) {
+                showAlert(e.message, 'danger');
+            }
+        }
+    </script>
+</body>
+</html>
