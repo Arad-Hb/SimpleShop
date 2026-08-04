@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+  }
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>فرم محصول — پنل تأمین‌کننده</title>
@@ -18,14 +26,24 @@
   </aside>
   <div class="admin-main">
     <header class="admin-header">
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+  }
+})();
+</script>
       <div class="d-flex align-items-center gap-3">
-        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <button type="button" class="btn btn-link sidebar-toggle-btn" data-sidebar-toggle aria-label="منو"><i class="bi bi-layout-sidebar-reverse"></i></button>
         <h2 class="header-title" id="form-title">محصول</h2>
       </div>
       <div class="header-actions"><span class="text-muted small" data-supplier-name></span></div>
     </header>
     <main class="admin-content">
-      <nav class="breadcrumb-nav"><ol class="breadcrumb mb-0" data-breadcrumb></ol></nav>
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
 
       <div class="content-card">
         <div class="card-header" id="form-title-header">اطلاعات محصول</div>

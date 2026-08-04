@@ -3,7 +3,7 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     if (ShopSupplier.auth.isAuthenticated()) {
-      window.location.href = 'index.html';
+      window.location.href = './';
       return;
     }
 
@@ -18,8 +18,13 @@
     toggleBtn?.addEventListener('click', () => {
       const show = passwordInput.type === 'password';
       passwordInput.type = show ? 'text' : 'password';
-      toggleIcon.className = show ? 'bi bi-eye-slash' : 'bi bi-eye';
+      toggleIcon.className = show ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill';
       toggleBtn.setAttribute('aria-pressed', String(show));
+    });
+
+    document.querySelector('.login-forgot')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      ShopSupplier.ui?.showToast?.('info', 'بازیابی رمز عبور در نسخه دمو فعال نیست.');
     });
 
     form?.addEventListener('submit', (e) => {
@@ -34,7 +39,7 @@
         errorBox.classList.remove('d-none');
         return;
       }
-      window.location.href = 'index.html';
+      window.location.href = './';
     });
   });
 })(window.ShopSupplier = window.ShopSupplier || {});

@@ -2,22 +2,31 @@
   'use strict';
 
   const { escapeHtml, generateId, formatDate } = ShopSupplier.utils;
+  const PAGE_SIZE = 8;
+  let currentPage = 1;
 
   const render = () => {
     const brands = ShopSupplier.storage.getBrands();
     const products = ShopSupplier.storage.getProducts();
     const tbody = document.getElementById('brands-body');
     const empty = document.getElementById('brands-empty');
+    const infoEl = document.getElementById('pagination-info');
+    const paginationEl = document.getElementById('pagination');
     if (!tbody) return;
 
     if (!brands.length) {
       tbody.innerHTML = '';
       empty?.classList.remove('d-none');
+      if (infoEl) infoEl.textContent = '';
+      if (paginationEl) paginationEl.innerHTML = '';
       return;
     }
     empty?.classList.add('d-none');
 
-    tbody.innerHTML = brands.map((b) => {
+    const result = ShopSupplier.ui.paginate(brands, currentPage, PAGE_SIZE);
+    currentPage = result.page;
+
+    tbody.innerHTML = result.items.map((b) => {
       const count = products.filter((p) => p.brandId === b.id).length;
       return `
         <tr>
@@ -25,16 +34,29 @@
           <td>${escapeHtml(b.description || '—')}</td>
           <td><span class="supplier-badge"><i class="bi bi-box"></i> ${count.toLocaleString('fa-IR')} محصول</span></td>
           <td>${formatDate(b.createdAt)}</td>
-          <td class="text-nowrap">
-            <button type="button" class="btn btn-sm btn-outline-primary" data-edit="${escapeHtml(b.id)}">
-              <i class="bi bi-pencil"></i>
-            </button>
-            <button type="button" class="btn btn-sm btn-outline-danger" data-delete="${escapeHtml(b.id)}">
-              <i class="bi bi-trash"></i>
-            </button>
+          <td class="text-center col-actions">
+            <div class="table-actions">
+              <button type="button" class="btn btn-sm btn-outline-primary" data-edit="${escapeHtml(b.id)}" title="ویرایش">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger" data-delete="${escapeHtml(b.id)}" title="حذف">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
         </tr>`;
     }).join('');
+
+    if (infoEl) {
+      const from = result.totalItems ? (result.page - 1) * result.pageSize + 1 : 0;
+      const to = Math.min(result.page * result.pageSize, result.totalItems);
+      infoEl.textContent = `نمایش ${from.toLocaleString('fa-IR')} تا ${to.toLocaleString('fa-IR')} از ${result.totalItems.toLocaleString('fa-IR')} مورد`;
+    }
+
+    ShopSupplier.ui.renderPagination(paginationEl, result.page, result.totalPages, (page) => {
+      currentPage = page;
+      render();
+    });
   };
 
   const resetForm = () => {
@@ -49,7 +71,7 @@
     if (!ShopSupplier.auth.requireAuth()) return;
 
     ShopSupplier.ui.initBreadcrumb([
-      { label: 'خانه', href: 'index.html' },
+      { label: 'داشبورد', href: 'index.html' },
       { label: 'برندهای من' }
     ]);
 
@@ -70,7 +92,6 @@
         description: document.getElementById('brand-description').value.trim(),
         createdAt: existing?.createdAt || new Date().toISOString()
       });
-      // sync brandName on products
       const data = ShopSupplier.storage.getData();
       data.products = (data.products || []).map((p) =>
         p.brandId === id ? { ...p, brandName: name } : p
@@ -79,6 +100,7 @@
 
       ShopSupplier.ui.showToast('success', 'برند ذخیره شد.');
       resetForm();
+      currentPage = 1;
       render();
     });
 
@@ -94,18 +116,22 @@
         document.getElementById('brand-description').value = brand.description || '';
         document.getElementById('brand-form-title').textContent = 'ویرایش برند';
         document.getElementById('btn-cancel-edit')?.classList.remove('d-none');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        document.querySelector('.admin-main')?.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       const delBtn = e.target.closest('[data-delete]');
       if (delBtn) {
-        if (confirm('حذف برند؟ محصولات مرتبط بدون برند می‌مانند.')) {
-          ShopSupplier.storage.deleteBrand(delBtn.dataset.delete);
-          ShopSupplier.ui.showToast('success', 'برند حذف شد.');
-          resetForm();
-          render();
-        }
+        ShopSupplier.ui.showConfirmModal(
+          'حذف برند',
+          'حذف برند؟ محصولات مرتبط بدون برند می‌مانند.',
+          () => {
+            ShopSupplier.storage.deleteBrand(delBtn.dataset.delete);
+            ShopSupplier.ui.showToast('success', 'برند حذف شد.');
+            resetForm();
+            render();
+          }
+        );
       }
     });
   });

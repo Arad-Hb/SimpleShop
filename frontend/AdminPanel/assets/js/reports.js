@@ -136,27 +136,51 @@
   let monthPlaceCleanup = null;
   let monthPanelHost = null;
 
+  let monthCloseTimer = null;
+  const MONTH_ANIM_MS = 220;
+
   const closeMonthDropdown = () => {
     const root = document.getElementById('persian-month-select');
     const panel = document.getElementById('filter-month-panel');
     const trigger = document.getElementById('filter-month-trigger');
     if (root) root.classList.remove('is-open');
-    if (panel) {
-      panel.hidden = true;
-      panel.style.left = '';
-      panel.style.top = '';
-      panel.style.width = '';
-      panel.style.maxWidth = '';
-      // Return panel to its original host so markup stays intact
-      if (monthPanelHost && panel.parentElement !== monthPanelHost) {
-        monthPanelHost.appendChild(panel);
-      }
-    }
     if (trigger) trigger.setAttribute('aria-expanded', 'false');
     if (monthPlaceCleanup) {
       monthPlaceCleanup();
       monthPlaceCleanup = null;
     }
+    if (!panel) return;
+
+    const finish = () => {
+      panel.classList.remove('is-open', 'is-leaving');
+      panel.hidden = true;
+      panel.style.left = '';
+      panel.style.top = '';
+      panel.style.width = '';
+      panel.style.maxWidth = '';
+      if (monthPanelHost && panel.parentElement !== monthPanelHost) {
+        monthPanelHost.appendChild(panel);
+      }
+      monthCloseTimer = null;
+    };
+
+    if (monthCloseTimer) {
+      clearTimeout(monthCloseTimer);
+      monthCloseTimer = null;
+    }
+
+    const reduceMotion =
+      typeof window.matchMedia === 'function' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (panel.hidden || reduceMotion) {
+      finish();
+      return;
+    }
+
+    panel.classList.remove('is-open');
+    panel.classList.add('is-leaving');
+    monthCloseTimer = window.setTimeout(finish, MONTH_ANIM_MS);
   };
 
   const placeMonthPanel = () => {
@@ -196,6 +220,10 @@
     if (ShopAdmin.ui && typeof ShopAdmin.ui.notifyOverlayOpen === 'function') {
       ShopAdmin.ui.notifyOverlayOpen('persian-month-select');
     }
+    if (monthCloseTimer) {
+      clearTimeout(monthCloseTimer);
+      monthCloseTimer = null;
+    }
     if (!monthPanelHost) monthPanelHost = panel.parentElement;
     // Portal to body so ancestors cannot clip the panel
     if (panel.parentElement !== document.body) {
@@ -203,6 +231,10 @@
     }
     root?.classList.add('is-open');
     panel.hidden = false;
+    panel.classList.remove('is-leaving');
+    panel.classList.remove('is-open');
+    void panel.offsetWidth;
+    requestAnimationFrame(() => panel.classList.add('is-open'));
     trigger.setAttribute('aria-expanded', 'true');
     placeMonthPanel();
     if (monthPlaceCleanup) monthPlaceCleanup();
@@ -1060,9 +1092,9 @@
     monthTrigger?.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      const willOpen = Boolean(monthPanel?.hidden);
-      if (willOpen) openMonthDropdown();
-      else closeMonthDropdown();
+      const isOpen = Boolean(monthRoot?.classList.contains('is-open'));
+      if (isOpen) closeMonthDropdown();
+      else openMonthDropdown();
     });
 
     monthList?.addEventListener('click', (e) => {

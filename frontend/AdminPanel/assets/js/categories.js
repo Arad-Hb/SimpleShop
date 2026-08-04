@@ -374,11 +374,9 @@
   const init = () => {
     if (!ShopAdmin.auth.requireAuth()) return;
 
-    const page = window.location.pathname.split('/').pop() || '';
-
-    if (page === 'category-form.html') {
+    if (document.getElementById('category-form')) {
       initCategoryForm();
-    } else if (page === 'categories.html') {
+    } else if (document.getElementById('categories-table') || document.getElementById('categories-tbody')) {
       initCategoriesList();
     }
   };

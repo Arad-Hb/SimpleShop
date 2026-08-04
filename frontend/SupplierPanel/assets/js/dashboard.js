@@ -7,8 +7,7 @@
     if (!ShopSupplier.auth.requireAuth()) return;
 
     ShopSupplier.ui.initBreadcrumb([
-      { label: 'خانه', href: 'index.html' },
-      { label: 'داشبورد' }
+      { label: 'داشبورد', href: 'index.html' }
     ]);
 
     const s = ShopSupplier.storage.stats();

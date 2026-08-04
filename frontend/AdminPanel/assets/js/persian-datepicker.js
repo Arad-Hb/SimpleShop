@@ -135,6 +135,8 @@
 
   let openPicker = null;
   let placeCleanup = null;
+  let closeTimer = null;
+  const CLOSE_ANIM_MS = 180;
 
   const clearPlaceListeners = () => {
     if (typeof placeCleanup === 'function') {
@@ -143,12 +145,35 @@
     }
   };
 
-  const closeOpenPicker = () => {
+  const prefersReducedMotion = () =>
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const getDatepickerWidth = () => {
+    const vw = window.innerWidth || 1200;
+    if (vw < 380) return Math.min(188, vw - 12);
+    if (vw < 576) return 204;
+    return 228;
+  };
+
+  const closeOpenPicker = (immediate = false) => {
     clearPlaceListeners();
-    if (openPicker) {
-      openPicker.remove();
-      openPicker = null;
+    if (closeTimer) {
+      clearTimeout(closeTimer);
+      closeTimer = null;
     }
+    if (!openPicker) return;
+    const panel = openPicker;
+    openPicker = null;
+    if (immediate || prefersReducedMotion()) {
+      panel.remove();
+      return;
+    }
+    panel.classList.add('is-leaving');
+    closeTimer = window.setTimeout(() => {
+      panel.remove();
+      closeTimer = null;
+    }, CLOSE_ANIM_MS);
   };
 
   const DATEPICKER_OVERLAY_ID = 'persian-datepicker';
@@ -166,13 +191,13 @@
     }
   };
 
-  const placeFixedPanel = (panel, anchorEl, { width = 280, gap = 6 } = {}) => {
+  const placeFixedPanel = (panel, anchorEl, { width = 228, gap = 6 } = {}) => {
     if (!panel || !anchorEl) return;
     const margin = 8;
     const rect = anchorEl.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const maxW = Math.min(width, Math.max(180, vw - margin * 2));
+    const maxW = Math.min(width, Math.max(168, vw - margin * 2));
     panel.style.position = 'fixed';
     panel.style.width = `${maxW}px`;
     panel.style.maxWidth = `${maxW}px`;
@@ -235,7 +260,7 @@
   };
 
   const renderCalendar = (root, viewJy, viewJm) => {
-    closeOpenPicker();
+    closeOpenPicker(true);
 
     const display = root.querySelector('.persian-datepicker__display');
     const panel = document.createElement('div');
@@ -373,7 +398,7 @@
     openPicker = panel;
     openPicker._root = root;
 
-    const place = () => placeFixedPanel(panel, display || root, { width: 300, gap: 8 });
+    const place = () => placeFixedPanel(panel, display || root, { width: getDatepickerWidth(), gap: 6 });
     place();
     bindPlaceOnViewport(place);
   };

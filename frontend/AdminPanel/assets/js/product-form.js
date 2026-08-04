@@ -628,4 +628,4 @@
   };
 
   document.addEventListener('DOMContentLoaded', init);
-})(window.ShopAdmin);
+})(window.ShopAdmin = window.ShopAdmin || {});

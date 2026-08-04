@@ -464,11 +464,9 @@
   const init = () => {
     if (!ShopAdmin.auth.requireAuth()) return;
 
-    const page = window.location.pathname.split('/').pop() || '';
-
-    if (page === 'supplier-form.html') {
+    if (document.getElementById('supplier-form')) {
       initSupplierForm();
-    } else if (page === 'suppliers.html') {
+    } else if (document.getElementById('suppliers-table') || document.getElementById('suppliers-tbody')) {
       initSuppliersList();
     }
   };

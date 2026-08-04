@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+  }
+})();
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>سبدهای خرید — پنل مدیریت فروشگاه</title>

@@ -1,4 +1,5 @@
-/* SupplierPanel extras on top of Cobalt admin.css */
+/* SupplierPanel extras on top of shared admin.css */
+
 .supplier-badge {
   display: inline-flex;
   align-items: center;
@@ -46,7 +47,7 @@
   min-width: 2.5rem;
   text-align: center;
   font-weight: 800;
-  color: var(--text);
+  color: var(--sidebar-bg);
   font-variant-numeric: tabular-nums;
 }
 
@@ -68,8 +69,27 @@
   border: 1px solid var(--line);
   font-size: 0.85rem;
   font-weight: 600;
+  color: var(--sidebar-bg);
 }
 
-.login-page .login-brand i {
-  background: linear-gradient(145deg, var(--secondary), var(--primary));
+/* Supplier products table — keep stock stepper readable */
+.admin-table .table-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.admin-table .col-actions {
+  width: 108px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.settings-page .stat-card .stat-value {
+  color: var(--sidebar-bg);
+}
+
+.settings-panel[hidden] {
+  display: none !important;
 }

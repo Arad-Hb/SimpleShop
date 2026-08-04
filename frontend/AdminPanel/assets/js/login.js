@@ -6,7 +6,7 @@
 
   const initLogin = () => {
     if (ShopAdmin.auth.isAuthenticated()) {
-      window.location.href = 'index.html';
+      window.location.href = './';
       return;
     }
 
@@ -26,10 +26,15 @@
         toggleBtn.setAttribute('aria-pressed', String(isHidden));
         toggleBtn.setAttribute('aria-label', isHidden ? 'پنهان کردن رمز عبور' : 'نمایش رمز عبور');
         if (toggleIcon) {
-          toggleIcon.className = isHidden ? 'bi bi-eye-slash' : 'bi bi-eye';
+          toggleIcon.className = isHidden ? 'bi bi-eye-slash-fill' : 'bi bi-eye-fill';
         }
       });
     }
+
+    document.querySelector('.login-forgot')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      ShopAdmin.ui?.showToast?.('info', 'بازیابی رمز عبور در نسخه دمو فعال نیست.');
+    });
 
     if (!form) return;
 
@@ -63,7 +68,7 @@
       const result = ShopAdmin.auth.login(username, password, rememberMe);
 
       if (result.success) {
-        window.location.href = 'index.html';
+        window.location.href = './';
         return;
       }
 

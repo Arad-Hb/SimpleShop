@@ -5,9 +5,24 @@
     if (!ShopSupplier.auth.requireAuth()) return;
 
     ShopSupplier.ui.initBreadcrumb([
-      { label: 'خانه', href: 'index.html' },
+      { label: 'داشبورد', href: 'index.html' },
       { label: 'پروفایل تأمین‌کننده' }
     ]);
+
+    const switchPanel = (panelId) => {
+      document.querySelectorAll('[data-profile-panel]').forEach((btn) => {
+        btn.classList.toggle('is-active', btn.getAttribute('data-profile-panel') === panelId);
+      });
+      document.querySelectorAll('[data-profile-content]').forEach((panel) => {
+        const match = panel.getAttribute('data-profile-content') === panelId;
+        panel.hidden = !match;
+        panel.classList.toggle('is-active', match);
+      });
+    };
+    document.querySelectorAll('[data-profile-panel]').forEach((btn) => {
+      btn.addEventListener('click', () => switchPanel(btn.getAttribute('data-profile-panel')));
+    });
+    switchPanel('general');
 
     const profile = ShopSupplier.storage.getProfile() || {};
     const stats = ShopSupplier.storage.stats();

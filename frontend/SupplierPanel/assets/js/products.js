@@ -2,6 +2,8 @@
   'use strict';
 
   const { escapeHtml, formatPrice } = ShopSupplier.utils;
+  const PAGE_SIZE = 8;
+  let currentPage = 1;
 
   const stockBadge = (p) => {
     if (!p.stock || p.stock <= 0) return '<span class="badge badge-stock-out">ناموجود</span>';
@@ -9,7 +11,7 @@
     return '<span class="badge badge-stock-available">موجود</span>';
   };
 
-  const renderTable = () => {
+  const filteredProducts = () => {
     const q = (document.getElementById('search')?.value || '').trim().toLowerCase();
     const brandFilter = document.getElementById('filter-brand')?.value || '';
     const statusFilter = document.getElementById('filter-status')?.value || '';
@@ -27,19 +29,30 @@
       products = products.filter((p) => p.stock > 0 && p.stock <= (p.lowStockThreshold || 5));
     }
     if (statusFilter === 'out') products = products.filter((p) => !p.stock || p.stock <= 0);
+    return products;
+  };
 
+  const renderTable = () => {
+    const products = filteredProducts();
     const tbody = document.getElementById('products-body');
     const empty = document.getElementById('products-empty');
+    const infoEl = document.getElementById('pagination-info');
+    const paginationEl = document.getElementById('pagination');
     if (!tbody) return;
 
     if (!products.length) {
       tbody.innerHTML = '';
       empty?.classList.remove('d-none');
+      if (infoEl) infoEl.textContent = '';
+      if (paginationEl) paginationEl.innerHTML = '';
       return;
     }
     empty?.classList.add('d-none');
 
-    tbody.innerHTML = products.map((p) => `
+    const result = ShopSupplier.ui.paginate(products, currentPage, PAGE_SIZE);
+    currentPage = result.page;
+
+    tbody.innerHTML = result.items.map((p) => `
       <tr data-id="${escapeHtml(p.id)}">
         <td>
           <div class="fw-semibold">${escapeHtml(p.name)}</div>
@@ -60,16 +73,29 @@
             ${p.isActive !== false ? 'فعال' : 'غیرفعال'}
           </span>
         </td>
-        <td class="text-nowrap">
-          <a href="product-form.html?id=${encodeURIComponent(p.id)}" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-pencil"></i>
-          </a>
-          <button type="button" class="btn btn-sm btn-outline-danger" data-delete="${escapeHtml(p.id)}">
-            <i class="bi bi-trash"></i>
-          </button>
+        <td class="text-center col-actions">
+          <div class="table-actions">
+            <a href="product-form.html?id=${encodeURIComponent(p.id)}" class="btn btn-sm btn-outline-primary" title="ویرایش">
+              <i class="bi bi-pencil"></i>
+            </a>
+            <button type="button" class="btn btn-sm btn-outline-danger" data-delete="${escapeHtml(p.id)}" title="حذف">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
         </td>
       </tr>
     `).join('');
+
+    if (infoEl) {
+      const from = result.totalItems ? (result.page - 1) * result.pageSize + 1 : 0;
+      const to = Math.min(result.page * result.pageSize, result.totalItems);
+      infoEl.textContent = `نمایش ${from.toLocaleString('fa-IR')} تا ${to.toLocaleString('fa-IR')} از ${result.totalItems.toLocaleString('fa-IR')} مورد`;
+    }
+
+    ShopSupplier.ui.renderPagination(paginationEl, result.page, result.totalPages, (page) => {
+      currentPage = page;
+      renderTable();
+    });
   };
 
   const fillBrandFilter = () => {
@@ -84,21 +110,26 @@
     if (!ShopSupplier.auth.requireAuth()) return;
 
     ShopSupplier.ui.initBreadcrumb([
-      { label: 'خانه', href: 'index.html' },
+      { label: 'داشبورد', href: 'index.html' },
       { label: 'محصولات من' }
     ]);
 
     fillBrandFilter();
+    ShopSupplier.ui.enhanceFormSelects(document);
     renderTable();
 
     document.getElementById('filter-form')?.addEventListener('submit', (e) => {
       e.preventDefault();
+      currentPage = 1;
       renderTable();
     });
     document.getElementById('btn-reset')?.addEventListener('click', () => {
       document.getElementById('search').value = '';
       document.getElementById('filter-brand').value = '';
       document.getElementById('filter-status').value = '';
+      document.getElementById('filter-brand')?.dispatchEvent(new Event('change', { bubbles: true }));
+      document.getElementById('filter-status')?.dispatchEvent(new Event('change', { bubbles: true }));
+      currentPage = 1;
       renderTable();
     });
 
@@ -119,11 +150,15 @@
       const delBtn = e.target.closest('[data-delete]');
       if (delBtn) {
         const id = delBtn.dataset.delete;
-        if (confirm('این محصول حذف شود؟')) {
-          ShopSupplier.storage.deleteProduct(id);
-          ShopSupplier.ui.showToast('success', 'محصول حذف شد.');
-          renderTable();
-        }
+        ShopSupplier.ui.showConfirmModal(
+          'حذف محصول',
+          'این محصول حذف شود؟ این کار قابل بازگشت نیست.',
+          () => {
+            ShopSupplier.storage.deleteProduct(id);
+            ShopSupplier.ui.showToast('success', 'محصول حذف شد.');
+            renderTable();
+          }
+        );
       }
     });
   });

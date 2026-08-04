@@ -10,7 +10,7 @@
     if (!ShopSupplier.auth.requireAuth()) return;
 
     ShopSupplier.ui.initBreadcrumb([
-      { label: 'خانه', href: 'index.html' },
+      { label: 'داشبورد', href: 'index.html' },
       { label: 'محصولات من', href: 'products.html' },
       { label: editId ? 'ویرایش محصول' : 'محصول جدید' }
     ]);
@@ -19,6 +19,7 @@
     const brands = ShopSupplier.storage.getBrands();
     brandSelect.innerHTML = '<option value="">انتخاب برند</option>' +
       brands.map((b) => `<option value="${b.id}">${b.name}</option>`).join('');
+    ShopSupplier.ui.enhanceFormSelects(document);
 
     const title = document.getElementById('form-title');
     if (editId) {

@@ -58,8 +58,13 @@
 
   const requireAuth = (loginPage = 'login.html') => {
     if (isAuthenticated()) return true;
-    const current = window.location.pathname.split('/').pop() || 'index.html';
-    if (current !== loginPage) window.location.href = loginPage;
+    const current = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
+    const loginNames = new Set([
+      loginPage.toLowerCase(),
+      loginPage.replace(/\.html$/i, '').toLowerCase(),
+      'login'
+    ]);
+    if (!loginNames.has(current)) window.location.href = loginPage;
     return false;
   };
 

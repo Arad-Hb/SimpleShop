@@ -31,6 +31,17 @@
       const profile = ShopSupplier.storage.getProfile();
       userEl.textContent = profile?.contactPerson || 'تأمین‌کننده';
     }
+
+    if (typeof ShopSupplier.ui.enhanceFormSelects === 'function') {
+      ShopSupplier.ui.enhanceFormSelects(document);
+      setTimeout(() => ShopSupplier.ui.enhanceFormSelects(document), 0);
+    }
+
+    document.querySelectorAll('.modal').forEach((modal) => {
+      if (typeof ShopSupplier.ui.enhanceAdminModal === 'function') {
+        ShopSupplier.ui.enhanceAdminModal(modal);
+      }
+    });
   };
 
   document.addEventListener('DOMContentLoaded', initApp);
