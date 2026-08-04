@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SimpleShop — فروشگاه اینترنتی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="store.css">
+</head>
+<body>
+  <div id="store-header"></div>
+
+  <main>
+    <section class="section-block hero-section">
+      <div class="container-xxl">
+        <div class="hero-grid">
+          <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+            </div>
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <div class="hero-slide slide-a">
+                  <div class="hero-copy">
+                    <span class="eyebrow">فصل جدید</span>
+                    <h1>تجربه خرید هوشمند</h1>
+                    <p>هزاران محصول اصل با ارسال سریع و ضمانت بازگشت</p>
+                    <a href="category.html?tag=amazing" class="btn btn-light btn-lg">مشاهده شگفت‌انگیزها</a>
+                  </div>
+                </div>
+              </div>
+              <div class="carousel-item">
+                <div class="hero-slide slide-b">
+                  <div class="hero-copy">
+                    <span class="eyebrow offer-tag tag-sale">تخفیف ویژه</span>
+                    <h1>تا ۵۰٪ روی لوازم خانگی</h1>
+                    <p>فرصت محدود برای پرطرفدارترین برندها</p>
+                    <a href="category.html?id=home" class="btn btn-light btn-lg">خرید کنید</a>
+                  </div>
+                </div>
+              </div>
+              <div class="carousel-item">
+                <div class="hero-slide slide-c">
+                  <div class="hero-copy">
+                    <span class="eyebrow">کالای دیجیتال</span>
+                    <h1>گوشی‌ها و گجت‌های روز</h1>
+                    <p>جدیدترین مدل‌ها با قیمت رقابتی</p>
+                    <a href="category.html?id=digital" class="btn btn-light btn-lg">کاوش کنید</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon"></span>
+            </button>
+          </div>
+
+          <aside class="hero-side-ads">
+            <a href="category.html?tag=amazing" class="side-ad ad-1">
+              <span class="offer-tag tag-amazing">پیشنهاد شگفت‌انگیز</span>
+              <strong>فقط تا پایان امروز</strong>
+            </a>
+            <a href="category.html?tag=special" class="side-ad ad-2">
+              <span class="offer-tag tag-special">پیشنهاد ویژه</span>
+              <strong>امتیاز بگیرید، جایزه ببرید</strong>
+            </a>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="container-xxl">
+        <div class="cat-strip">
+          <a href="category.html?id=digital" class="cat-chip"><i class="bi bi-phone"></i><span>دیجیتال</span></a>
+          <a href="search.html?q=لپ‌تاپ" class="cat-chip"><i class="bi bi-laptop"></i><span>لپ‌تاپ</span></a>
+          <a href="search.html?q=هدفون" class="cat-chip"><i class="bi bi-headphones"></i><span>هدفون</span></a>
+          <a href="category.html?id=home" class="cat-chip"><i class="bi bi-house-heart"></i><span>خانه</span></a>
+          <a href="category.html?id=beauty" class="cat-chip"><i class="bi bi-balloon-heart"></i><span>زیبایی</span></a>
+          <a href="category.html?id=sport" class="cat-chip"><i class="bi bi-bicycle"></i><span>ورزش</span></a>
+          <a href="category.html?id=gaming" class="cat-chip"><i class="bi bi-controller"></i><span>گیمینگ</span></a>
+          <a href="category.html?id=fashion" class="cat-chip"><i class="bi bi-handbag"></i><span>مد</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="container-xxl">
+        <div class="deals-band">
+          <div class="deals-head">
+            <div>
+              <h2><i class="bi bi-lightning-charge-fill"></i> پیشنهادهای شگفت‌انگیز</h2>
+              <p>فرصت محدود — رنگ قرمز/نارنجی یعنی پیشنهاد داغ</p>
+            </div>
+            <div class="deal-timer" id="deal-timer">
+              <span>۱۲</span>:<span>۴۵</span>:<span>۳۳</span>
+            </div>
+            <a href="category.html?tag=amazing" class="see-all">همه شگفت‌انگیزها <i class="bi bi-chevron-left"></i></a>
+          </div>
+          <div class="product-rail" id="deals-rail"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="container-xxl">
+        <div class="ad-row">
+          <a href="category.html?id=fashion" class="ad-banner banner-a"><span>مد و پوشاک</span><strong>استایل تابستانی</strong></a>
+          <a href="category.html?id=home" class="ad-banner banner-b"><span>خانه و زندگی</span><strong>نوسازی با قیمت ویژه</strong></a>
+          <a href="category.html?id=beauty" class="ad-banner banner-c"><span>زیبایی</span><strong>برندهای اصل مراقبت پوست</strong></a>
+          <a href="category.html?id=sport" class="ad-banner banner-d"><span>ورزش</span><strong>شروع مسیر تناسب اندام</strong></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="container-xxl">
+        <div class="section-head">
+          <h2>پرفروش‌ترین‌ها</h2>
+          <a href="category.html" class="see-all">مشاهده همه <i class="bi bi-chevron-left"></i></a>
+        </div>
+        <div class="product-grid" id="best-grid"></div>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="container-xxl">
+        <a href="category.html?tag=special" class="wide-promo">
+          <div class="wide-promo-copy">
+            <span class="offer-tag tag-special">پیشنهاد ویژه</span>
+            <h2>خرید اقساطی بدون بهره برای منتخب‌ها</h2>
+            <p>تا ۱۲ قسط، تأیید آنی، ارسال سریع</p>
+          </div>
+          <span class="wide-promo-cta">مشاهده کالاها <i class="bi bi-arrow-left"></i></span>
+        </a>
+      </div>
+    </section>
+
+    <section class="section-block">
+      <div class="container-xxl">
+        <div class="section-head">
+          <h2>تازه‌ها</h2>
+          <a href="category.html" class="see-all">مشاهده همه <i class="bi bi-chevron-left"></i></a>
+        </div>
+        <div class="product-grid" id="new-grid"></div>
+      </div>
+    </section>
+
+    <section class="section-block trust-section">
+      <div class="container-xxl">
+        <div class="trust-row">
+          <div class="trust-item"><i class="bi bi-shield-check"></i><div><strong>ضمانت اصالت</strong><span>کالای ۱۰۰٪ اصل</span></div></div>
+          <div class="trust-item"><i class="bi bi-truck"></i><div><strong>ارسال سریع</strong><span>در سراسر کشور</span></div></div>
+          <div class="trust-item"><i class="bi bi-arrow-repeat"></i><div><strong>۷ روز بازگشت</strong><span>بدون دردسر</span></div></div>
+          <div class="trust-item"><i class="bi bi-headset"></i><div><strong>پشتیبانی ۲۴/۷</strong><span>همیشه در کنار شما</span></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="store-footer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/store-core.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

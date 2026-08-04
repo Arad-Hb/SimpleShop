@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>برندهای من — پنل تأمین‌کننده</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/supplier.css">
+</head>
+<body data-page="brands">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-truck"></i><span data-company-name>تأمین‌کننده</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">برندهای من</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-supplier-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav"><ol class="breadcrumb mb-0" data-breadcrumb></ol></nav>
+
+      <div class="page-header">
+        <div>
+          <h1>برندهای من</h1>
+          <p class="text-muted mb-0 small">برندهایی که محصولاتتان زیر آن‌ها عرضه می‌شود</p>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="content-card">
+            <div class="card-header" id="brand-form-title">افزودن برند</div>
+            <div class="card-body">
+              <form id="brand-form">
+                <input type="hidden" id="brand-id">
+                <div class="mb-3">
+                  <label class="form-label" for="brand-name">نام برند *</label>
+                  <input type="text" class="form-control" id="brand-name" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label" for="brand-description">توضیح</label>
+                  <textarea class="form-control" id="brand-description" rows="3"></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary">ذخیره</button>
+                  <button type="button" id="btn-cancel-edit" class="btn btn-outline-secondary d-none">انصراف</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="content-card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                  <thead>
+                    <tr>
+                      <th>برند</th>
+                      <th>توضیح</th>
+                      <th>تعداد محصول</th>
+                      <th>تاریخ</th>
+                      <th>عملیات</th>
+                    </tr>
+                  </thead>
+                  <tbody id="brands-body"></tbody>
+                </table>
+              </div>
+              <div id="brands-empty" class="empty-state d-none">
+                <i class="bi bi-award"></i>
+                <p>هنوز برندی ثبت نشده است.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/brands.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورود — پنل تأمین‌کننده</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/supplier.css">
+</head>
+<body class="login-page">
+  <div class="login-card">
+    <div class="login-brand">
+      <i class="bi bi-truck"></i>
+      <h1>پنل تأمین‌کننده</h1>
+      <p>برای مدیریت محصولات و موجودی وارد شوید</p>
+    </div>
+
+    <form id="login-form" novalidate>
+      <div class="mb-3">
+        <label for="username" class="form-label">نام کاربری</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-person"></i></span>
+          <input type="text" class="form-control" id="username" name="username"
+                 autocomplete="username" placeholder="نام کاربری" required>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">رمز عبور</label>
+        <div class="input-group">
+          <span class="input-group-text"><i class="bi bi-lock"></i></span>
+          <input type="password" class="form-control" id="password" name="password"
+                 autocomplete="current-password" placeholder="رمز عبور" required>
+          <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                  aria-label="نمایش رمز عبور" aria-pressed="false">
+            <i class="bi bi-eye" id="toggle-password-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+        <label class="form-check-label" for="rememberMe">مرا به خاطر بسپار</label>
+      </div>
+
+      <div id="login-error" class="alert alert-danger d-none" role="alert"></div>
+
+      <button type="submit" class="btn btn-primary w-100">ورود به پنل</button>
+    </form>
+
+    <div class="demo-hint">
+      <i class="bi bi-info-circle"></i>
+      <strong>حساب دمو:</strong>
+      نام کاربری <code>supplier</code> — رمز عبور <code>Supplier@123</code>
+    </div>
+  </div>
+
+  <script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/login.js"></script>
+</body>
+</html>

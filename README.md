@@ -1,83 +1,85 @@
-# SimpleShop - فروشگاه اینترنتی ساده
+# SimpleShop
 
-پروژه آموزشی فروشگاه اینترنتی با **ASP.NET Core Web API**، **EF Core Code First**، **SQL Server** و **JavaScript**.
-
-## امکانات
-
-- مدیریت دسته‌بندی‌ها، محصولات، تأمین‌کنندگان، مشتریان و سفارش‌ها (پنل مدیر)
-- نمایش، جست‌وجو، فیلتر و مرتب‌سازی محصولات
-- سبد خرید و ثبت سفارش با کنترل موجودی
-- احراز هویت JWT (مدیر / مشتری)
-- گزارش‌های ساده: تعداد سفارش، مجموع فروش، محصولات کم‌موجود
-
-## پیش‌نیازها
-
-- [.NET 10 SDK](https://dotnet.microsoft.com/download) (یا .NET 8+)
-- SQL Server یا LocalDB
-
-## اجرا
-
-```bash
-cd SimpleShop/SimpleShop
-dotnet ef migrations add InitialCreate
-dotnet run
-```
-
-مرورگر: `https://localhost:7xxx` یا `http://localhost:5xxx`
-
-## حساب‌های آزمایشی
-
-| نقش | نام کاربری | رمز عبور |
-|-----|------------|----------|
-| مدیر | admin | Admin123! |
-| مشتری | customer | Customer123! |
-
-## ساختار پروژه
+Educational e-commerce project split into **frontend** and a **layered teaching API**.
 
 ```
 SimpleShop/
-├── Controllers/     # Web API
-├── Data/            # DbContext, Seeder
-├── Models/
-│   ├── Entities/    # Category, Product, Order, ...
-│   └── DTOs/
-├── Services/        # Business logic
-└── wwwroot/         # Frontend (HTML/CSS/JS)
-    └── admin/       # پنل مدیریت
+├── frontend/                 # All UI panels (HTML / CSS / Bootstrap 5 / JS)
+│   ├── VisitorPanel/         # Customer storefront (JWT in localStorage)
+│   ├── AdminPanel/           # Admin offline panel (LocalStorage + IndexedDB images)
+│   └── SupplierPanel/        # Supplier portal (LocalStorage)
+├── api/
+│   ├── Framework/            # OperationResult, PageModel, base repo contracts
+│   ├── DomainModel/          # Entities, DbContext, ViewModels, seeder, migrations
+│   ├── DataAccess/           # Repository interfaces + implementations
+│   └── SimpleShop.Api/       # Thin Web API host (JWT, CORS, controllers)
+├── SimpleShop.slnx
+└── README.md
 ```
 
-## Connection String
+Legacy duplicate trees (root AdminPanel / StorefrontPreview / flat `api` Controllers) were removed.
 
-در `appsettings.json`:
+## Run the API
 
-```json
-"DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=SimpleShopDb;Trusted_Connection=True;TrustServerCertificate=True;"
-```
+Default URL: `http://localhost:5102`  
+Database: `SimpleShopLayeredDb` (migrated + seeded on startup)
 
-## API Endpoints
+### Visual Studio
 
-| Method | Route | توضیح |
-|--------|-------|-------|
-| POST | /api/auth/login | ورود |
-| POST | /api/auth/register | ثبت‌نام مشتری |
-| GET | /api/products | لیست محصولات (فیلتر/جست‌وجو) |
-| GET/POST/PUT/DELETE | /api/categories | CRUD دسته‌بندی |
-| GET/POST/PUT/DELETE | /api/suppliers | CRUD تأمین‌کننده (Admin) |
-| GET/POST/PUT/DELETE | /api/products | CRUD محصول (Admin) |
-| GET | /api/customers | لیست مشتریان (Admin) |
-| GET/POST/PUT/DELETE | /api/cart | سبد خرید (Customer) |
-| GET/POST | /api/orders | سفارش‌ها |
-| GET | /api/reports/summary | گزارش (Admin) |
+1. Open **`SimpleShop.slnx`** (repo root).
+2. In **Solution Explorer**, right-click **`SimpleShop.Api`** → **Set as Startup Project**.
+3. In the toolbar profile dropdown, pick **`http`** (uses `http://localhost:5102`).
+4. Press **F5** (debug) or **Ctrl+F5** (run without debugger).
 
-## نکات آموزشی
+On startup the API migrates the database and seeds data if needed.
 
-- **مدرس در کلاس:** محصولات، تأمین‌کنندگان، سفارش
-- **دانشجو:** دسته‌بندی‌ها، مشتریان، گزارش‌ها (الگوی مشابه)
+**If it doesn’t start**
 
-## انتشار
+- Install the **.NET 10 SDK** (project targets `net10.0`).
+- Make sure SQL Server is running locally (connection string uses `Server=.;...Trusted_Connection=True`).
+- If port `5102` is busy, stop the other process or change the URL in `api/SimpleShop.Api/Properties/launchSettings.json`.
+
+**Quick check:** open `http://localhost:5102/api/categories`
+
+### Command line
 
 ```bash
-dotnet publish -c Release -o ./publish
+cd api/SimpleShop.Api
+dotnet run --launch-profile http
 ```
 
-خروجی `publish` را روی IIS، Azure App Service یا هر هاست .NET قرار دهید.
+### Demo accounts (API)
+
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | `admin` | `Admin123!` |
+| Customer | `customer` / `customer02`… | `Customer123!` |
+| Supplier user | `supplier01`…`supplier15` | `Supplier123!` |
+
+Seed targets on API startup: **10 categories**, **100 products**, **100 users** (admin + customers + supplier users), plus **15** supplier companies.
+
+## Run the frontend
+
+Open any panel with Live Server (or a static file server). Keep `frontend/` as the web root when possible.
+
+| Panel | Entry |
+|-------|--------|
+| Visitor store | `frontend/VisitorPanel/index.html` |
+| Admin | `frontend/AdminPanel/login.html` |
+| Supplier | `frontend/SupplierPanel/login.html` |
+
+VisitorPanel talks to the API via `js/config.js` (`API_BASE_URL`).  
+If the API is offline, it falls back to local demo catalog data.
+
+## Sync status
+
+- **VisitorPanel → API**: `/api/products`, `/api/categories`, `/api/auth/login`
+- **Admin logo → VisitorPanel**: Settings → لوگوی فروشگاه writes `simpleShopPublicBranding` in localStorage (serve both panels from `frontend/` so they share origin)
+- AdminPanel / SupplierPanel data: LocalStorage demos (product gallery, customer avatar, admin profile avatar)
+
+## Notes
+
+- No ASP.NET Identity — JWT + BCrypt only.
+- Controllers call repositories; they never use `DbContext` directly.
+- API CORS allows any origin so frontend can run on another port.
+- SupplierPanel shares Bootstrap assets from `../AdminPanel/assets/`.

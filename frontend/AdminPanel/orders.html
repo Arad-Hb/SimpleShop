@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سفارش‌ها — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="orders">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">سفارش‌ها</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <h1>مدیریت سفارش‌ها</h1>
+      </div>
+
+      <form id="filter-form" class="filter-bar">
+        <div class="filter-field">
+          <label class="form-label" for="filter-orderNumber">شماره سفارش</label>
+          <input type="search" class="form-control form-control-sm" id="filter-orderNumber" name="orderNumber" placeholder="ORD-...">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-customer">مشتری</label>
+          <select class="form-select form-select-sm" id="filter-customer" name="customerId">
+            <option value="">همه</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-status">وضعیت</label>
+          <select class="form-select form-select-sm" id="filter-status" name="status">
+            <option value="">همه</option>
+            <option value="pending">در انتظار</option>
+            <option value="processing">در حال پردازش</option>
+            <option value="shipped">ارسال شده</option>
+            <option value="delivered">تحویل شده</option>
+            <option value="cancelled">لغو شده</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-payment">پرداخت</label>
+          <select class="form-select form-select-sm" id="filter-payment" name="paymentStatus">
+            <option value="">همه</option>
+            <option value="paid">پرداخت شده</option>
+            <option value="unpaid">پرداخت نشده</option>
+            <option value="refunded">مرجوعی</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-dateFrom">از تاریخ</label>
+          <input type="date" class="form-control form-control-sm" id="filter-dateFrom" name="dateFrom" data-persian-calendar placeholder="انتخاب تاریخ شمسی" title="نمایش شمسی؛ فیلتر با تاریخ میلادی انجام می‌شود">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-dateTo">تا تاریخ</label>
+          <input type="date" class="form-control form-control-sm" id="filter-dateTo" name="dateTo" data-persian-calendar placeholder="انتخاب تاریخ شمسی" title="نمایش شمسی؛ فیلتر با تاریخ میلادی انجام می‌شود">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-minTotal">حداقل مبلغ</label>
+          <input type="number" class="form-control form-control-sm" id="filter-minTotal" name="minTotal" min="0" step="1000">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-sort">مرتب‌سازی</label>
+          <select class="form-select form-select-sm" id="filter-sort" name="sort">
+            <option value="createdAt-desc">جدیدترین</option>
+            <option value="createdAt-asc">قدیمی‌ترین</option>
+            <option value="total-desc">بیشترین مبلغ</option>
+            <option value="total-asc">کمترین مبلغ</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> اعمال</button>
+          <button type="reset" class="btn btn-outline-secondary btn-sm" id="reset-filters">پاک کردن</button>
+        </div>
+      </form>
+
+      <div class="content-card">
+        <div class="table-responsive">
+          <table class="table admin-table admin-table--orders mb-0">
+            <thead>
+              <tr>
+                <th>شماره</th>
+                <th>مشتری</th>
+                <th>مبلغ کل</th>
+                <th>وضعیت</th>
+                <th>پرداخت</th>
+                <th>تاریخ</th>
+                <th>عملیات</th>
+              </tr>
+            </thead>
+            <tbody id="orders-body"></tbody>
+          </table>
+        </div>
+        <div class="card-body border-top">
+          <div class="pagination-wrapper">
+            <span class="text-muted small" id="pagination-info"></span>
+            <div id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/persian-datepicker.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/orders.js"></script>
+</body>
+</html>

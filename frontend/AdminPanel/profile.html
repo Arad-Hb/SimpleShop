@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروفایل مدیر — پنل مدیریت</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="profile">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">پروفایل مدیر</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="settings-page">
+        <div class="settings-page__hero">
+          <div>
+            <h1 class="settings-page__title">
+              <span>پروفایل مدیر</span>
+              <i class="bi bi-person-gear" aria-hidden="true"></i>
+            </h1>
+            <p class="settings-page__desc">مدیریت اطلاعات شخصی، تصویر پروفایل و امنیت حساب کاربری</p>
+          </div>
+        </div>
+
+        <nav class="settings-page__tabs" aria-label="بخش‌های پروفایل">
+          <button type="button" class="settings-page__tab is-active" data-profile-tab="profile">پروفایل</button>
+          <button type="button" class="settings-page__tab" data-profile-tab="security">امنیت حساب</button>
+        </nav>
+
+        <form id="profile-form" novalidate>
+          <!-- Tab: Profile -->
+          <div class="settings-tab-panel is-active" data-tab-panel="profile">
+            <div class="settings-layout">
+              <aside class="settings-select-menu" aria-label="منوی انتخاب">
+                <div class="settings-select-menu__label">انتخاب بخش</div>
+                <button type="button" class="settings-select-menu__item is-active" data-profile-panel="personal">
+                  <span class="settings-select-menu__icon"><i class="bi bi-person"></i></span>
+                  <span class="settings-select-menu__text">اطلاعات شخصی</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="settings-select-menu__item" data-profile-panel="avatar">
+                  <span class="settings-select-menu__icon"><i class="bi bi-image"></i></span>
+                  <span class="settings-select-menu__text">تصویر پروفایل</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+              </aside>
+
+              <div class="settings-panels">
+                <!-- Personal info -->
+                <section class="settings-panel is-active" data-profile-content="personal" aria-labelledby="profile-personal-title">
+                  <header class="settings-panel__header">
+                    <h2 id="profile-personal-title">اطلاعات شخصی</h2>
+                    <p>نام، ایمیل و شماره تماس حساب مدیر را ویرایش کنید.</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo settings-card__logo--soft"><i class="bi bi-person-badge"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">پروفایل کاربری</h3>
+                          <p class="settings-card__subtitle">اطلاعات قابل نمایش در پنل مدیریت</p>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch settings-card__switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="profileActiveToggle" checked>
+                        <label class="form-check-label" for="profileActiveToggle">فعال</label>
+                      </div>
+                    </div>
+
+                    <div class="settings-card__body">
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="fullName" class="form-label">نام کامل <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" id="fullName" name="fullName" required>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="email" class="form-label">ایمیل <span class="text-danger">*</span></label>
+                          <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-md-6">
+                          <label for="mobile" class="form-label">موبایل</label>
+                          <input type="text" class="form-control" id="mobile" name="mobile" placeholder="09121234567" dir="ltr">
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label">نام کاربری</label>
+                          <input type="text" class="form-control" value="admin" readonly disabled>
+                          <div class="form-text">نام کاربری در نسخه دمو قابل تغییر نیست.</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="settings-card__note">
+                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+                      <span>پس از ذخیره، نام مدیر در هدر پنل به‌روز می‌شود.</span>
+                    </div>
+                  </article>
+                </section>
+
+                <!-- Avatar -->
+                <section class="settings-panel" data-profile-content="avatar" hidden aria-labelledby="profile-avatar-title">
+                  <header class="settings-panel__header">
+                    <h2 id="profile-avatar-title">تصویر پروفایل</h2>
+                    <p>آواتار حساب مدیر را بارگذاری یا حذف کنید.</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo"><i class="bi bi-person-circle"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">آواتار</h3>
+                          <p class="settings-card__subtitle">نمایش در هدر و صفحه پروفایل</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__body settings-card__body--media">
+                      <div class="settings-media-preview settings-media-preview--avatar">
+                        <img src="" alt="پیش‌نمایش آواتار" id="avatar-preview" class="settings-media-preview__img" hidden>
+                        <div id="avatar-placeholder" class="settings-media-preview__empty">
+                          <i class="bi bi-person-circle"></i>
+                          <span>آواتاری انتخاب نشده</span>
+                        </div>
+                      </div>
+                      <div class="settings-media-actions">
+                        <input type="file" class="form-control" id="avatar-upload" accept="image/jpeg,image/png,image/webp">
+                        <button type="button" class="btn btn-outline-danger settings-card__action" id="avatar-remove">حذف آواتار</button>
+                      </div>
+                    </div>
+                    <div class="settings-card__status">
+                      <span class="settings-card__status-ok"><i class="bi bi-check-circle-fill"></i> آماده بارگذاری</span>
+                    </div>
+                    <div class="settings-card__note">
+                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+                      <span>فرمت‌های مجاز: JPG، PNG و WebP — حداکثر ۲ مگابایت.</span>
+                    </div>
+                  </article>
+                </section>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Security -->
+          <div class="settings-tab-panel" data-tab-panel="security" hidden>
+            <div class="settings-layout">
+              <aside class="settings-select-menu" aria-label="منوی امنیت">
+                <div class="settings-select-menu__label">انتخاب بخش</div>
+                <button type="button" class="settings-select-menu__item is-active" data-security-panel="account">
+                  <span class="settings-select-menu__icon"><i class="bi bi-shield-lock"></i></span>
+                  <span class="settings-select-menu__text">اطلاعات حساب</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="settings-select-menu__item" data-security-panel="password">
+                  <span class="settings-select-menu__icon"><i class="bi bi-key"></i></span>
+                  <span class="settings-select-menu__text">تغییر رمز عبور</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+              </aside>
+
+              <div class="settings-panels">
+                <!-- Account info -->
+                <section class="settings-panel is-active" data-security-content="account" aria-labelledby="profile-account-title">
+                  <header class="settings-panel__header">
+                    <h2 id="profile-account-title">اطلاعات حساب</h2>
+                    <p>نقش و وضعیت ورود حساب مدیر (فقط نمایش).</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo"><i class="bi bi-shield-check"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">وضعیت حساب</h3>
+                          <p class="settings-card__subtitle">جزئیات نقش و فعالیت اخیر</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__body">
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label class="form-label">نقش</label>
+                          <input type="text" class="form-control" value="مدیر سیستم" readonly disabled>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">آخرین ورود</label>
+                          <input type="text" class="form-control" id="lastLogin" readonly disabled>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">تاریخ ایجاد حساب</label>
+                          <input type="text" class="form-control" id="accountCreated" readonly disabled>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__status">
+                      <span class="settings-card__status-ok"><i class="bi bi-check-circle-fill"></i> حساب فعال است</span>
+                    </div>
+                  </article>
+                </section>
+
+                <!-- Password -->
+                <section class="settings-panel" data-security-content="password" hidden aria-labelledby="profile-password-title">
+                  <header class="settings-panel__header">
+                    <h2 id="profile-password-title">تغییر رمز عبور</h2>
+                    <p>رمز عبور حساب مدیر را به‌روزرسانی کنید.</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo settings-card__logo--danger"><i class="bi bi-key"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">رمز عبور</h3>
+                          <p class="settings-card__subtitle">در نسخه دمو آفلاین غیرفعال است</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__body">
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label class="form-label">رمز عبور فعلی</label>
+                          <input type="password" class="form-control" value="••••••••" readonly disabled>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">رمز عبور جدید</label>
+                          <input type="password" class="form-control" placeholder="—" readonly disabled>
+                        </div>
+                        <div class="col-md-4">
+                          <label class="form-label">تکرار رمز عبور</label>
+                          <input type="password" class="form-control" placeholder="—" readonly disabled>
+                        </div>
+                      </div>
+                      <button type="button" class="btn btn-secondary mt-3" disabled>تغییر رمز عبور (غیرفعال در دمو)</button>
+                    </div>
+                    <div class="settings-card__note">
+                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+                      <span>تغییر رمز از طریق API در مرحله بعد فعال خواهد شد.</span>
+                    </div>
+                  </article>
+                </section>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-page__actions">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره پروفایل</button>
+            <button type="reset" class="btn btn-outline-secondary">بازنشانی فرم</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/profile.js"></script>
+</body>
+</html>

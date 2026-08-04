@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سازمان فروش — پنل مدیریت</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="settings">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">سازمان فروش</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="settings-page">
+        <div class="settings-page__hero">
+          <div>
+            <h1 class="settings-page__title">
+              <span>سازمان فروش</span>
+              <i class="bi bi-building-gear" aria-hidden="true"></i>
+            </h1>
+            <p class="settings-page__desc">مدیریت اطلاعات سازمان، تصویر فروشگاه و شبکه‌های اجتماعی</p>
+          </div>
+        </div>
+
+        <nav class="settings-page__tabs" aria-label="بخش‌های تنظیمات">
+          <button type="button" class="settings-page__tab is-active" data-settings-tab="organization">سازمان فروش</button>
+          <button type="button" class="settings-page__tab" data-settings-tab="seo">سئو و نمایش</button>
+          <button type="button" class="settings-page__tab" data-settings-tab="advanced">تنظیمات پیشرفته</button>
+        </nav>
+
+        <form id="settings-form" novalidate>
+          <!-- Tab: Organization -->
+          <div class="settings-tab-panel is-active" data-tab-panel="organization">
+            <div class="settings-layout">
+              <aside class="settings-select-menu" aria-label="منوی انتخاب">
+                <div class="settings-select-menu__label">انتخاب بخش</div>
+                <button type="button" class="settings-select-menu__item is-active" data-org-panel="general">
+                  <span class="settings-select-menu__icon"><i class="bi bi-info-circle"></i></span>
+                  <span class="settings-select-menu__text">اطلاعات عمومی</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="settings-select-menu__item" data-org-panel="images">
+                  <span class="settings-select-menu__icon"><i class="bi bi-image"></i></span>
+                  <span class="settings-select-menu__text">تصویر فروشگاه</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="settings-select-menu__item" data-org-panel="social">
+                  <span class="settings-select-menu__icon"><i class="bi bi-share"></i></span>
+                  <span class="settings-select-menu__text">شبکه‌های اجتماعی</span>
+                  <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
+                </button>
+              </aside>
+
+              <div class="settings-panels">
+                <!-- General -->
+                <section class="settings-panel is-active" data-org-content="general" aria-labelledby="org-general-title">
+                  <header class="settings-panel__header">
+                    <h2 id="org-general-title">اطلاعات عمومی</h2>
+                    <p>نام، تماس و وضعیت نمایش سازمان فروش را تنظیم کنید.</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo settings-card__logo--soft"><i class="bi bi-shop"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">پروفایل سازمان</h3>
+                          <p class="settings-card__subtitle">اطلاعات اصلی قابل نمایش در فروشگاه</p>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch settings-card__switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="orgPublicToggle" checked>
+                        <label class="form-check-label" for="orgPublicToggle">فعال</label>
+                      </div>
+                    </div>
+
+                    <div class="settings-card__body">
+                      <div class="mb-3">
+                        <label for="shopName" class="form-label">نام فروشگاه <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="shopName" name="shopName" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="shopDescription" class="form-label">توضیحات فروشگاه</label>
+                        <textarea class="form-control" id="shopDescription" name="shopDescription" rows="2"></textarea>
+                      </div>
+                      <div class="row g-3">
+                        <div class="col-md-6">
+                          <label for="contactPhone" class="form-label">تلفن تماس</label>
+                          <input type="text" class="form-control" id="contactPhone" name="contactPhone">
+                        </div>
+                        <div class="col-md-6">
+                          <label for="contactEmail" class="form-label">ایمیل</label>
+                          <input type="email" class="form-control" id="contactEmail" name="contactEmail">
+                        </div>
+                      </div>
+                      <div class="mt-3 mb-3">
+                        <label for="address" class="form-label">آدرس</label>
+                        <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                      </div>
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label for="currency" class="form-label">واحد پول</label>
+                          <input type="text" class="form-control" id="currency" name="currency" placeholder="تومان">
+                        </div>
+                        <div class="col-md-4">
+                          <label for="lowStockThreshold" class="form-label">آستانه موجودی کم</label>
+                          <input type="number" class="form-control" id="lowStockThreshold" name="lowStockThreshold" min="0">
+                        </div>
+                        <div class="col-md-4">
+                          <label for="shopVisibility" class="form-label">نمایش فروشگاه</label>
+                          <select class="form-select" id="shopVisibility" name="shopVisibility">
+                            <option value="public">عمومی</option>
+                            <option value="private">خصوصی (در دست ساخت)</option>
+                            <option value="maintenance">حالت تعمیر</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="settings-card__note">
+                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+                      <span>تغییرات پس از ذخیره در هدر پنل و برندینگ عمومی اعمال می‌شود.</span>
+                    </div>
+                  </article>
+                </section>
+
+                <!-- Images -->
+                <section class="settings-panel" data-org-content="images" hidden aria-labelledby="org-images-title">
+                  <header class="settings-panel__header">
+                    <h2 id="org-images-title">تصویر فروشگاه</h2>
+                    <p>لوگو، فاویکون و تصویر اشتراک‌گذاری در شبکه‌های اجتماعی را مدیریت کنید.</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo"><i class="bi bi-image"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">لوگو فروشگاه</h3>
+                          <p class="settings-card__subtitle">نمایش در هدر و برندینگ عمومی</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__body settings-card__body--media">
+                      <div class="settings-media-preview">
+                        <img src="" alt="پیش‌نمایش لوگو" id="logo-preview" class="settings-media-preview__img" hidden>
+                        <div id="logo-placeholder" class="settings-media-preview__empty">
+                          <i class="bi bi-image"></i>
+                          <span>لوگویی انتخاب نشده</span>
+                        </div>
+                      </div>
+                      <div class="settings-media-actions">
+                        <input type="file" class="form-control" id="logo-upload" accept="image/jpeg,image/png,image/webp">
+                        <button type="button" class="btn btn-outline-danger settings-card__action" id="logo-remove">حذف لوگو</button>
+                      </div>
+                    </div>
+                    <div class="settings-card__status">
+                      <span class="settings-card__status-ok"><i class="bi bi-check-circle-fill"></i> آماده بارگذاری</span>
+                    </div>
+                  </article>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo"><i class="bi bi-bookmark"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">Favicon</h3>
+                          <p class="settings-card__subtitle">آیکون تب مرورگر</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__body settings-card__body--media">
+                      <div class="settings-media-preview settings-media-preview--sm">
+                        <img src="" alt="پیش‌نمایش favicon" id="favicon-preview" class="settings-media-preview__img" hidden>
+                        <div id="favicon-placeholder" class="settings-media-preview__empty">
+                          <i class="bi bi-bookmark"></i>
+                        </div>
+                      </div>
+                      <div class="settings-media-actions">
+                        <input type="file" class="form-control" id="favicon-upload" accept="image/jpeg,image/png,image/webp,image/x-icon">
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo"><i class="bi bi-share"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">تصویر OG</h3>
+                          <p class="settings-card__subtitle">پیش‌نمایش هنگام اشتراک‌گذاری لینک</p>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="settings-card__body settings-card__body--media">
+                      <div class="settings-media-preview">
+                        <img src="" alt="پیش‌نمایش OG" id="og-preview" class="settings-media-preview__img" hidden>
+                        <div id="og-placeholder" class="settings-media-preview__empty">
+                          <i class="bi bi-share"></i>
+                          <span>تصویری انتخاب نشده</span>
+                        </div>
+                      </div>
+                      <div class="settings-media-actions">
+                        <input type="file" class="form-control" id="og-upload" accept="image/jpeg,image/png,image/webp">
+                      </div>
+                    </div>
+                    <div class="settings-card__note">
+                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+                      <span>بهترین اندازه پیشنهادی برای تصویر OG حدود ۱۲۰۰×۶۳۰ پیکسل است.</span>
+                    </div>
+                  </article>
+                </section>
+
+                <!-- Social -->
+                <section class="settings-panel" data-org-content="social" hidden aria-labelledby="org-social-title">
+                  <header class="settings-panel__header">
+                    <h2 id="org-social-title">شبکه‌های اجتماعی</h2>
+                    <p>لینک‌ها و شناسه‌های اجتماعی سازمان فروش را متصل کنید.</p>
+                  </header>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo settings-card__logo--ig"><i class="bi bi-instagram"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">اینستاگرام</h3>
+                          <p class="settings-card__subtitle">شناسه یا لینک صفحه اینستاگرام</p>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch settings-card__switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="socialInstagramEnabled">
+                        <label class="form-check-label" for="socialInstagramEnabled">فعال</label>
+                      </div>
+                    </div>
+                    <div class="settings-card__body">
+                      <label for="instagram" class="form-label">آیدی / لینک</label>
+                      <input type="text" class="form-control" id="instagram" name="instagram" placeholder="@simpleshop_ir" dir="ltr">
+                    </div>
+                  </article>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo settings-card__logo--tg"><i class="bi bi-telegram"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">تلگرام</h3>
+                          <p class="settings-card__subtitle">کانال یا پشتیبانی تلگرام</p>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch settings-card__switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="socialTelegramEnabled">
+                        <label class="form-check-label" for="socialTelegramEnabled">فعال</label>
+                      </div>
+                    </div>
+                    <div class="settings-card__body">
+                      <label for="telegram" class="form-label">آیدی / لینک</label>
+                      <input type="text" class="form-control" id="telegram" name="telegram" placeholder="@simpleshop_support" dir="ltr">
+                    </div>
+                  </article>
+
+                  <article class="settings-card">
+                    <div class="settings-card__top">
+                      <div class="settings-card__brand">
+                        <span class="settings-card__logo settings-card__logo--wa"><i class="bi bi-whatsapp"></i></span>
+                        <div>
+                          <h3 class="settings-card__title">واتساپ</h3>
+                          <p class="settings-card__subtitle">شماره پشتیبانی واتساپ</p>
+                        </div>
+                      </div>
+                      <div class="form-check form-switch settings-card__switch mb-0">
+                        <input class="form-check-input" type="checkbox" role="switch" id="socialWhatsappEnabled">
+                        <label class="form-check-label" for="socialWhatsappEnabled">فعال</label>
+                      </div>
+                    </div>
+                    <div class="settings-card__body">
+                      <label for="whatsapp" class="form-label">شماره واتساپ</label>
+                      <input type="text" class="form-control" id="whatsapp" name="whatsapp" placeholder="0912..." dir="ltr">
+                    </div>
+                    <div class="settings-card__note">
+                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
+                      <span>سوییچ‌های غیرفعال، نمایش آن شبکه را در فروشگاه خاموش می‌کنند.</span>
+                    </div>
+                  </article>
+                </section>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: SEO -->
+          <div class="settings-tab-panel" data-tab-panel="seo" hidden>
+            <div class="settings-panel is-active">
+              <header class="settings-panel__header">
+                <h2>سئو و نمایش</h2>
+                <p>عنوان و توضیحات پیش‌فرض موتورهای جستجو را تنظیم کنید.</p>
+              </header>
+              <article class="settings-card">
+                <div class="settings-card__body">
+                  <div class="mb-3">
+                    <label for="defaultSeoTitle" class="form-label">عنوان SEO پیش‌فرض</label>
+                    <input type="text" class="form-control" id="defaultSeoTitle" name="defaultSeoTitle">
+                  </div>
+                  <div class="mb-3">
+                    <label for="defaultSeoDescription" class="form-label">توضیحات SEO پیش‌فرض</label>
+                    <textarea class="form-control" id="defaultSeoDescription" name="defaultSeoDescription" rows="2"></textarea>
+                  </div>
+                  <div class="seo-preview" id="seo-preview">
+                    <div class="seo-title" id="seo-preview-title">عنوان صفحه</div>
+                    <div class="seo-url">https://example.com</div>
+                    <div class="seo-desc" id="seo-preview-desc">توضیحات متا...</div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <!-- Tab: Advanced -->
+          <div class="settings-tab-panel" data-tab-panel="advanced" hidden>
+            <div class="settings-panel is-active">
+              <header class="settings-panel__header">
+                <h2>تنظیمات پیشرفته</h2>
+                <p>عملیات حساس و بازنشانی داده‌های آزمایشی.</p>
+              </header>
+              <article class="settings-card settings-card--danger">
+                <div class="settings-card__top">
+                  <div class="settings-card__brand">
+                    <span class="settings-card__logo settings-card__logo--danger"><i class="bi bi-exclamation-triangle"></i></span>
+                    <div>
+                      <h3 class="settings-card__title">منطقه خطر</h3>
+                      <p class="settings-card__subtitle">بازنشانی داده‌های دمو LocalStorage</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="settings-card__body">
+                  <p class="small text-muted mb-3">بازنشانی داده‌های دمو تمام اطلاعات LocalStorage را پاک کرده و داده‌های نمونه را مجدداً بارگذاری می‌کند.</p>
+                  <button type="button" class="btn btn-outline-danger" id="btn-reset-demo">
+                    <i class="bi bi-arrow-counterclockwise"></i> بازنشانی داده‌های دمو
+                  </button>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="settings-page__actions">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره تنظیمات</button>
+            <button type="reset" class="btn btn-outline-secondary">بازنشانی فرم</button>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/settings.js"></script>
+</body>
+</html>

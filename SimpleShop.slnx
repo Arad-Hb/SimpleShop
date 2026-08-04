@@ -1,3 +1,8 @@
 <Solution>
-  <Project Path="SimpleShop/SimpleShop.csproj" />
+  <Folder Name="/api/">
+    <Project Path="api/Framework/Framework.csproj" />
+    <Project Path="api/DomainModel/DomainModel.csproj" />
+    <Project Path="api/DataAccess/DataAccess.csproj" />
+    <Project Path="api/SimpleShop.Api/SimpleShop.Api.csproj" />
+  </Folder>
 </Solution>

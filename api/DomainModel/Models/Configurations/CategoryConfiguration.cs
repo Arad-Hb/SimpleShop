@@ -1,0 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace DomainModel.Models.Configurations;
+
+public class CategoryConfiguration : IEntityTypeConfiguration<Category>
+{
+    public void Configure(EntityTypeBuilder<Category> e)
+    {
+        e.Property(c => c.Name).HasMaxLength(100).IsRequired();
+        e.Property(c => c.Description).HasMaxLength(500);
+        e.Property(c => c.Slug).HasMaxLength(150);
+        e.Property(c => c.MetaTitle).HasMaxLength(200);
+        e.Property(c => c.MetaDescription).HasMaxLength(500);
+        e.HasIndex(c => c.Slug);
+
+        e.HasOne(c => c.ImageFile)
+            .WithMany()
+            .HasForeignKey(c => c.ImageFileId)
+            .OnDelete(DeleteBehavior.SetNull);
+    }
+}

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروفایل — پنل تأمین‌کننده</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/supplier.css">
+</head>
+<body data-page="profile">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-truck"></i><span data-company-name>تأمین‌کننده</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">پروفایل تأمین‌کننده</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-supplier-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav"><ol class="breadcrumb mb-0" data-breadcrumb></ol></nav>
+
+      <div class="page-header">
+        <div>
+          <h1>پروفایل تأمین‌کننده</h1>
+          <p class="text-muted mb-0 small">اطلاعات شرکت و راه‌های ارتباطی</p>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-value" id="stat-products">—</div>
+            <div class="stat-label">محصولات شما</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon info"><i class="bi bi-award"></i></div>
+            <div class="stat-value" id="stat-brands">—</div>
+            <div class="stat-label">برندها</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-layers"></i></div>
+            <div class="stat-value" id="stat-stock">—</div>
+            <div class="stat-label">جمع موجودی</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-header">اطلاعات پروفایل</div>
+        <div class="card-body">
+          <form id="profile-form">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label" for="companyName">نام شرکت *</label>
+                <input type="text" class="form-control" id="companyName" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="contactPerson">نام مسئول *</label>
+                <input type="text" class="form-control" id="contactPerson" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="email">ایمیل</label>
+                <input type="email" class="form-control" id="email">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="phone">تلفن</label>
+                <input type="text" class="form-control" id="phone">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label" for="mobile">موبایل</label>
+                <input type="text" class="form-control" id="mobile">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="website">وب‌سایت</label>
+                <input type="url" class="form-control" id="website" placeholder="https://">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" for="address">آدرس</label>
+                <input type="text" class="form-control" id="address">
+              </div>
+              <div class="col-12">
+                <label class="form-label" for="description">درباره تأمین‌کننده</label>
+                <textarea class="form-control" id="description" rows="4"></textarea>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4"><i class="bi bi-check-lg"></i> ذخیره پروفایل</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/profile.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسویه حساب — SimpleShop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="store.css">
+</head>
+<body>
+  <div id="store-header"></div>
+  <main class="page-shell">
+    <div class="container-xxl">
+      <div class="page-title-bar">
+        <div>
+          <div class="crumb"><a href="index.html">خانه</a> / <a href="cart.html">سبد</a> / تسویه</div>
+          <h1>تسویه حساب</h1>
+        </div>
+      </div>
+      <div class="checkout-grid">
+        <div class="panel-card">
+          <h2 class="h5 fw-bold mb-3">اطلاعات گیرنده</h2>
+          <form id="checkout-form">
+            <div class="mb-3">
+              <label class="form-label" for="fullName">نام و نام خانوادگی *</label>
+              <input type="text" class="form-control" id="fullName" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="phone">موبایل *</label>
+              <input type="tel" class="form-control" id="phone" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="address">آدرس کامل *</label>
+              <textarea class="form-control" id="address" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="note">توضیحات سفارش</label>
+              <textarea class="form-control" id="note" rows="2"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg w-100">ثبت سفارش</button>
+          </form>
+        </div>
+        <aside class="panel-card cart-summary" id="checkout-summary"></aside>
+      </div>
+    </div>
+  </main>
+  <div id="store-footer"></div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api-client.js"></script>
+  <script src="js/store-core.js"></script>
+  <script src="js/layout.js"></script>
+  <script src="js/checkout-page.js"></script>
+</body>
+</html>

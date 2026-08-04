@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>گزارش‌ها — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="reports">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title">گزارش‌ها</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <div>
+          <h1>گزارش‌های فروشگاه</h1>
+          <p class="text-muted mb-0 small">تحلیل فروش چندماهه، انواع گزارش و آمار نظرات — تاریخ‌ها در صفحه شمسی نمایش داده می‌شوند</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2 no-print">
+          <button type="button" class="btn btn-outline-primary" id="btn-export-csv">
+            <i class="bi bi-download"></i> خروجی CSV
+          </button>
+          <button type="button" class="btn btn-outline-secondary" id="btn-print">
+            <i class="bi bi-printer"></i> چاپ
+          </button>
+        </div>
+      </div>
+
+      <div class="filter-bar no-print">
+        <div class="filter-field">
+          <label class="form-label" for="filter-report-type">نوع گزارش</label>
+          <select class="form-select form-select-sm" id="filter-report-type">
+            <option value="overview">نمای کلی فروش</option>
+            <option value="monthly">مقایسه ماهانه</option>
+            <option value="category">فروش بر اساس دسته‌بندی</option>
+            <option value="status">سفارش‌ها بر اساس وضعیت</option>
+            <option value="payment">فروش بر اساس پرداخت</option>
+          </select>
+        </div>
+        <div class="filter-field persian-month-field">
+          <label class="form-label" for="filter-month-trigger">ماه شمسی</label>
+          <div class="persian-month-select" id="persian-month-select">
+            <button type="button" class="persian-month-select__trigger" id="filter-month-trigger" aria-haspopup="listbox" aria-expanded="false">
+              <span class="persian-month-select__icon"><i class="bi bi-calendar-month" aria-hidden="true"></i></span>
+              <span class="persian-month-select__text" id="filter-month-label">همه ماه‌ها</span>
+              <span class="persian-month-select__caret"><i class="bi bi-chevron-down" aria-hidden="true"></i></span>
+            </button>
+            <input type="hidden" id="filter-month" value="">
+            <div class="persian-month-select__panel" id="filter-month-panel" hidden role="listbox" aria-label="انتخاب ماه شمسی">
+              <div class="persian-month-select__panel-head">انتخاب ماه</div>
+              <div class="persian-month-select__list" id="filter-month-list"></div>
+            </div>
+          </div>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-date-from">از تاریخ</label>
+          <input type="date" class="form-control form-control-sm" id="filter-date-from" data-persian-calendar placeholder="انتخاب تاریخ شمسی" title="نمایش شمسی؛ فیلتر با تاریخ میلادی انجام می‌شود">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-date-to">تا تاریخ</label>
+          <input type="date" class="form-control form-control-sm" id="filter-date-to" data-persian-calendar placeholder="انتخاب تاریخ شمسی" title="نمایش شمسی؛ فیلتر با تاریخ میلادی انجام می‌شود">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-category">دسته‌بندی</label>
+          <select class="form-select form-select-sm" id="filter-category">
+            <option value="">همه</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-product">محصول</label>
+          <select class="form-select form-select-sm" id="filter-product">
+            <option value="">همه</option>
+          </select>
+        </div>
+        <div class="filter-field filter-field--grow">
+          <label class="form-label" for="filter-customer">مشتری</label>
+          <input type="search" class="form-control form-control-sm" id="filter-customer" placeholder="نام، نام‌خانوادگی، موبایل یا شناسه" autocomplete="off">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-order-status">وضعیت سفارش</label>
+          <select class="form-select form-select-sm" id="filter-order-status">
+            <option value="">همه</option>
+            <option value="pending">در انتظار</option>
+            <option value="processing">در حال پردازش</option>
+            <option value="shipped">ارسال شده</option>
+            <option value="delivered">تحویل شده</option>
+            <option value="cancelled">لغو شده</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-payment-status">وضعیت پرداخت</label>
+          <select class="form-select form-select-sm" id="filter-payment-status">
+            <option value="">همه</option>
+            <option value="paid">پرداخت شده</option>
+            <option value="unpaid">پرداخت نشده</option>
+            <option value="refunded">مرجوعی</option>
+          </select>
+        </div>
+        <div class="filter-actions">
+          <button type="button" class="btn btn-primary btn-sm" id="btn-apply-filters">اعمال فیلتر</button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-clear-filters">پاک کردن</button>
+        </div>
+      </div>
+
+      <!-- آمار کلی -->
+      <div class="row g-3 mb-4" id="report-stats" data-report-panel="overview monthly category status payment">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-cart-check"></i></div>
+            <div class="stat-value" data-stat="totalOrders">—</div>
+            <div class="stat-label">کل سفارش‌ها</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-currency-exchange"></i></div>
+            <div class="stat-value" data-stat="totalRevenue" style="font-size:1.1rem">—</div>
+            <div class="stat-label">درآمد کل</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon info"><i class="bi bi-receipt"></i></div>
+            <div class="stat-value" data-stat="avgOrderValue" style="font-size:1.1rem">—</div>
+            <div class="stat-label">میانگین سفارش</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon primary"><i class="bi bi-box-seam"></i></div>
+            <div class="stat-value" data-stat="itemsSold">—</div>
+            <div class="stat-label">اقلام فروخته‌شده</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon warning"><i class="bi bi-people"></i></div>
+            <div class="stat-value" data-stat="activeCustomers">—</div>
+            <div class="stat-label">مشتریان فعال</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-star"></i></div>
+            <div class="stat-value" data-stat="avgRating">—</div>
+            <div class="stat-label">میانگین امتیاز</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- نمودار فروش -->
+      <div class="content-card mb-4" data-report-panel="overview">
+        <div class="card-header"><i class="bi bi-bar-chart"></i> فروش بر اساس بازه زمانی</div>
+        <div class="card-body">
+          <div class="chart-bar-container" id="sales-chart" aria-label="نمودار فروش"></div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4" data-report-panel="overview">
+        <!-- محصولات پرفروش -->
+        <div class="col-lg-6">
+          <div class="content-card h-100">
+            <div class="card-header"><i class="bi bi-trophy"></i> محصولات پرفروش</div>
+            <div class="table-responsive">
+              <table class="table admin-table mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>محصول</th>
+                    <th>تعداد</th>
+                    <th>درآمد</th>
+                  </tr>
+                </thead>
+                <tbody id="top-products-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- مشتریان برتر -->
+        <div class="col-lg-6">
+          <div class="content-card h-100">
+            <div class="card-header"><i class="bi bi-person-badge"></i> مشتریان برتر</div>
+            <div class="table-responsive">
+              <table class="table admin-table mb-0">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>مشتری</th>
+                    <th>سفارش</th>
+                    <th>مجموع خرید</th>
+                  </tr>
+                </thead>
+                <tbody id="top-customers-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- آمار نظرات -->
+      <div class="content-card mb-4" data-report-panel="overview">
+        <div class="card-header"><i class="bi bi-chat-square-text"></i> آمار نظرات</div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-3">
+              <div class="text-center p-3 border rounded">
+                <div class="fs-3 fw-bold text-primary" id="review-total">—</div>
+                <div class="text-muted small">کل نظرات</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center p-3 border rounded">
+                <div class="fs-3 fw-bold text-success" id="review-approved">—</div>
+                <div class="text-muted small">تأیید شده</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center p-3 border rounded">
+                <div class="fs-3 fw-bold text-warning" id="review-pending">—</div>
+                <div class="text-muted small">در انتظار</div>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="text-center p-3 border rounded">
+                <div class="fs-3 fw-bold text-danger" id="review-rejected">—</div>
+                <div class="text-muted small">رد شده</div>
+              </div>
+            </div>
+            <div class="col-12">
+              <h6 class="mb-3">توزیع امتیازها</h6>
+              <div id="rating-distribution"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- مقایسه ماهانه -->
+      <div class="content-card mb-4" data-report-panel="monthly">
+        <div class="card-header"><i class="bi bi-calendar3"></i> مقایسه ماهانه فروش</div>
+        <div class="card-body">
+          <div class="chart-bar-container mb-4" id="monthly-chart" aria-label="نمودار ماهانه"></div>
+          <div class="table-responsive">
+            <table class="table admin-table mb-0">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>ماه (شمسی)</th>
+                  <th>تعداد سفارش</th>
+                  <th>پرداخت‌شده</th>
+                  <th>درآمد</th>
+                </tr>
+              </thead>
+              <tbody id="monthly-report-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- گزارش دسته‌بندی -->
+      <div class="content-card mb-4" data-report-panel="category">
+        <div class="card-header"><i class="bi bi-tags"></i> فروش بر اساس دسته‌بندی</div>
+        <div class="table-responsive">
+          <table class="table admin-table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>دسته‌بندی</th>
+                <th>سفارش</th>
+                <th>تعداد اقلام</th>
+                <th>درآمد</th>
+              </tr>
+            </thead>
+            <tbody id="category-report-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- گزارش وضعیت -->
+      <div class="content-card mb-4" data-report-panel="status">
+        <div class="card-header"><i class="bi bi-flag"></i> سفارش‌ها بر اساس وضعیت</div>
+        <div class="table-responsive">
+          <table class="table admin-table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>وضعیت</th>
+                <th>تعداد</th>
+                <th>مجموع مبلغ</th>
+              </tr>
+            </thead>
+            <tbody id="status-report-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- گزارش پرداخت -->
+      <div class="content-card mb-4" data-report-panel="payment">
+        <div class="card-header"><i class="bi bi-credit-card"></i> فروش بر اساس وضعیت پرداخت</div>
+        <div class="table-responsive">
+          <table class="table admin-table mb-0">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>وضعیت پرداخت</th>
+                <th>تعداد</th>
+                <th>مجموع مبلغ</th>
+              </tr>
+            </thead>
+            <tbody id="payment-report-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/persian-datepicker.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/reports.js"></script>
+</body>
+</html>

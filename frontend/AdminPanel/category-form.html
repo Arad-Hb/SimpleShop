@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فرم دسته‌بندی — پنل مدیریت فروشگاه</title>
+  <link rel="stylesheet" href="assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body data-page="categories">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه</span></div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link d-lg-none" data-sidebar-toggle aria-label="منو"><i class="bi bi-list fs-4"></i></button>
+        <h2 class="header-title" id="form-page-title">دسته‌بندی</h2>
+      </div>
+      <div class="header-actions"><span class="text-muted small" data-admin-name></span></div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <h1 id="form-heading">افزودن دسته‌بندی</h1>
+        <a href="categories.html" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-right"></i> بازگشت به لیست
+        </a>
+      </div>
+
+      <div class="content-card">
+        <div class="card-body">
+          <form id="category-form" novalidate>
+            <input type="hidden" name="id" id="category-id">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="category-name" class="form-label">نام <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="category-name" name="name" required>
+              </div>
+              <div class="col-md-6">
+                <label for="category-slug" class="form-label">شناسه URL (slug)</label>
+                <input type="text" class="form-control" id="category-slug" name="slug" dir="ltr">
+                <div class="form-text">به‌صورت خودکار از نام ساخته می‌شود.</div>
+              </div>
+              <div class="col-12">
+                <label for="category-description" class="form-label">توضیحات</label>
+                <textarea class="form-control" id="category-description" name="description" rows="3"></textarea>
+              </div>
+              <div class="col-md-4">
+                <label for="category-sort-order" class="form-label">ترتیب نمایش</label>
+                <input type="number" class="form-control" id="category-sort-order" name="sortOrder" min="0" value="0">
+              </div>
+              <div class="col-md-4 d-flex align-items-end">
+                <div class="form-check form-switch mb-2">
+                  <input class="form-check-input" type="checkbox" id="category-is-active" name="isActive" checked>
+                  <label class="form-check-label" for="category-is-active">فعال</label>
+                </div>
+              </div>
+              <div class="col-md-4 d-none" id="meta-dates">
+                <div class="small text-muted">
+                  <div>ایجاد: <span id="category-created-at">—</span></div>
+                  <div>آخرین ویرایش: <span id="category-updated-at">—</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
+              <button type="submit" class="btn btn-primary" id="btn-save">
+                <i class="bi bi-check-lg"></i> ذخیره
+              </button>
+              <a href="categories.html" class="btn btn-outline-secondary">انصراف</a>
+              <button type="button" class="btn btn-danger ms-auto d-none" id="btn-delete">
+                <i class="bi bi-trash"></i> حذف
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div id="toast-container" class="toast-container position-fixed bottom-0 start-0 p-3"></div>
+<div id="confirm-modal-root"></div>
+
+<script src="assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/validation.js"></script>
+<script src="assets/js/pagination.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/sync.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/categories.js"></script>
+</body>
+</html>
