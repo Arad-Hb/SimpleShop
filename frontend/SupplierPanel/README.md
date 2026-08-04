@@ -6,8 +6,9 @@ Offline supplier portal (HTML + CSS + Bootstrap 5 + vanilla JS) using the **Coba
 
 ## Quick start
 
-1. Open `frontend/SupplierPanel/login.html` in the browser (or Live Server).
-2. Bootstrap/CSS are loaded from `../AdminPanel/assets/` — keep both folders under `frontend/`.
+1. Open **`login.html`** directly (not the folder). Opening the folder shows a file list, not the login UI.
+2. With Live Server: right‑click `login.html` → Open with Live Server.
+3. Bootstrap/CSS are loaded from `../AdminPanel/assets/` — keep both folders under `frontend/`.
 
 ## Demo login
 

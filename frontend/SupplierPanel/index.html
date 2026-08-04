@@ -6,6 +6,13 @@
   var path = location.pathname || '';
   if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
     location.replace(path + '/' + location.search + location.hash);
+    return;
+  }
+  try {
+    var raw = sessionStorage.getItem('shopSupplierSession') || localStorage.getItem('shopSupplierSession');
+    if (!raw) location.replace('login.html');
+  } catch (e) {
+    location.replace('login.html');
   }
 })();
 </script>
@@ -26,15 +33,7 @@
   </aside>
   <div class="admin-main">
     <header class="admin-header">
-  <script>
-(function () {
-  var path = location.pathname || '';
-  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
-    location.replace(path + '/' + location.search + location.hash);
-  }
-})();
-</script>
-      <div class="d-flex align-items-center gap-3">
+<div class="d-flex align-items-center gap-3">
         <button type="button" class="btn btn-link sidebar-toggle-btn" data-sidebar-toggle aria-label="منو"><i class="bi bi-layout-sidebar-reverse"></i></button>
         <h2 class="header-title">داشبورد تأمین‌کننده</h2>
       </div>
