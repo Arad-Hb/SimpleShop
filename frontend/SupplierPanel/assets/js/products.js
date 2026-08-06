@@ -4,6 +4,7 @@
   const { escapeHtml, formatPrice } = ShopSupplier.utils;
   const PAGE_SIZE = 8;
   let currentPage = 1;
+  let apiProducts = [];
 
   const stockBadge = (p) => {
     if (!p.stock || p.stock <= 0) return '<span class="badge badge-stock-out">ناموجود</span>';
@@ -16,7 +17,7 @@
     const brandFilter = document.getElementById('filter-brand')?.value || '';
     const statusFilter = document.getElementById('filter-status')?.value || '';
 
-    let products = ShopSupplier.storage.getProducts();
+    let products = apiProducts.slice();
     if (q) {
       products = products.filter((p) =>
         [p.name, p.sku, p.brandName].join(' ').toLowerCase().includes(q)
@@ -60,13 +61,7 @@
         </td>
         <td>${escapeHtml(p.brandName || '—')}</td>
         <td>${formatPrice(p.price)}</td>
-        <td>
-          <div class="stock-stepper" data-stock-for="${escapeHtml(p.id)}">
-            <button type="button" data-delta="-1" aria-label="کاهش موجودی"><i class="bi bi-dash"></i></button>
-            <span class="stock-value">${Number(p.stock || 0).toLocaleString('fa-IR')}</span>
-            <button type="button" data-delta="1" aria-label="افزایش موجودی"><i class="bi bi-plus"></i></button>
-          </div>
-        </td>
+        <td>${Number(p.stock || 0).toLocaleString('fa-IR')}</td>
         <td>${stockBadge(p)}</td>
         <td>
           <span class="badge ${p.isActive !== false ? 'badge-stock-available' : 'badge-stock-inactive'}">
@@ -74,14 +69,7 @@
           </span>
         </td>
         <td class="text-center col-actions">
-          <div class="table-actions">
-            <a href="product-form.html?id=${encodeURIComponent(p.id)}" class="btn btn-sm btn-outline-primary" title="ویرایش">
-              <i class="bi bi-pencil"></i>
-            </a>
-            <button type="button" class="btn btn-sm btn-outline-danger" data-delete="${escapeHtml(p.id)}" title="حذف">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+          <span class="text-muted small">فقط مشاهده</span>
         </td>
       </tr>
     `).join('');
@@ -101,18 +89,37 @@
   const fillBrandFilter = () => {
     const select = document.getElementById('filter-brand');
     if (!select) return;
-    const brands = ShopSupplier.storage.getBrands();
+    const brands = new Map();
+    apiProducts.forEach((p) => {
+      if (p.brandId && !brands.has(p.brandId)) brands.set(p.brandId, p.brandName || p.brandId);
+    });
     select.innerHTML = '<option value="">همه برندها</option>' +
-      brands.map((b) => `<option value="${escapeHtml(b.id)}">${escapeHtml(b.name)}</option>`).join('');
+      [...brands.entries()].map(([id, name]) =>
+        `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`
+      ).join('');
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
     if (!ShopSupplier.auth.requireAuth()) return;
 
     ShopSupplier.ui.initBreadcrumb([
       { label: 'داشبورد', href: 'index.html' },
       { label: 'محصولات من' }
     ]);
+
+    const tbody = document.getElementById('products-body');
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-4">
+        <span class="spinner-border spinner-border-sm me-2"></span>در حال بارگذاری از API...
+      </td></tr>`;
+    }
+
+    const syncResult = await ShopSupplier.sync.syncProductsFromApi();
+    apiProducts = ShopSupplier.sync.getProducts();
+
+    if (!syncResult.ok) {
+      ShopSupplier.ui.showToast('warning', syncResult.message || 'همگام‌سازی API ناموفق بود.');
+    }
 
     fillBrandFilter();
     ShopSupplier.ui.enhanceFormSelects(document);
@@ -131,35 +138,6 @@
       document.getElementById('filter-status')?.dispatchEvent(new Event('change', { bubbles: true }));
       currentPage = 1;
       renderTable();
-    });
-
-    document.getElementById('products-body')?.addEventListener('click', (e) => {
-      const deltaBtn = e.target.closest('[data-delta]');
-      if (deltaBtn) {
-        const stepper = deltaBtn.closest('[data-stock-for]');
-        const id = stepper?.dataset.stockFor;
-        const delta = Number(deltaBtn.dataset.delta);
-        if (id && delta) {
-          ShopSupplier.storage.adjustStock(id, delta);
-          ShopSupplier.ui.showToast('success', 'موجودی به‌روزرسانی شد.');
-          renderTable();
-        }
-        return;
-      }
-
-      const delBtn = e.target.closest('[data-delete]');
-      if (delBtn) {
-        const id = delBtn.dataset.delete;
-        ShopSupplier.ui.showConfirmModal(
-          'حذف محصول',
-          'این محصول حذف شود؟ این کار قابل بازگشت نیست.',
-          () => {
-            ShopSupplier.storage.deleteProduct(id);
-            ShopSupplier.ui.showToast('success', 'محصول حذف شد.');
-            renderTable();
-          }
-        );
-      }
     });
   });
 })(window.ShopSupplier = window.ShopSupplier || {});

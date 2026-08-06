@@ -1,0 +1,184 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel|CustomerPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+    return;
+  }
+  try {
+    var raw = sessionStorage.getItem('shopCustomerSession') || localStorage.getItem('shopCustomerSession');
+    if (!raw) location.replace('login.html');
+  } catch (e) {
+    location.replace('login.html');
+  }
+})();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>داشبورد — پنل مشتری</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
+</head>
+<body data-page="dashboard">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand customer-sidebar-brand">
+      <div class="customer-avatar-wrap">
+        <img src="assets/img/customer-avatar.png" alt="" class="customer-avatar" data-customer-avatar>
+      </div>
+      <span data-customer-brand>مشتری</span>
+      <span class="customer-sidebar-chip"><i class="bi bi-stars" aria-hidden="true"></i> حساب من</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link sidebar-toggle-btn" data-sidebar-toggle aria-label="منو"><i class="bi bi-layout-sidebar-reverse"></i></button>
+        <h2 class="header-title">خانه حساب من</h2>
+      </div>
+      <div class="header-actions">
+        <span class="fun-tag fun-tag--mint me-2">فعال</span>
+        <span class="text-muted small" data-customer-name></span>
+      </div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <section class="customer-hero">
+        <div class="customer-hero__inner">
+          <div>
+            <div class="customer-hero__eyebrow"><i class="bi bi-sun" aria-hidden="true"></i> خوش آمدید</div>
+            <h1>سلام <span id="dash-greet">مشتری</span>، خوش اومدید!</h1>
+            <p>از اینجا سفارش‌ها، سبدهای ناتمام و اطلاعات حسابتان را راحت و رنگی مدیریت کنید — برای هر سلیقه و هر سن.</p>
+            <div class="customer-hero__tags">
+              <span class="fun-tag"><i class="bi bi-bag-heart"></i> خرید آسان</span>
+              <span class="fun-tag"><i class="bi bi-truck"></i> پیگیری سفارش</span>
+              <span class="fun-tag"><i class="bi bi-wallet2"></i> کیف پول من</span>
+            </div>
+          </div>
+          <div class="customer-hero__actions">
+            <a href="orders.html" class="btn btn-light"><i class="bi bi-bag-check"></i> سفارش‌های من</a>
+            <a href="carts.html" class="btn btn-outline-light"><i class="bi bi-cart3"></i> سبدهای ناتمام</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="dash-shortcuts">
+        <a class="dash-shortcut dash-shortcut--orders" href="orders.html">
+          <span class="dash-shortcut__icon"><i class="bi bi-bag-check"></i></span>
+          <span class="dash-shortcut__title">سفارش‌ها</span>
+          <span class="dash-shortcut__desc">تاریخچه خرید و وضعیت ارسال</span>
+        </a>
+        <a class="dash-shortcut dash-shortcut--carts" href="carts.html">
+          <span class="dash-shortcut__icon"><i class="bi bi-cart3"></i></span>
+          <span class="dash-shortcut__title">سبدهای باز</span>
+          <span class="dash-shortcut__desc">چیزهایی که هنوز پرداخت نشدند</span>
+        </a>
+        <a class="dash-shortcut dash-shortcut--profile" href="profile.html">
+          <span class="dash-shortcut__icon"><i class="bi bi-person-heart"></i></span>
+          <span class="dash-shortcut__title">پروفایل</span>
+          <span class="dash-shortcut__desc">نام، تماس و آدرس شما</span>
+        </a>
+        <a class="dash-shortcut dash-shortcut--money" href="financial.html">
+          <span class="dash-shortcut__icon"><i class="bi bi-wallet2"></i></span>
+          <span class="dash-shortcut__title">اطلاعات مالی</span>
+          <span class="dash-shortcut__desc">کارت و شبا برای بازگشت وجه</span>
+        </a>
+      </div>
+
+      <div class="section-label">
+        <h2>نگاه سریع به حساب</h2>
+        <span class="fun-tag fun-tag--sky"><i class="bi bi-graph-up-arrow"></i> خلاصه امروز</span>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card stat-card--teal">
+            <div class="stat-icon"><i class="bi bi-bag"></i></div>
+            <div class="stat-value" id="stat-orders">—</div>
+            <div class="stat-label">کل سفارش‌ها</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card stat-card--mint">
+            <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
+            <div class="stat-value" id="stat-paid">—</div>
+            <div class="stat-label">پرداخت‌شده</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card stat-card--amber">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value" id="stat-pending">—</div>
+            <div class="stat-label">در انتظار</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card stat-card--sky">
+            <div class="stat-icon"><i class="bi bi-cash-stack"></i></div>
+            <div class="stat-value" id="stat-spent" style="font-size:0.95rem">—</div>
+            <div class="stat-label">جمع خرید</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card stat-card--coral">
+            <div class="stat-icon"><i class="bi bi-cart3"></i></div>
+            <div class="stat-value" id="stat-carts">—</div>
+            <div class="stat-label">سبد ناتمام</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4 col-xl-2">
+          <div class="stat-card stat-card--lilac">
+            <div class="stat-icon"><i class="bi bi-box"></i></div>
+            <div class="stat-value" id="stat-cart-items">—</div>
+            <div class="stat-label">کالای معلق</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-label">
+        <h2>آخرین سفارش‌ها</h2>
+        <a href="orders.html" class="fun-tag fun-tag--coral">مشاهده همه</a>
+      </div>
+
+      <div class="content-card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table admin-table mb-0">
+              <thead>
+                <tr>
+                  <th>شماره سفارش</th>
+                  <th>وضعیت</th>
+                  <th>مبلغ</th>
+                  <th>تاریخ</th>
+                  <th class="text-center">عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="recent-orders"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>

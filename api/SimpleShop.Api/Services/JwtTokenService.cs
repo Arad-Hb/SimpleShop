@@ -12,14 +12,12 @@ public class JwtTokenService(IConfiguration config)
     {
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new(ClaimTypes.NameIdentifier, user.UserId),
             new(ClaimTypes.Name, user.Username),
             new(ClaimTypes.Role, user.Role),
-            new("FullName", user.FullName)
+            new("FullName", user.FullName),
+            new("Mobile", user.Mobile)
         };
-
-        if (user.CustomerId.HasValue)
-            claims.Add(new Claim("CustomerId", user.CustomerId.Value.ToString()));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

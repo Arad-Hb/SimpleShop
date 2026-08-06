@@ -1,44 +1,128 @@
 (function (Store) {
   'use strict';
 
+  const createPaymentReference = () =>
+    `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
+
   document.addEventListener('DOMContentLoaded', () => {
     const { formatPrice, escapeHtml, showToast } = Store.ui;
-    const { getProduct } = Store.catalog;
     const summary = document.getElementById('checkout-summary');
     const form = document.getElementById('checkout-form');
-    const items = Store.cart.getCart();
+    const payBtn = document.getElementById('btn-pay');
+    const entity = Store.card.getCardEntity();
+    const cardItems = entity.cardItems;
 
-    if (!items.length) {
-      window.location.href = 'cart.html';
+    if (!cardItems.length) {
+      window.location.href = 'card.html';
       return;
     }
 
-    const total = Store.cart.cartTotal();
+    const orderLines = Store.card.toOrderItems();
+    if (!orderLines.length) {
+      showToast('اقلام کارت با کاتالوگ فروشگاه هم‌خوان نیستند. لطفاً دوباره به کارت اضافه کنید.');
+      return;
+    }
+
+    const total = entity.itemsTotal || Store.card.cardTotal();
+    const isLoggedIn = !!Store.api?.getToken?.();
+
     if (summary) {
       summary.innerHTML = `
         <h2 class="h5 fw-bold mb-3">سفارش شما</h2>
-        ${items.map((item) => {
-          const p = getProduct(item.id);
-          if (!p) return '';
-          return `<div class="row-line"><span>${escapeHtml(p.title)} × ${item.qty.toLocaleString('fa-IR')}</span><span>${formatPrice(p.price * item.qty)}</span></div>`;
-        }).join('')}
+        ${cardItems.map((row) => `
+          <div class="row-line checkout-line">
+            <span class="checkout-line-title">
+              ${row.imageUrl ? `<img src="${escapeHtml(row.imageUrl)}" alt="" class="checkout-thumb">` : ''}
+              ${escapeHtml(row.title)} × ${row.quantity.toLocaleString('fa-IR')}
+            </span>
+            <span>${formatPrice(row.lineTotal)}</span>
+          </div>`).join('')}
         <div class="total-line"><span>مبلغ کل</span><span>${formatPrice(total)}</span></div>
-        <p class="small text-muted mb-0">ارسال رایگان · پرداخت هنگام تحویل (دمو)</p>`;
+        <p class="small text-muted mb-0">${isLoggedIn ? 'پرداخت و ثبت سفارش با حساب کاربری' : 'پرداخت، سپس ثبت‌نام/ورود خودکار و تکمیل سفارش'}</p>`;
     }
 
-    form?.addEventListener('submit', (e) => {
-      e.preventDefault();
+    const splitName = (full) => {
+      const parts = String(full || '').trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return { firstName: '', lastName: '' };
+      if (parts.length === 1) return { firstName: parts[0], lastName: parts[0] };
+      return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
+    };
+
+    const setBusy = (busy) => {
+      if (payBtn) {
+        payBtn.disabled = busy;
+        payBtn.textContent = busy ? 'در حال پردازش…' : 'پرداخت و تکمیل سفارش';
+      }
+      form?.querySelectorAll('input, textarea, button').forEach((el) => {
+        if (el !== payBtn) el.disabled = busy;
+      });
+    };
+
+    const runCheckout = async () => {
       const name = document.getElementById('fullName').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
-      if (!name || !phone || !address) {
-        showToast('لطفاً فیلدهای ضروری را کامل کنید');
+      const postalCode = document.getElementById('postalCode').value.trim();
+      const note = document.getElementById('note')?.value?.trim() || '';
+
+      if (!name || !phone || !address || !postalCode) {
+        showToast('لطفاً نام، موبایل، آدرس و کد پستی را کامل کنید');
         return;
       }
-      Store.cart.clearCart();
-      const { formatDateTime } = Store.ui;
-      showToast(`سفارش شما در تاریخ ${formatDateTime(new Date())} با موفقیت ثبت شد`);
-      setTimeout(() => { window.location.href = 'index.html'; }, 900);
+
+      if (!Store.config?.USE_API || !Store.api) {
+        showToast('اتصال به سرور فعال نیست');
+        return;
+      }
+
+      const shippingAddress = note ? `${address}\n${note}` : address;
+      const { firstName, lastName } = splitName(name);
+      const paymentReference = createPaymentReference();
+
+      setBusy(true);
+      try {
+        let orderId;
+
+        if (isLoggedIn) {
+          const result = await Store.api.createOrder({
+            shippingAddress,
+            paymentStatus: 'Paid',
+            items: orderLines
+          });
+          orderId = result?.id ?? result?.Id;
+        } else {
+          const result = await Store.api.completeCheckout({
+            mobile: phone,
+            firstName,
+            lastName,
+            shippingAddress,
+            postalCode,
+            paymentReference,
+            items: orderLines
+          });
+          if (result?.token) Store.api.setToken(result.token);
+          orderId = result?.order?.id ?? result?.order?.Id;
+        }
+
+        Store.card.clearCard();
+        showToast(orderId
+          ? `پرداخت موفق — سفارش #${orderId} ثبت شد`
+          : 'پرداخت موفق — سفارش شما ثبت شد');
+        setTimeout(() => { window.location.href = 'index.html'; }, 900);
+      } catch (err) {
+        const message = SimpleShopHttp?.parseError?.(err) || err?.message || 'تکمیل سفارش ناموفق بود';
+        showToast(message);
+        setBusy(false);
+      }
+    };
+
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      runCheckout();
+    });
+    payBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      runCheckout();
     });
   });
 })(window.SimpleStore = window.SimpleStore || {});

@@ -11,7 +11,7 @@ public class SalesReportOrderDto
 {
     public int Id { get; set; }
     public string OrderNumber { get; set; } = string.Empty;
-    public int CustomerId { get; set; }
+    public string CustomerId { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string PaymentStatus { get; set; } = string.Empty;
     public decimal Total { get; set; }
@@ -32,7 +32,7 @@ public class SalesReportOrderItemDto
 
 public class SalesReportCustomerDto
 {
-    public int Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string FullName { get; set; } = string.Empty;

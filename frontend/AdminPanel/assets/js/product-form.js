@@ -13,11 +13,13 @@
     validateRequired, validateSlug, validateUnique, validateImageFile,
     showFieldError, clearFieldErrors
   } = ShopAdmin.validation;
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
-  const productRepo = ShopAdmin.storage.createRepository('products');
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
+
   const categoryRepo = ShopAdmin.storage.createRepository('categories');
   const supplierRepo = ShopAdmin.storage.createRepository('suppliers');
-  const orderItemRepo = ShopAdmin.storage.createRepository('orderItems');
   const { imageStore } = ShopAdmin.storage;
 
   const form = document.getElementById('product-form');
@@ -53,29 +55,123 @@
     return product;
   };
 
-  const productHasOrders = (productId) =>
-    orderItemRepo.getAll().some((item) => item.productId === productId);
+  const productHasOrders = () => false;
+
+  const toApiPayload = (data) => ({
+    name: data.name,
+    description: data.description || null,
+    price: Number(data.price) || 0,
+    stock: Number(data.stock) || 0,
+    categoryId: Number(data.categoryId),
+    supplierId: data.supplierId ? Number(data.supplierId) : null,
+    slug: data.slug || null,
+    metaTitle: data.seo?.metaTitle || null,
+    metaDescription: data.seo?.metaDescription || null,
+    metaKeywords: data.seo?.keywords || null,
+    canonicalUrl: data.seo?.canonicalUrl || null,
+    ogTitle: data.seo?.ogTitle || null,
+    ogDescription: data.seo?.ogDescription || null
+  });
+
+  const populateDropdowns = async () => {
+    const catSel = document.getElementById('categoryId');
+    const supSel = document.getElementById('supplierId');
+    if (!catSel || !supSel) return;
+
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const [cats, supPage] = await Promise.all([
+        ShopAdmin.api.getCategories(),
+        ShopAdmin.api.getSuppliers()
+      ]);
+
+      (Array.isArray(cats) ? cats : [])
+        .sort((a, b) => (pick(a, 'sortOrder', 'SortOrder') || 0) - (pick(b, 'sortOrder', 'SortOrder') || 0))
+        .forEach((c) => {
+          const opt = document.createElement('option');
+          opt.value = pick(c, 'id', 'Id');
+          opt.textContent = `${pick(c, 'name', 'Name') || ''}${pick(c, 'isActive', 'IsActive') === false ? ' (غیرفعال)' : ''}`;
+          catSel.appendChild(opt);
+        });
+
+      (supPage?.items || supPage?.Items || []).forEach((s) => {
+        const opt = document.createElement('option');
+        opt.value = pick(s, 'id', 'Id');
+        opt.textContent = `${pick(s, 'name', 'Name') || ''}${pick(s, 'isActive', 'IsActive') === false ? ' (غیرفعال)' : ''}`;
+        supSel.appendChild(opt);
+      });
+    } catch {
+      categoryRepo.getAll()
+        .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .forEach((c) => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `${c.name}${c.isActive === false ? ' (غیرفعال)' : ''}`;
+          catSel.appendChild(opt);
+        });
+
+      supplierRepo.getAll().forEach((s) => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.name}${s.isActive === false ? ' (غیرفعال)' : ''}`;
+        supSel.appendChild(opt);
+      });
+    }
+  };
 
   const markDirty = () => { isDirty = true; };
 
-  const populateDropdowns = () => {
-    const catSel = document.getElementById('categoryId');
-    const supSel = document.getElementById('supplierId');
+  const mapApiToForm = (dto) => {
+    const gallery = Array.isArray(dto.gallery) ? dto.gallery : (Array.isArray(dto.Gallery) ? dto.Gallery : []);
+    const imageUrl = pick(dto, 'imageUrl', 'ImageUrl') || '';
+    const thumbnailUrl = pick(dto, 'thumbnailUrl', 'ThumbnailUrl') || imageUrl || '';
+    const images = gallery.length
+      ? gallery.map((g, i) => ({
+          id: `api-img-${pick(dto, 'id', 'Id')}-${pick(g, 'id', 'Id') || i}`,
+          alt: pick(g, 'altText', 'AltText') || pick(dto, 'name', 'Name') || '',
+          isPrimary: pick(g, 'isPrimary', 'IsPrimary') === true || i === 0,
+          sortOrder: pick(g, 'sortOrder', 'SortOrder') ?? i,
+          url: pick(g, 'url', 'Url') || imageUrl,
+          thumbnailUrl: pick(g, 'thumbnailUrl', 'ThumbnailUrl') || thumbnailUrl
+        }))
+      : (imageUrl || thumbnailUrl
+        ? [{
+            id: `api-img-${pick(dto, 'id', 'Id')}-primary`,
+            alt: pick(dto, 'name', 'Name') || '',
+            isPrimary: true,
+            sortOrder: 0,
+            url: imageUrl,
+            thumbnailUrl
+          }]
+        : []);
 
-    categoryRepo.getAll()
-      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
-      .forEach((c) => {
-        const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = `${c.name}${c.isActive === false ? ' (غیرفعال)' : ''}`;
-        catSel.appendChild(opt);
-      });
-
-    supplierRepo.getAll().forEach((s) => {
-      const opt = document.createElement('option');
-      opt.value = s.id;
-      opt.textContent = `${s.name}${s.isActive === false ? ' (غیرفعال)' : ''}`;
-      supSel.appendChild(opt);
+    return normalizeProduct({
+      id: pick(dto, 'id', 'Id'),
+      name: pick(dto, 'name', 'Name') || '',
+      sku: pick(dto, 'sku', 'Sku') || `API-${String(pick(dto, 'id', 'Id')).padStart(4, '0')}`,
+      categoryId: pick(dto, 'categoryId', 'CategoryId'),
+      supplierId: pick(dto, 'supplierId', 'SupplierId'),
+      price: pick(dto, 'price', 'Price'),
+      discountPrice: null,
+      stock: pick(dto, 'stock', 'Stock'),
+      minimumStock: 5,
+      isActive: pick(dto, 'isActive', 'IsActive') !== false,
+      description: pick(dto, 'description', 'Description') || '',
+      slug: pick(dto, 'slug', 'Slug') || '',
+      images,
+      createdAt: pick(dto, 'createdAt', 'CreatedAt') || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      seo: {
+        metaTitle: pick(dto, 'metaTitle', 'MetaTitle') || '',
+        metaDescription: pick(dto, 'metaDescription', 'MetaDescription') || '',
+        keywords: pick(dto, 'metaKeywords', 'MetaKeywords') || '',
+        canonicalUrl: pick(dto, 'canonicalUrl', 'CanonicalUrl') || '',
+        ogTitle: pick(dto, 'ogTitle', 'OgTitle') || '',
+        ogDescription: pick(dto, 'ogDescription', 'OgDescription') || '',
+        ogImageId: null,
+        index: true,
+        follow: true
+      }
     });
   };
 
@@ -293,10 +389,8 @@
     document.getElementById('gallery-error')?.classList.add('d-none');
 
     const errors = { main: [], gallery: [], seo: [] };
-    const products = productRepo.getAll();
-
     const name = document.getElementById('name')?.value;
-    const sku = document.getElementById('sku')?.value;
+    const sku = document.getElementById('sku')?.value?.trim();
     const categoryId = document.getElementById('categoryId')?.value;
     const supplierId = document.getElementById('supplierId')?.value;
     const price = document.getElementById('price')?.value;
@@ -312,7 +406,6 @@
 
     if (validateRequired(name, 'نام محصول')) addMainError('name', validateRequired(name, 'نام محصول'));
     if (validateRequired(sku, 'کد محصول')) addMainError('sku', validateRequired(sku, 'کد محصول'));
-    else if (validateUnique(sku, products, 'sku', editId)) addMainError('sku', validateUnique(sku, products, 'sku', editId));
     if (!categoryId) addMainError('categoryId', 'دسته‌بندی الزامی است.');
     if (!supplierId) addMainError('supplierId', 'تأمین‌کننده الزامی است.');
 
@@ -337,9 +430,6 @@
     if (slugErr) {
       errors.seo.push(slugErr);
       showFieldError(document.getElementById('slug'), slugErr);
-    } else if (validateUnique(slug, products, 'slug', editId)) {
-      errors.seo.push('شناسه URL تکراری است.');
-      showFieldError(document.getElementById('slug'), 'شناسه URL تکراری است.');
     }
 
     if (!galleryImages.length) {
@@ -446,20 +536,21 @@
     try {
       await saveImages();
       const data = collectFormData();
-      const primary = data.images.find((i) => i.isPrimary);
+      await ShopAdmin.api.ensureApiAuth();
+      const payload = toApiPayload(data);
 
       if (editId) {
-        productRepo.update(editId, { ...data, imageId: primary?.id ?? null });
+        await ShopAdmin.api.updateProduct(editId, payload);
         ShopAdmin.ui.showToast('success', 'محصول با موفقیت به‌روزرسانی شد.');
       } else {
-        productRepo.create({ ...data, imageId: primary?.id ?? null, rating: 0, reviewCount: 0 });
+        await ShopAdmin.api.createProduct(payload);
         ShopAdmin.ui.showToast('success', 'محصول با موفقیت ثبت شد.');
       }
 
       isDirty = false;
       setTimeout(() => { window.location.href = 'products.html'; }, 600);
     } catch (err) {
-      ShopAdmin.ui.showToast('error', 'خطا در ذخیره محصول.');
+      ShopAdmin.ui.showToast('error', apiError(err));
       console.error(err);
     } finally {
       setSubmitting(false);
@@ -467,8 +558,18 @@
   };
 
   const loadProduct = async (id) => {
-    const product = normalizeProduct(productRepo.getById(id));
-    if (!product) {
+    let product;
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const dto = await ShopAdmin.api.getProduct(id);
+      product = mapApiToForm(dto);
+    } catch {
+      ShopAdmin.ui.showToast('error', 'محصول یافت نشد.');
+      window.location.href = 'products.html';
+      return;
+    }
+
+    if (!product?.id) {
       ShopAdmin.ui.showToast('error', 'محصول یافت نشد.');
       window.location.href = 'products.html';
       return;
@@ -489,8 +590,9 @@
     document.getElementById('isActive').checked = product.isActive !== false;
     document.getElementById('description').value = product.description || '';
 
-    slugManual = true;
-    document.getElementById('slug').value = product.slug || '';
+    const existingSlug = (product.slug || '').trim();
+    slugManual = Boolean(existingSlug);
+    document.getElementById('slug').value = existingSlug || slugify(product.name || '');
     const seo = product.seo || defaultSeo();
     document.getElementById('metaTitle').value = seo.metaTitle || '';
     document.getElementById('metaDescription').value = seo.metaDescription || '';
@@ -509,7 +611,9 @@
     document.getElementById('sys-reviewCount').value = (Number(product.reviewCount) || 0).toLocaleString('fa-IR');
 
     galleryImages = await Promise.all((product.images || []).map(async (img, i) => {
-      const previewUrl = await loadImagePreview(img.id);
+      let previewUrl = img.thumbnailUrl || img.url || '';
+      if (previewUrl && ShopAdmin.api?.mediaUrl) previewUrl = ShopAdmin.api.mediaUrl(previewUrl);
+      if (!previewUrl) previewUrl = await loadImagePreview(img.id);
       return {
         id: img.id,
         alt: img.alt || '',
@@ -527,7 +631,7 @@
       }
     }
 
-    const hasOrders = productHasOrders(id);
+    const hasOrders = productHasOrders();
     const btnDelete = document.getElementById('btn-delete');
     const btnDeactivate = document.getElementById('btn-deactivate');
     if (hasOrders) {
@@ -548,25 +652,26 @@
   const handleDelete = () => {
     if (!editId) return;
     ShopAdmin.ui.showConfirmModal('حذف محصول', 'آیا از حذف این محصول مطمئن هستید؟', async () => {
-      const product = productRepo.getById(editId);
-      const ids = [...(product?.images || []).map((i) => i.id), product?.seo?.ogImageId].filter(Boolean);
-      await Promise.all(ids.map((imgId) => imageStore.deleteImage(imgId).catch(() => {})));
-      productRepo.remove(editId);
-      isDirty = false;
-      ShopAdmin.ui.showToast('success', 'محصول حذف شد.');
-      window.location.href = 'products.html';
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+        await ShopAdmin.api.deleteProduct(editId);
+        isDirty = false;
+        ShopAdmin.ui.showToast('success', 'محصول حذف شد.');
+        window.location.href = 'products.html';
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
+      }
     });
   };
 
   const handleDeactivate = () => {
     if (!editId) return;
-    productRepo.update(editId, { isActive: false });
     document.getElementById('isActive').checked = false;
     isDirty = false;
-    ShopAdmin.ui.showToast('warning', 'محصول غیرفعال شد.');
+    ShopAdmin.ui.showToast('warning', 'غیرفعال‌سازی isActive در API پشتیبانی نمی‌شود؛ فقط UI.');
   };
 
-  const init = () => {
+  const init = async () => {
     const params = ShopAdmin.utils.parseQuery();
     const isEdit = !!params.id;
 
@@ -576,7 +681,7 @@
       { label: isEdit ? 'ویرایش محصول' : 'ثبت محصول' }
     ]);
 
-    populateDropdowns();
+    await populateDropdowns();
     initGalleryDropZone();
 
     document.getElementById('name')?.addEventListener('input', () => { autoSlug(); markDirty(); updateSeoPreview(); });

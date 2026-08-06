@@ -19,20 +19,36 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
         _ => "paid"
     };
 
-    private static (string FirstName, string LastName) SplitName(string? fullName)
-    {
-        var name = (fullName ?? string.Empty).Trim();
-        if (string.IsNullOrEmpty(name)) return ("مشتری", "");
-        var parts = name.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        return parts.Length == 1 ? (parts[0], "") : (parts[0], parts[1]);
-    }
-
-    public Task<OperationResult> Add(OrderCreateModel model) => CreateFromCart(model);
+    public Task<OperationResult> Add(OrderCreateModel model) => CreateFromItems(model);
 
     public async Task<OperationResult> Update(OrderCreateModel model)
     {
         var op = new OperationResult("Update Order");
-        return await Task.FromResult(op.ToFailed("برای تغییر وضعیت از UpdateStatus استفاده کنید"));
+        try
+        {
+            if (model.Id <= 0)
+                return op.ToFailed("شناسه سفارش نامعتبر است");
+
+            var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == model.Id);
+            if (order == null)
+                return op.ToFailed("سفارش پیدا نشد");
+
+            if (!string.IsNullOrWhiteSpace(model.ShippingAddress))
+                order.ShippingAddress = model.ShippingAddress.Trim();
+
+            if (!string.IsNullOrWhiteSpace(model.PaymentStatus))
+                order.PaymentStatus = model.PaymentStatus.Trim().ToLowerInvariant();
+
+            if (!string.IsNullOrWhiteSpace(model.Status))
+                order.Status = NormalizeStatus(model.Status);
+
+            await db.SaveChangesAsync();
+            return op.ToSuccess("سفارش به‌روزرسانی شد", order.Id);
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed(ex.Message);
+        }
     }
 
     public async Task<OperationResult> Delete(int id)
@@ -59,15 +75,18 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
         if (order == null) return null;
         return new OrderCreateModel
         {
-            CustomerId = order.CustomerId,
-            ShippingAddress = order.ShippingAddress
+            Id = order.Id,
+            UserId = order.UserId,
+            Status = NormalizeStatus(order.Status),
+            ShippingAddress = order.ShippingAddress,
+            PaymentStatus = order.PaymentStatus
         };
     }
 
     public async Task<OrderDetailsModel?> GetDetails(int id)
     {
         var order = await db.Orders.AsNoTracking()
-            .Include(o => o.Customer).ThenInclude(c => c.User)
+            .Include(o => o.User)
             .Include(o => o.OrderItems).ThenInclude(oi => oi.Product)
             .FirstOrDefaultAsync(o => o.Id == id);
 
@@ -76,10 +95,10 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
         return new OrderDetailsModel
         {
             Id = order.Id,
-            CustomerId = order.CustomerId,
-            CustomerName = order.Customer.User.FullName,
+            UserId = order.UserId,
+            CustomerName = order.User.DisplayName,
             OrderDate = order.OrderDate,
-            Status = order.Status,
+            Status = NormalizeStatus(order.Status),
             TotalAmount = order.TotalAmount,
             ShippingAddress = order.ShippingAddress,
             Items = order.OrderItems.Select(oi => new OrderItemLine
@@ -98,15 +117,18 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
         searchModel.PageIndex = Math.Max(0, searchModel.PageIndex);
 
         var query = db.Orders.AsNoTracking()
-            .Include(o => o.Customer).ThenInclude(c => c.User)
+            .Include(o => o.User)
             .Include(o => o.OrderItems)
             .AsQueryable();
 
-        if (searchModel.CustomerId is > 0)
-            query = query.Where(o => o.CustomerId == searchModel.CustomerId);
+        if (!string.IsNullOrWhiteSpace(searchModel.UserId))
+            query = query.Where(o => o.UserId == searchModel.UserId);
 
         if (!string.IsNullOrWhiteSpace(searchModel.Status))
-            query = query.Where(o => o.Status == searchModel.Status);
+        {
+            var statusFilter = NormalizeStatus(searchModel.Status);
+            query = query.Where(o => o.Status.ToLower() == statusFilter);
+        }
 
         var result = new OrderListComplex { SearchModel = searchModel };
         result.SearchModel.RecordCount = await query.CountAsync();
@@ -117,10 +139,10 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
             .Select(o => new OrderListItem
             {
                 Id = o.Id,
-                CustomerId = o.CustomerId,
-                CustomerName = o.Customer.User.FullName,
+                UserId = o.UserId,
+                CustomerName = o.User.DisplayName,
                 OrderDate = o.OrderDate,
-                Status = o.Status,
+                Status = o.Status.ToLower(),
                 TotalAmount = o.TotalAmount,
                 ItemCount = o.OrderItems.Count
             })
@@ -136,24 +158,22 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
             .OrderByDescending(o => o.OrderDate)
             .ToListAsync();
 
-        var customers = await db.Customers.AsNoTracking()
-            .Include(c => c.User)
-            .OrderBy(c => c.Id)
+        var users = await db.Users.AsNoTracking()
+            .OrderBy(u => u.RegisterDate)
             .ToListAsync();
 
         var payload = new SalesReportPayload();
 
-        foreach (var customer in customers)
+        foreach (var user in users)
         {
-            var (first, last) = SplitName(customer.User?.FullName);
             payload.Customers.Add(new SalesReportCustomerDto
             {
-                Id = customer.Id,
-                FirstName = first,
-                LastName = last,
-                FullName = customer.User?.FullName ?? $"{first} {last}".Trim(),
-                Mobile = customer.Phone ?? string.Empty,
-                Email = customer.User?.Email ?? string.Empty
+                Id = user.Id,
+                FirstName = user.FirstName ?? string.Empty,
+                LastName = user.LastName ?? string.Empty,
+                FullName = user.DisplayName,
+                Mobile = user.PhoneNumber ?? string.Empty,
+                Email = user.Email ?? string.Empty
             });
         }
 
@@ -165,7 +185,7 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
             {
                 Id = order.Id,
                 OrderNumber = $"ORD-{order.Id:D6}",
-                CustomerId = order.CustomerId,
+                CustomerId = order.UserId,
                 Status = status,
                 PaymentStatus = DerivePaymentStatus(status),
                 Total = order.TotalAmount,
@@ -198,7 +218,7 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
         {
             var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return op.ToFailed("سفارش پیدا نشد");
-            order.Status = status;
+            order.Status = NormalizeStatus(status);
             await db.SaveChangesAsync();
             return op.ToSuccess("وضعیت سفارش به‌روزرسانی شد", id);
         }
@@ -208,50 +228,60 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
         }
     }
 
-    public async Task<OperationResult> CreateFromCart(OrderCreateModel model)
+    public async Task<OperationResult> CreateFromItems(OrderCreateModel model)
     {
-        var op = new OperationResult("Create Order From Cart");
+        var op = new OperationResult("Create Order");
         try
         {
-            var cartItems = await db.CartItems
-                .Include(ci => ci.Product)
-                .Where(ci => ci.CustomerId == model.CustomerId)
-                .ToListAsync();
-
-            if (cartItems.Count == 0)
+            if (model.Items.Count == 0)
                 return op.ToFailed("سبد خرید خالی است");
 
-            foreach (var item in cartItems)
-            {
-                if (item.Quantity > item.Product.Stock)
-                    return op.ToFailed($"موجودی «{item.Product.Name}» کافی نیست");
-            }
+            var user = await db.Users.FirstOrDefaultAsync(u => u.Id == model.UserId);
+            if (user == null) return op.ToFailed("کاربر پیدا نشد");
 
-            var customer = await db.Customers.FirstOrDefaultAsync(c => c.Id == model.CustomerId);
-            if (customer == null) return op.ToFailed("مشتری پیدا نشد");
+            var productIds = model.Items.Select(i => i.ProductId).Distinct().ToList();
+            var products = await db.Products.Where(p => productIds.Contains(p.Id)).ToListAsync();
+
+            foreach (var line in model.Items)
+            {
+                var product = products.FirstOrDefault(p => p.Id == line.ProductId);
+                if (product == null) return op.ToFailed($"محصول #{line.ProductId} پیدا نشد");
+                if (line.Quantity <= 0) return op.ToFailed("تعداد نامعتبر است");
+                if (line.Quantity > product.Stock)
+                    return op.ToFailed($"موجودی «{product.Name}» کافی نیست");
+            }
 
             await using var transaction = await db.Database.BeginTransactionAsync();
             try
             {
                 var order = new Order
                 {
-                    CustomerId = model.CustomerId,
-                    Status = "Pending",
-                    ShippingAddress = model.ShippingAddress ?? customer.Address,
-                    OrderItems = cartItems.Select(ci => new OrderItem
+                    UserId = model.UserId,
+                    Status = "pending",
+                    PaymentStatus = string.IsNullOrWhiteSpace(model.PaymentStatus)
+                        ? "unpaid"
+                        : model.PaymentStatus.Trim().ToLowerInvariant(),
+                    ShippingAddress = model.ShippingAddress ?? user.Address,
+                    OrderItems = model.Items.Select(line =>
                     {
-                        ProductId = ci.ProductId,
-                        Quantity = ci.Quantity,
-                        UnitPrice = ci.Product.Price
+                        var product = products.First(p => p.Id == line.ProductId);
+                        return new OrderItem
+                        {
+                            ProductId = line.ProductId,
+                            Quantity = line.Quantity,
+                            UnitPrice = product.Price
+                        };
                     }).ToList()
                 };
                 order.TotalAmount = order.OrderItems.Sum(oi => oi.UnitPrice * oi.Quantity);
 
-                foreach (var item in cartItems)
-                    item.Product.Stock -= item.Quantity;
+                foreach (var line in model.Items)
+                {
+                    var product = products.First(p => p.Id == line.ProductId);
+                    product.Stock -= line.Quantity;
+                }
 
                 db.Orders.Add(order);
-                db.CartItems.RemoveRange(cartItems);
                 await db.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return op.ToSuccess("سفارش ثبت شد", order.Id);

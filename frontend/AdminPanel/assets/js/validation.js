@@ -68,7 +68,7 @@
     if (!value || !String(value).trim()) return 'شناسه URL الزامی است.';
     const slug = String(value).trim();
     if (!/^[\u0600-\u06FFa-z0-9]+(?:-[\u0600-\u06FFa-z0-9]+)*$/.test(slug)) {
-      return 'شناسه URL فقط می‌تواند شامل حروف، اعداد و خط تیره باشد.';
+      return 'شناسه URL نامعتبر است: فقط حروف فارسی یا انگلیسی کوچک، اعداد و خط‌تیره (-) مجاز است — بدون فاصله.';
     }
     return null;
   };

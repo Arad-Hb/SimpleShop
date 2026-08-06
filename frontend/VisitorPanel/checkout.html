@@ -15,7 +15,7 @@
     <div class="container-xxl">
       <div class="page-title-bar">
         <div>
-          <div class="crumb"><a href="index.html">خانه</a> / <a href="cart.html">سبد</a> / تسویه</div>
+          <div class="crumb"><a href="index.html">خانه</a> / <a href="card.html">کارت</a> / تسویه</div>
           <h1>تسویه حساب</h1>
         </div>
       </div>
@@ -25,21 +25,33 @@
           <form id="checkout-form">
             <div class="mb-3">
               <label class="form-label" for="fullName">نام و نام خانوادگی *</label>
-              <input type="text" class="form-control" id="fullName" required>
+              <input type="text" class="form-control" id="fullName" required autocomplete="name">
             </div>
             <div class="mb-3">
               <label class="form-label" for="phone">موبایل *</label>
-              <input type="tel" class="form-control" id="phone" required>
+              <input type="tel" class="form-control" id="phone" required autocomplete="tel" placeholder="09123456789">
             </div>
             <div class="mb-3">
               <label class="form-label" for="address">آدرس کامل *</label>
-              <textarea class="form-control" id="address" rows="3" required></textarea>
+              <textarea class="form-control" id="address" rows="3" required autocomplete="street-address"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label" for="postalCode">کد پستی *</label>
+              <input type="text" class="form-control" id="postalCode" required autocomplete="postal-code" inputmode="numeric" maxlength="10">
             </div>
             <div class="mb-3">
               <label class="form-label" for="note">توضیحات سفارش</label>
               <textarea class="form-control" id="note" rows="2"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary btn-lg w-100">ثبت سفارش</button>
+            <div class="payment-demo-box mb-3">
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <i class="bi bi-credit-card text-primary"></i>
+                <strong>پرداخت آزمایشی</strong>
+              </div>
+              <p class="small text-muted mb-0">پس از تأیید اطلاعات، پرداخت شبیه‌سازی می‌شود. در صورت موفقیت، مشتری در سیستم ثبت و سفارش با وضعیت «پرداخت‌شده» ایجاد می‌شود.</p>
+            </div>
+            <p class="small text-muted">می‌توانید بدون ورود قبلی خرید کنید. پس از پرداخت موفق، حساب مشتری برای شما ساخته می‌شود.</p>
+            <button type="button" class="btn btn-primary btn-lg w-100" id="btn-pay">پرداخت و تکمیل سفارش</button>
           </form>
         </div>
         <aside class="panel-card cart-summary" id="checkout-summary"></aside>
@@ -49,6 +61,8 @@
   <div id="store-footer"></div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="js/config.js"></script>
+  <script src="../shared/vendor/axios.min.js"></script>
+  <script src="../shared/js/http-client.js"></script>
   <script src="js/api-client.js"></script>
   <script src="js/store-core.js"></script>
   <script src="js/layout.js"></script>

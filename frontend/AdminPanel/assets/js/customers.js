@@ -1,94 +1,162 @@
 /**
- * customers.js — لیست و فرم مشتریان
+ * customers.js — لیست و فرم مشتریان — متصل به API
  */
 (function (ShopAdmin) {
   'use strict';
 
-  const { escapeHtml, formatPrice, formatDate, formatDateTime, getStatusBadge, parseQuery, debounce, generateId } = ShopAdmin.utils;
-  const { paginate, sortItems } = ShopAdmin.pagination;
-  const customerRepo = ShopAdmin.storage.createRepository('customers');
-  const { imageStore } = ShopAdmin.storage;
+  const { escapeHtml, formatPrice, parseQuery, debounce } = ShopAdmin.utils;
+  const { sortItems } = ShopAdmin.pagination;
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
-  const PAGE_SIZE = 10;
-  let pendingAvatarId = null;
-  let pendingAvatarBlob = null;
-  let avatarPreviewUrl = null;
-  let removeAvatarOnSave = false;
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
-  const getCustomerName = (c) => `${c.firstName || ''} ${c.lastName || ''}`.trim() || '—';
-
-  const computeCustomerStats = (customerId, orders) => {
-    const customerOrders = orders.filter((o) => o.customerId === customerId);
-    const totalPurchase = customerOrders
-      .filter((o) => o.status === 'delivered' && o.paymentStatus === 'paid')
-      .reduce((sum, o) => sum + (Number(o.total) || 0), 0);
-    return { orderCount: customerOrders.length, totalPurchase };
+  const splitFullName = (fullName) => {
+    const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return { firstName: '', lastName: '' };
+    if (parts.length === 1) return { firstName: parts[0], lastName: '' };
+    return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
   };
 
-  const enrichCustomers = (customers, orders) => customers.map((c) => ({
-    ...c,
-    ...computeCustomerStats(c.id, orders)
-  }));
+  const mapListItem = (dto) => {
+    const fullName = pick(dto, 'fullName', 'FullName') || '';
+    const { firstName, lastName } = splitFullName(fullName);
+    const phone = pick(dto, 'phone', 'Phone') || '';
+    const username = pick(dto, 'username', 'Username') || '';
+    return {
+      id: pick(dto, 'id', 'Id') || '',
+      firstName,
+      lastName,
+      username,
+      mobile: phone || username,
+      email: pick(dto, 'email', 'Email') || '',
+      nationalId: '',
+      isActive: true,
+      orderCount: 0,
+      totalPurchase: 0,
+      createdAt: null
+    };
+  };
+
+  const mapEditModel = (dto) => ({
+    id: pick(dto, 'id', 'Id') || '',
+    firstName: pick(dto, 'firstName', 'FirstName') || '',
+    lastName: pick(dto, 'lastName', 'LastName') || '',
+    username: pick(dto, 'username', 'Username') || '',
+    email: pick(dto, 'email', 'Email') || '',
+    mobile: pick(dto, 'phone', 'Phone') || pick(dto, 'username', 'Username') || '',
+    phone: pick(dto, 'phone', 'Phone') || '',
+    address: pick(dto, 'address', 'Address') || '',
+    postalCode: pick(dto, 'postalCode', 'PostalCode') || ''
+  });
+
+  const toApiPayload = (form, { includePassword = false } = {}) => {
+    const mobile = form.mobile.value.trim();
+    const payload = {
+      firstName: form.firstName.value.trim(),
+      lastName: form.lastName.value.trim(),
+      username: form.username.value.trim() || mobile,
+      email: form.email.value.trim(),
+      phone: mobile,
+      address: form.address.value.trim() || null,
+      postalCode: form.postalCode.value.trim() || null,
+      role: 'Customer'
+    };
+    if (includePassword) {
+      payload.password = form.password?.value || '';
+    }
+    return payload;
+  };
+
+  const enrichWithOrderStats = (customers, orders) => {
+    const byUser = new Map();
+    (orders || []).forEach((o) => {
+      const userId = pick(o, 'userId', 'UserId');
+      if (!userId) return;
+      if (!byUser.has(userId)) byUser.set(userId, []);
+      byUser.get(userId).push(o);
+    });
+
+    return customers.map((c) => {
+      const userOrders = byUser.get(c.id) || [];
+      const totalPurchase = userOrders
+        .filter((o) => (pick(o, 'status', 'Status') || '') === 'delivered')
+        .reduce((sum, o) => sum + (Number(pick(o, 'totalAmount', 'TotalAmount')) || 0), 0);
+      return {
+        ...c,
+        orderCount: userOrders.length,
+        totalPurchase
+      };
+    });
+  };
+
+  const getCustomerName = (c) => `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.username || '—';
 
   // ─── List page ───────────────────────────────────────────────
 
-  const listState = { page: 1, filters: {} };
+  const initCustomersList = () => {
+    const state = {
+      page: 1,
+      pageSize: 10,
+      search: '',
+      filters: {},
+      items: [],
+      totalItems: 0,
+      loading: false
+    };
 
-  const applyCustomerFilters = (customers, filters) => {
-    let result = [...customers];
-
-    if (filters.name) {
-      const q = filters.name.trim().toLowerCase();
-      result = result.filter((c) =>
-        getCustomerName(c).toLowerCase().includes(q)
-        || (c.username || '').toLowerCase().includes(q)
-      );
-    }
-    if (filters.mobile) {
-      const q = filters.mobile.trim();
-      result = result.filter((c) => (c.mobile || '').includes(q));
-    }
-    if (filters.email) {
-      const q = filters.email.trim().toLowerCase();
-      result = result.filter((c) => (c.email || '').toLowerCase().includes(q));
-    }
-    if (filters.nationalId) {
-      const q = filters.nationalId.trim();
-      result = result.filter((c) => (c.nationalId || '').includes(q));
-    }
-    if (filters.active === 'true') result = result.filter((c) => c.isActive !== false);
-    if (filters.active === 'false') result = result.filter((c) => c.isActive === false);
-    if (filters.hasOrders === 'yes') result = result.filter((c) => c.orderCount > 0);
-    if (filters.hasOrders === 'no') result = result.filter((c) => c.orderCount === 0);
-
-    if (filters.sort) {
-      const [field, dir] = filters.sort.split('-');
-      result = sortItems(result, field, dir);
-    }
-
-    return result;
-  };
-
-  const renderCustomersList = () => {
     const tbody = document.getElementById('customers-body');
-    if (!tbody) return;
+    const form = document.getElementById('filter-form');
 
-    const orders = ShopAdmin.storage.createRepository('orders').getAll();
-    const all = enrichCustomers(customerRepo.getAll(), orders);
-    const filtered = applyCustomerFilters(all, listState.filters);
-    const { items, page, totalItems, totalPages } = paginate(filtered, listState.page, PAGE_SIZE);
+    ShopAdmin.ui.initBreadcrumb([
+      { label: 'داشبورد', href: 'index.html' },
+      { label: 'مشتریان' }
+    ]);
 
-    if (!items.length) {
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-5"><i class="bi bi-people display-6 d-block mb-2 opacity-50"></i>مشتری‌ای یافت نشد</td></tr>';
-    } else {
+    const applyClientFilters = (items) => {
+      let result = [...items];
+      const { name, mobile, email, active, hasOrders } = state.filters;
+
+      if (name) {
+        const q = name.trim().toLowerCase();
+        result = result.filter((c) =>
+          getCustomerName(c).toLowerCase().includes(q)
+          || (c.username || '').toLowerCase().includes(q)
+        );
+      }
+      if (mobile) {
+        const q = mobile.trim();
+        result = result.filter((c) => (c.mobile || '').includes(q));
+      }
+      if (email) {
+        const q = email.trim().toLowerCase();
+        result = result.filter((c) => (c.email || '').toLowerCase().includes(q));
+      }
+      if (active === 'true') result = result.filter((c) => c.isActive);
+      if (active === 'false') result = result.filter((c) => !c.isActive);
+      if (hasOrders === 'yes') result = result.filter((c) => c.orderCount > 0);
+      if (hasOrders === 'no') result = result.filter((c) => c.orderCount === 0);
+
+      if (state.filters.sort) {
+        const [field, dir] = state.filters.sort.split('-');
+        result = sortItems(result, field, dir);
+      }
+
+      return result;
+    };
+
+    const renderRows = (items) => {
+      if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-5"><i class="bi bi-people display-6 d-block mb-2 opacity-50"></i>مشتری‌ای یافت نشد</td></tr>';
+        return;
+      }
+
       tbody.innerHTML = items.map((c) => `
         <tr>
           <td>
             <div class="d-flex align-items-center gap-2">
-              <img class="rounded-circle border" width="36" height="36" alt="" data-customer-avatar="${escapeHtml(c.avatarId || '')}"
-                   style="object-fit:cover;${c.avatarId ? '' : 'display:none'}">
               <span class="rounded-circle border d-inline-flex align-items-center justify-content-center text-muted bg-light"
-                    style="width:36px;height:36px;${c.avatarId ? 'display:none' : ''}" data-customer-avatar-fallback>
+                    style="width:36px;height:36px">
                 <i class="bi bi-person"></i>
               </span>
               <span>${escapeHtml(getCustomerName(c))}</span>
@@ -97,86 +165,126 @@
           <td dir="ltr">${escapeHtml(c.username || '—')}</td>
           <td dir="ltr">${escapeHtml(c.mobile || '—')}</td>
           <td dir="ltr">${escapeHtml(c.email || '—')}</td>
-          <td dir="ltr">${escapeHtml(c.nationalId || '—')}</td>
+          <td dir="ltr">—</td>
           <td>${(c.orderCount || 0).toLocaleString('fa-IR')}</td>
           <td>${escapeHtml(formatPrice(c.totalPurchase || 0))}</td>
-          <td>${getStatusBadge(c.isActive !== false ? 'active' : 'inactive')}</td>
-          <td class="text-muted small">${escapeHtml(formatDate(c.createdAt))}</td>
+          <td><span class="badge bg-success">فعال</span></td>
+          <td class="text-muted small">—</td>
           <td class="no-print">
             <div class="table-actions">
-              <a href="customer-form.html?id=${c.id}" class="btn btn-outline-primary" title="ویرایش">
+              <a href="customer-form.html?id=${encodeURIComponent(c.id)}" class="btn btn-outline-primary" title="ویرایش">
                 <i class="bi bi-pencil"></i>
               </a>
-              <button type="button" class="btn btn-outline-danger" data-action="delete-customer" data-id="${c.id}" title="حذف">
+              <button type="button" class="btn btn-outline-danger" data-action="delete-customer" data-id="${escapeHtml(c.id)}" title="حذف">
                 <i class="bi bi-trash"></i>
               </button>
             </div>
           </td>
         </tr>
       `).join('');
-    }
 
-    const infoEl = document.getElementById('pagination-info');
-    if (infoEl) {
-      infoEl.textContent = totalItems
-        ? `نمایش ${((page - 1) * PAGE_SIZE + 1).toLocaleString('fa-IR')} تا ${Math.min(page * PAGE_SIZE, totalItems).toLocaleString('fa-IR')} از ${totalItems.toLocaleString('fa-IR')} مشتری`
-        : '';
-    }
-
-    ShopAdmin.ui.renderPagination(document.getElementById('pagination'), page, totalPages, (p) => {
-      listState.page = p;
-      renderCustomersList();
-    });
-
-    tbody.querySelectorAll('[data-action="delete-customer"]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const id = Number(btn.dataset.id);
-        const customer = customerRepo.getById(id);
-        ShopAdmin.ui.showConfirmModal(
-          'حذف مشتری',
-          `آیا از حذف «${getCustomerName(customer)}» مطمئن هستید؟`,
-          () => {
-            customerRepo.remove(id);
-            ShopAdmin.ui.showToast('success', 'مشتری حذف شد.');
-            renderCustomersList();
-          }
-        );
+      tbody.querySelectorAll('[data-action="delete-customer"]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.dataset.id;
+          const customer = state.items.find((x) => x.id === id);
+          ShopAdmin.ui.showConfirmModal(
+            'حذف مشتری',
+            `آیا از حذف «${getCustomerName(customer || { username: id })}» مطمئن هستید؟`,
+            async () => {
+              try {
+                await ShopAdmin.api.ensureApiAuth();
+                await ShopAdmin.api.deleteCustomer(id);
+                ShopAdmin.ui.showToast('success', 'مشتری حذف شد.');
+                loadList();
+              } catch (err) {
+                ShopAdmin.ui.showToast('error', apiError(err));
+              }
+            }
+          );
+        });
       });
-    });
-  };
+    };
 
-  const initCustomersList = () => {
-    ShopAdmin.ui.initBreadcrumb([
-      { label: 'داشبورد', href: 'index.html' },
-      { label: 'مشتریان' }
-    ]);
+    const renderPagination = (page, totalPages, totalItems) => {
+      const infoEl = document.getElementById('pagination-info');
+      if (infoEl) {
+        infoEl.textContent = totalItems
+          ? `نمایش ${((page - 1) * state.pageSize + 1).toLocaleString('fa-IR')} تا ${Math.min(page * state.pageSize, totalItems).toLocaleString('fa-IR')} از ${totalItems.toLocaleString('fa-IR')} مشتری`
+          : '';
+      }
+      ShopAdmin.ui.renderPagination(document.getElementById('pagination'), page, totalPages, (p) => {
+        state.page = p;
+        loadList();
+      });
+    };
 
-    const form = document.getElementById('filter-form');
+    const loadList = async () => {
+      if (!tbody) return;
+      state.loading = true;
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">در حال بارگذاری...</td></tr>';
+
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+
+        const searchTerms = [
+          state.filters.name,
+          state.filters.mobile,
+          state.filters.email
+        ].filter(Boolean).join(' ').trim();
+
+        const [customerData, orderData] = await Promise.all([
+          ShopAdmin.api.searchCustomers({
+            pageIndex: state.page - 1,
+            pageSize: state.pageSize,
+            search: searchTerms || state.search
+          }),
+          ShopAdmin.api.searchOrders({ pageIndex: 0, pageSize: 500 })
+        ]);
+
+        const rawItems = customerData?.items || customerData?.Items || [];
+        let items = enrichWithOrderStats(rawItems.map(mapListItem), orderData?.items || orderData?.Items || []);
+        items = applyClientFilters(items);
+
+        state.items = items;
+        state.totalItems = customerData?.searchModel?.recordCount
+          ?? customerData?.SearchModel?.RecordCount
+          ?? items.length;
+
+        const totalPages = Math.max(1, Math.ceil(state.totalItems / state.pageSize));
+        renderRows(items);
+        renderPagination(state.page, totalPages, state.totalItems);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center text-danger py-4">${escapeHtml(apiError(err))}</td></tr>`;
+      } finally {
+        state.loading = false;
+      }
+    };
+
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         const fd = new FormData(form);
-        listState.filters = Object.fromEntries(fd.entries());
-        listState.page = 1;
-        renderCustomersList();
+        state.filters = Object.fromEntries(fd.entries());
+        state.page = 1;
+        loadList();
       });
 
       form.addEventListener('reset', () => {
         setTimeout(() => {
-          listState.filters = {};
-          listState.page = 1;
-          renderCustomersList();
+          state.filters = {};
+          state.page = 1;
+          loadList();
         }, 0);
       });
 
       const debouncedSearch = debounce(() => {
         const fd = new FormData(form);
-        listState.filters = Object.fromEntries(fd.entries());
-        listState.page = 1;
-        renderCustomersList();
+        state.filters = Object.fromEntries(fd.entries());
+        state.page = 1;
+        loadList();
       }, 400);
 
-      ['filter-name', 'filter-mobile', 'filter-email', 'filter-nationalId'].forEach((id) => {
+      ['filter-name', 'filter-mobile', 'filter-email'].forEach((id) => {
         document.getElementById(id)?.addEventListener('input', debouncedSearch);
       });
       ['filter-active', 'filter-orders', 'filter-sort'].forEach((id) => {
@@ -184,117 +292,55 @@
       });
     }
 
-    renderCustomersList();
-    void hydrateCustomerAvatars();
-  };
-
-  const hydrateCustomerAvatars = async () => {
-    const imgs = document.querySelectorAll('[data-customer-avatar]');
-    for (const img of imgs) {
-      const id = img.getAttribute('data-customer-avatar');
-      if (!id) continue;
-      const blob = await imageStore.getImage(id);
-      if (!blob) continue;
-      img.src = URL.createObjectURL(blob);
-      img.style.display = '';
-      const fallback = img.parentElement?.querySelector('[data-customer-avatar-fallback]');
-      if (fallback) fallback.style.display = 'none';
-    }
+    loadList();
   };
 
   // ─── Form page ───────────────────────────────────────────────
 
-  const setAvatarPreview = async (avatarId, blob) => {
-    const preview = document.getElementById('customer-avatar-preview');
-    const placeholder = document.getElementById('customer-avatar-placeholder');
-    if (!preview || !placeholder) return;
-
-    if (avatarPreviewUrl) {
-      URL.revokeObjectURL(avatarPreviewUrl);
-      avatarPreviewUrl = null;
-    }
-
-    if (blob) {
-      avatarPreviewUrl = URL.createObjectURL(blob);
-      preview.src = avatarPreviewUrl;
-      preview.style.display = '';
-      placeholder.style.display = 'none';
-      return;
-    }
-
-    if (!avatarId) {
-      preview.style.display = 'none';
-      preview.src = '';
-      placeholder.style.display = '';
-      return;
-    }
-
-    const stored = await imageStore.getImage(avatarId);
-    if (!stored) {
-      preview.style.display = 'none';
-      placeholder.style.display = '';
-      return;
-    }
-    avatarPreviewUrl = URL.createObjectURL(stored);
-    preview.src = avatarPreviewUrl;
-    preview.style.display = '';
-    placeholder.style.display = 'none';
-  };
-
-  const loadCustomerForm = async (id) => {
-    const customer = customerRepo.getById(id);
-    if (!customer) {
-      ShopAdmin.ui.showToast('error', 'مشتری یافت نشد.');
-      window.location.href = 'customers.html';
-      return;
-    }
-
-    pendingAvatarId = customer.avatarId || null;
-    pendingAvatarBlob = null;
-    removeAvatarOnSave = false;
-
-    document.getElementById('customer-id').value = customer.id;
-    document.getElementById('firstName').value = customer.firstName || '';
-    document.getElementById('lastName').value = customer.lastName || '';
-    document.getElementById('username').value = customer.username || '';
-    document.getElementById('email').value = customer.email || '';
-    document.getElementById('mobile').value = customer.mobile || '';
-    document.getElementById('phone').value = customer.phone || '';
-    document.getElementById('nationalId').value = customer.nationalId || '';
-    document.getElementById('postalCode').value = customer.postalCode || '';
-    document.getElementById('address').value = customer.address || '';
-    document.getElementById('isActive').checked = customer.isActive !== false;
-    await setAvatarPreview(pendingAvatarId);
-
-    document.getElementById('form-page-title').textContent = 'ویرایش مشتری';
-    document.getElementById('form-heading').textContent = `ویرایش: ${getCustomerName(customer)}`;
-    document.getElementById('delete-btn')?.classList.remove('d-none');
-
-    const metaEl = document.getElementById('meta-info');
-    if (metaEl) {
-      metaEl.classList.remove('d-none');
-      document.getElementById('meta-created').textContent = `عضویت: ${formatDateTime(customer.createdAt)}`;
-      document.getElementById('meta-lastLogin').textContent = `آخرین ورود: ${formatDateTime(customer.lastLogin)}`;
-      document.getElementById('meta-updated').textContent = `بروزرسانی: ${formatDateTime(customer.updatedAt)}`;
-    }
-
-    ShopAdmin.ui.initBreadcrumb([
-      { label: 'داشبورد', href: 'index.html' },
-      { label: 'مشتریان', href: 'customers.html' },
-      { label: getCustomerName(customer) }
-    ]);
-  };
-
   const initCustomerForm = async () => {
     const params = parseQuery();
-    const editId = params.id ? Number(params.id) : null;
+    const editId = params.id ? String(params.id) : null;
+    const form = document.getElementById('customer-form');
+    const passwordField = document.getElementById('password-field');
+    const passwordInput = document.getElementById('password');
+
+    if (!form) return;
 
     if (editId) {
-      await loadCustomerForm(editId);
+      document.getElementById('form-page-title').textContent = 'ویرایش مشتری';
+      document.getElementById('delete-btn')?.classList.remove('d-none');
+      passwordField?.classList.add('d-none');
+      passwordInput?.removeAttribute('required');
+
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+        const dto = await ShopAdmin.api.getCustomer(editId);
+        const customer = mapEditModel(dto);
+
+        document.getElementById('customer-id').value = customer.id;
+        document.getElementById('firstName').value = customer.firstName;
+        document.getElementById('lastName').value = customer.lastName;
+        document.getElementById('username').value = customer.username;
+        document.getElementById('email').value = customer.email;
+        document.getElementById('mobile').value = customer.mobile;
+        document.getElementById('phone').value = customer.phone;
+        document.getElementById('postalCode').value = customer.postalCode;
+        document.getElementById('address').value = customer.address;
+
+        document.getElementById('form-heading').textContent = `ویرایش: ${getCustomerName(customer)}`;
+        ShopAdmin.ui.initBreadcrumb([
+          { label: 'داشبورد', href: 'index.html' },
+          { label: 'مشتریان', href: 'customers.html' },
+          { label: getCustomerName(customer) }
+        ]);
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
+        setTimeout(() => { window.location.href = 'customers.html'; }, 800);
+        return;
+      }
     } else {
-      pendingAvatarId = null;
-      pendingAvatarBlob = null;
-      removeAvatarOnSave = false;
+      passwordField?.classList.remove('d-none');
+      passwordInput?.setAttribute('required', 'required');
       ShopAdmin.ui.initBreadcrumb([
         { label: 'داشبورد', href: 'index.html' },
         { label: 'مشتریان', href: 'customers.html' },
@@ -302,122 +348,77 @@
       ]);
     }
 
-    const form = document.getElementById('customer-form');
-    if (!form) return;
-
-    document.getElementById('customer-avatar-upload')?.addEventListener('change', async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const err = ShopAdmin.validation.validateImageFile(file);
-      if (err) {
-        ShopAdmin.ui.showToast('error', err);
-        e.target.value = '';
-        return;
-      }
-      pendingAvatarBlob = file;
-      pendingAvatarId = generateId('img');
-      removeAvatarOnSave = false;
-      await setAvatarPreview(null, file);
-      e.target.value = '';
-    });
-
-    document.getElementById('customer-avatar-remove')?.addEventListener('click', async () => {
-      pendingAvatarBlob = null;
-      pendingAvatarId = null;
-      removeAvatarOnSave = true;
-      await setAvatarPreview(null);
-    });
-
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const customers = customerRepo.getAll();
-      const editIdVal = document.getElementById('customer-id').value;
-      const excludeId = editIdVal ? Number(editIdVal) : null;
-      const existing = excludeId ? customerRepo.getById(excludeId) : null;
-
-      const { valid } = ShopAdmin.validation.validateForm(form, [
+      const rules = [
         { name: 'firstName', label: 'نام', rules: [(v) => ShopAdmin.validation.validateRequired(v, 'نام')] },
         { name: 'lastName', label: 'نام خانوادگی', rules: [(v) => ShopAdmin.validation.validateRequired(v, 'نام خانوادگی')] },
-        { name: 'username', label: 'نام کاربری', rules: [
-          (v) => ShopAdmin.validation.validateRequired(v, 'نام کاربری'),
-          (v) => ShopAdmin.validation.validateUnique(v, customers, 'username', excludeId)
-        ]},
+        { name: 'username', label: 'نام کاربری', rules: [(v) => ShopAdmin.validation.validateRequired(v, 'نام کاربری')] },
         { name: 'email', label: 'ایمیل', rules: [
           (v) => ShopAdmin.validation.validateRequired(v, 'ایمیل'),
-          (v) => ShopAdmin.validation.validateEmail(v),
-          (v) => ShopAdmin.validation.validateUnique(v, customers, 'email', excludeId)
+          (v) => ShopAdmin.validation.validateEmail(v)
         ]},
         { name: 'mobile', label: 'موبایل', rules: [
           (v) => ShopAdmin.validation.validateRequired(v, 'موبایل'),
-          (v) => ShopAdmin.validation.validateMobile(v),
-          (v) => ShopAdmin.validation.validateUnique(v, customers, 'mobile', excludeId)
+          (v) => ShopAdmin.validation.validateMobile(v)
         ]},
-        { name: 'phone', label: 'تلفن', rules: [(v) => ShopAdmin.validation.validatePhone(v)] },
-        { name: 'nationalId', label: 'کد ملی', rules: [(v) => ShopAdmin.validation.validateNationalId(v)] }
-      ]);
+        { name: 'phone', label: 'تلفن', rules: [(v) => ShopAdmin.validation.validatePhone(v)] }
+      ];
 
-      if (!valid) return;
-
-      let avatarId = existing?.avatarId || null;
-      if (removeAvatarOnSave) {
-        if (avatarId) await imageStore.deleteImage(avatarId).catch(() => {});
-        avatarId = null;
-      } else if (pendingAvatarBlob && pendingAvatarId) {
-        if (existing?.avatarId) await imageStore.deleteImage(existing.avatarId).catch(() => {});
-        await imageStore.saveImage(pendingAvatarId, pendingAvatarBlob);
-        avatarId = pendingAvatarId;
+      if (!editId) {
+        rules.push({
+          name: 'password',
+          label: 'رمز عبور',
+          rules: [(v) => ShopAdmin.validation.validateRequired(v, 'رمز عبور')]
+        });
       }
 
-      const payload = {
-        firstName: form.firstName.value.trim(),
-        lastName: form.lastName.value.trim(),
-        username: form.username.value.trim(),
-        email: form.email.value.trim(),
-        mobile: form.mobile.value.trim(),
-        phone: form.phone.value.trim(),
-        nationalId: form.nationalId.value.trim(),
-        postalCode: form.postalCode.value.trim(),
-        address: form.address.value.trim(),
-        isActive: form.isActive.checked,
-        avatarId
-      };
+      const { valid } = ShopAdmin.validation.validateForm(form, rules);
+      if (!valid) return;
 
-      if (excludeId) {
-        customerRepo.update(excludeId, payload);
-        ShopAdmin.ui.showToast('success', 'مشتری بروزرسانی شد.');
+      const idVal = document.getElementById('customer-id')?.value || '';
+      const payload = toApiPayload(form, { includePassword: !idVal });
+
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+        if (idVal) {
+          await ShopAdmin.api.updateCustomer(idVal, payload);
+          ShopAdmin.ui.showToast('success', 'مشتری بروزرسانی شد.');
+        } else {
+          await ShopAdmin.api.createCustomer(payload);
+          ShopAdmin.ui.showToast('success', 'مشتری جدید ثبت شد.');
+        }
         setTimeout(() => { window.location.href = 'customers.html'; }, 600);
-      } else {
-        customerRepo.create(payload);
-        ShopAdmin.ui.showToast('success', 'مشتری جدید ثبت شد.');
-        setTimeout(() => { window.location.href = 'customers.html'; }, 600);
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
       }
     });
 
     document.getElementById('delete-btn')?.addEventListener('click', () => {
-      const id = Number(document.getElementById('customer-id').value);
+      const id = document.getElementById('customer-id')?.value;
       if (!id) return;
-      const customer = customerRepo.getById(id);
       ShopAdmin.ui.showConfirmModal(
         'حذف مشتری',
-        `آیا از حذف «${getCustomerName(customer)}» مطمئن هستید؟`,
+        'آیا از حذف این مشتری مطمئن هستید؟',
         async () => {
-          if (customer?.avatarId) await imageStore.deleteImage(customer.avatarId).catch(() => {});
-          customerRepo.remove(id);
-          ShopAdmin.ui.showToast('success', 'مشتری حذف شد.');
-          window.location.href = 'customers.html';
+          try {
+            await ShopAdmin.api.ensureApiAuth();
+            await ShopAdmin.api.deleteCustomer(id);
+            ShopAdmin.ui.showToast('success', 'مشتری حذف شد.');
+            window.location.href = 'customers.html';
+          } catch (err) {
+            ShopAdmin.ui.showToast('error', apiError(err));
+          }
         }
       );
     });
   };
 
-  // ─── Init ────────────────────────────────────────────────────
-
   const init = () => {
     if (!ShopAdmin.auth.requireAuth()) return;
-
     if (document.getElementById('customers-body')) initCustomersList();
-    if (document.getElementById('customer-form')) initCustomerForm();
+    if (document.getElementById('customer-form')) void initCustomerForm();
   };
 
   document.addEventListener('DOMContentLoaded', init);

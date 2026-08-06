@@ -6,7 +6,7 @@
     const { productCard, bindAddButtons, escapeHtml } = Store.ui;
     const { PRODUCTS, CATEGORIES, getByCategory, TAG_LABELS } = Store.catalog;
     const params = new URLSearchParams(location.search);
-    const catId = params.get('id');
+    const catId = params.get('id') || params.get('cat');
     const tag = params.get('tag');
 
     let list = PRODUCTS.slice();

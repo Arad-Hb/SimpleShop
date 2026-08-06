@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="login-html">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ثبت‌نام — پنل مشتری</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/login.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
+</head>
+<body class="login-page" data-page="register">
+  <div class="login-shell">
+    <div class="login-card">
+      <div class="login-avatar" aria-hidden="true">
+        <img src="assets/img/tahlildadeh-logo.png" alt="Tahlildadeh Academy">
+      </div>
+
+      <div class="login-title">
+        <h1>ثبت‌نام مشتری</h1>
+        <p>حساب بسازید تا سفارش‌ها و سبد خریدتان را مدیریت کنید</p>
+      </div>
+
+      <form id="register-form" novalidate>
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-person-vcard" aria-hidden="true"></i></span>
+              <input type="text" id="firstName" name="firstName" placeholder="نام *" required>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-person-vcard-fill" aria-hidden="true"></i></span>
+              <input type="text" id="lastName" name="lastName" placeholder="نام خانوادگی *" required>
+            </div>
+          </div>
+        </div>
+
+        <div class="login-field-group mb-2">
+          <div class="login-field">
+            <span class="login-field__icon"><i class="bi bi-person-fill" aria-hidden="true"></i></span>
+            <input type="text" id="username" name="username" autocomplete="username" placeholder="نام کاربری *" required>
+          </div>
+        </div>
+
+        <div class="login-field-group mb-2">
+          <div class="login-field">
+            <span class="login-field__icon"><i class="bi bi-envelope-fill" aria-hidden="true"></i></span>
+            <input type="email" id="email" name="email" autocomplete="email" placeholder="ایمیل *" dir="ltr" required>
+          </div>
+        </div>
+
+        <div class="login-field-group mb-2">
+          <div class="login-field">
+            <span class="login-field__icon"><i class="bi bi-phone-fill" aria-hidden="true"></i></span>
+            <input type="text" id="mobile" name="mobile" placeholder="موبایل *" dir="ltr" required>
+          </div>
+        </div>
+
+        <div class="login-field-group mb-3">
+          <div class="login-field">
+            <span class="login-field__icon"><i class="bi bi-lock-fill" aria-hidden="true"></i></span>
+            <input type="password" id="password" name="password"
+                   autocomplete="new-password" placeholder="رمز عبور *" required>
+            <button type="button" class="login-field__eye" id="toggle-password"
+                    aria-label="نمایش رمز عبور" aria-pressed="false">
+              <i class="bi bi-eye-fill" id="toggle-password-icon" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="register-error" class="alert alert-danger d-none" role="alert"></div>
+
+        <button type="submit" class="login-btn">ایجاد حساب</button>
+      </form>
+
+      <div class="login-switch">
+        قبلاً ثبت‌نام کرده‌اید؟ <a href="login.html">وارد شوید</a>
+      </div>
+      <div class="login-academy">Tahlildadeh Academy</div>
+    </div>
+  </div>
+
+  <script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/storage.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="../shared/js/api-config.js"></script>
+  <script src="../shared/vendor/axios.min.js"></script>
+  <script src="../shared/js/http-client.js"></script>
+  <script src="../shared/js/auth-api.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/seed-data.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/register.js"></script>
+</body>
+</html>

@@ -15,6 +15,11 @@ public class CategoriesController(ICategoryRepository categories) : ControllerBa
     public async Task<ActionResult<List<CategoryListItem>>> GetAll()
         => Ok(await categories.GetAll());
 
+    [HttpGet("tree")]
+    [AllowAnonymous]
+    public async Task<ActionResult<List<CategoryTreeNode>>> GetTree()
+        => Ok(await categories.GetTree());
+
     [HttpGet("search")]
     [AllowAnonymous]
     public async Task<ActionResult<CategoryListComplex>> Search([FromQuery] CategorySearchModel searchModel)
@@ -32,10 +37,12 @@ public class CategoriesController(ICategoryRepository categories) : ControllerBa
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Create([FromBody] CategoryAddEditModel model)
     {
-        var op = await categories.Add(model);
-        if (!op.Success) return BadRequest(new { message = op.Message });
-        var item = await categories.Get((int)op.RecordID!);
-        return CreatedAtAction(nameof(GetById), new { id = op.RecordID }, item);
+        var result = await categories.CreateWithResult(model);
+        if (result.SortOrderConflict != null)
+            return Conflict(result.SortOrderConflict);
+        if (!result.Success) return BadRequest(new { message = result.Message });
+        var item = await categories.Get((int)result.RecordId!);
+        return CreatedAtAction(nameof(GetById), new { id = result.RecordId }, item);
     }
 
     [HttpPut("{id:int}")]
@@ -43,8 +50,10 @@ public class CategoriesController(ICategoryRepository categories) : ControllerBa
     public async Task<IActionResult> Update(int id, [FromBody] CategoryAddEditModel model)
     {
         model.Id = id;
-        var op = await categories.Update(model);
-        if (!op.Success) return BadRequest(new { message = op.Message });
+        var result = await categories.UpdateWithResult(model);
+        if (result.SortOrderConflict != null)
+            return Conflict(result.SortOrderConflict);
+        if (!result.Success) return BadRequest(new { message = result.Message });
         return Ok(await categories.Get(id));
     }
 

@@ -1,15 +1,20 @@
 /**
- * auth.js — احراز هویت دمو (بدون ذخیره رمز در LocalStorage)
+ * auth.js — احراز هویت پنل مدیریت (API + session)
  */
 (function (ShopAdmin) {
   'use strict';
 
-  const DEMO_USERNAME = 'admin';
-  const DEMO_PASSWORD = 'Admin@123';
+  const ROLE = 'Admin';
   const SESSION_KEY = 'shopAdminSession';
+  const LEGACY_TOKEN_KEY = 'shopAdminApiToken';
 
-  const buildSession = (username, rememberMe = false) => ({
-    username,
+  const buildSession = (authData, rememberMe = false) => ({
+    username: authData.username || authData.mobile || '',
+    mobile: authData.mobile || '',
+    userId: authData.userId || '',
+    role: authData.role || ROLE,
+    fullName: authData.fullName || '',
+    token: authData.token || '',
     loggedInAt: new Date().toISOString(),
     rememberMe,
     expiresAt: rememberMe
@@ -43,29 +48,50 @@
     }
   };
 
-  const isAuthenticated = () => getSession() !== null;
+  const getToken = () => getSession()?.token || null;
+
+  const isAuthenticated = () => {
+    const session = getSession();
+    return session !== null && !!session.token;
+  };
 
   /**
-   * @returns {{ success: boolean, message?: string }}
+   * @returns {Promise<{ success: boolean, message?: string }>}
    */
-  const login = (username, password, rememberMe = false) => {
+  const login = async (username, password, rememberMe = false) => {
     const user = String(username || '').trim();
     const pass = String(password || '');
 
-    if (user !== DEMO_USERNAME || pass !== DEMO_PASSWORD) {
-      return { success: false, message: 'نام کاربری یا رمز عبور اشتباه است.' };
+    if (!user || !pass) {
+      return { success: false, message: 'نام کاربری و رمز عبور الزامی است.' };
     }
 
-    saveSession(buildSession(user, rememberMe));
-    return { success: true };
+    try {
+      const data = await SimpleShopAuthApi.login({
+        apiBaseUrl: ShopAdmin.config?.API_BASE_URL,
+        username: user,
+        password: pass,
+        role: ROLE,
+        timeoutMs: ShopAdmin.config?.REQUEST_TIMEOUT_MS
+      });
+
+      if (!data?.token) {
+        return { success: false, message: 'پاسخ سرور نامعتبر است.' };
+      }
+
+      saveSession(buildSession(data, rememberMe));
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: SimpleShopAuthApi.formatError(err) };
+    }
   };
 
   const logout = () => {
     sessionStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
   };
 
-  /** هدایت به صفحه ورود در صورت عدم احراز هویت */
   const requireAuth = (loginPage = 'login.html') => {
     if (isAuthenticated()) return true;
     const current = (window.location.pathname.split('/').pop() || 'index.html').toLowerCase();
@@ -81,12 +107,12 @@
   };
 
   ShopAdmin.auth = {
-    DEMO_USERNAME,
-    DEMO_PASSWORD,
+    ROLE,
     login,
     logout,
     isAuthenticated,
     requireAuth,
-    getSession
+    getSession,
+    getToken
   };
 })(window.ShopAdmin = window.ShopAdmin || {});

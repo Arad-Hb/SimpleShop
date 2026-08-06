@@ -101,20 +101,17 @@
                 <label for="address" class="form-label">آدرس</label>
                 <textarea class="form-control" id="address" name="address" rows="2"></textarea>
               </div>
-              <div class="col-md-6">
-                <div class="form-check form-switch mt-2">
-                  <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
-                  <label class="form-check-label" for="isActive">حساب فعال</label>
-                </div>
+              <div class="col-md-6" id="password-field">
+                <label for="password" class="form-label">رمز عبور <span class="text-danger">*</span></label>
+                <input type="password" class="form-control" id="password" name="password" dir="ltr" minlength="6" autocomplete="new-password">
+                <div class="form-text">فقط هنگام ایجاد مشتری جدید الزامی است.</div>
               </div>
             </div>
 
             <div class="alert alert-info mt-4 mb-0" role="note">
               <h6 class="alert-heading"><i class="bi bi-shield-lock"></i> مدیریت رمز عبور</h6>
               <p class="mb-0 small">
-                رمز عبور مشتریان از طریق <strong>ASP.NET Identity</strong> در بک‌اند مدیریت می‌شود.
-                در این نسخه دمو، امکان تغییر یا مشاهده رمز عبور وجود ندارد.
-                پس از اتصال به API، بازیابی و تغییر رمز از طریق سرویس Identity انجام خواهد شد.
+                رمز عبور از طریق <strong>ASP.NET Identity</strong> ذخیره می‌شود. هنگام ویرایش، رمز تغییر نمی‌کند مگر فیلد جداگانه اضافه شود.
               </p>
             </div>
 
@@ -152,6 +149,8 @@
 <script src="assets/js/ui.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/config.js"></script>
+<script src="../shared/vendor/axios.min.js"></script>
+<script src="../shared/js/http-client.js"></script>
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/seed-data.js"></script>
 <script src="assets/js/sync.js"></script>

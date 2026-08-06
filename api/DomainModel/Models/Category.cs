@@ -12,6 +12,18 @@ public class Category
     public string? MetaDescription { get; set; }
     public int? ImageFileId { get; set; }
     public FileManager? ImageFile { get; set; }
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>Null = root category.</summary>
+    public int? ParentId { get; set; }
+    public Category? Parent { get; set; }
+    public ICollection<Category> Children { get; set; } = new List<Category>();
+
+    /// <summary>Display order among siblings (same ParentId).</summary>
+    public int SortOrder { get; set; }
+
+    /// <summary>0 = root; child depth = parent.Depth + 1.</summary>
+    public int Depth { get; set; }
 
     public ICollection<Product> Products { get; set; } = new List<Product>();
 }

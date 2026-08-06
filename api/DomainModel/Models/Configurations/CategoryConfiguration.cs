@@ -13,10 +13,16 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         e.Property(c => c.MetaTitle).HasMaxLength(200);
         e.Property(c => c.MetaDescription).HasMaxLength(500);
         e.HasIndex(c => c.Slug);
+        e.HasIndex(c => new { c.ParentId, c.SortOrder });
 
         e.HasOne(c => c.ImageFile)
             .WithMany()
             .HasForeignKey(c => c.ImageFileId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        e.HasOne(c => c.Parent)
+            .WithMany(c => c.Children)
+            .HasForeignKey(c => c.ParentId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

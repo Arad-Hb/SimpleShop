@@ -1,5 +1,5 @@
 /**
- * Thin fetch client for SimpleShop API
+ * VisitorPanel API client (Axios)
  */
 (function (Store) {
   'use strict';
@@ -12,41 +12,11 @@
     else localStorage.removeItem(tokenKey);
   };
 
-  const request = async (path, options = {}) => {
-    const base = (Store.config?.API_BASE_URL || '').replace(/\/$/, '');
-    const url = `${base}${path.startsWith('/') ? path : `/${path}`}`;
-    const headers = {
-      Accept: 'application/json',
-      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-      ...(options.headers || {})
-    };
-    const token = getToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(
-      () => controller.abort(),
-      Store.config?.REQUEST_TIMEOUT_MS || 8000
-    );
-
-    try {
-      const res = await fetch(url, {
-        ...options,
-        headers,
-        signal: controller.signal
-      });
-      if (!res.ok) {
-        const text = await res.text().catch(() => '');
-        const err = new Error(text || `HTTP ${res.status}`);
-        err.status = res.status;
-        throw err;
-      }
-      if (res.status === 204) return null;
-      return res.json();
-    } finally {
-      clearTimeout(timeout);
-    }
-  };
+  const { request } = SimpleShopHttp.createClient({
+    baseURL: Store.config?.API_BASE_URL,
+    getToken,
+    timeout: Store.config?.REQUEST_TIMEOUT_MS
+  });
 
   const getProducts = (query = {}) => {
     const params = new URLSearchParams();
@@ -66,7 +36,6 @@
     return request(`/api/banners${qs}`);
   };
 
-  /** Resolve API-relative media paths to absolute URLs */
   const mediaUrl = (path) => {
     if (!path) return '';
     if (/^https?:\/\//i.test(path) || path.startsWith('data:')) return path;
@@ -77,11 +46,20 @@
   const login = async (username, password) => {
     const data = await request('/api/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ username, password })
+      body: { username, password, role: 'Customer' }
     });
     if (data?.token) setToken(data.token);
     return data;
   };
+
+  const createOrder = (payload) =>
+    request('/api/orders', { method: 'POST', body: payload });
+
+  const guestCheckout = (payload) =>
+    request('/api/orders/guest', { method: 'POST', body: payload });
+
+  const completeCheckout = (payload) =>
+    request('/api/orders/complete-checkout', { method: 'POST', body: payload });
 
   const ping = async () => {
     try {
@@ -100,6 +78,9 @@
     getBanners,
     mediaUrl,
     login,
+    createOrder,
+    guestCheckout,
+    completeCheckout,
     ping,
     getToken,
     setToken

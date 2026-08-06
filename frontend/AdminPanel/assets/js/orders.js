@@ -1,21 +1,82 @@
 /**
- * orders.js — لیست و جزئیات سفارش‌ها
+ * orders.js — لیست و جزئیات سفارش‌ها (متصل به API)
  */
 (function (ShopAdmin) {
   'use strict';
 
   const { escapeHtml, formatPrice, formatDateTime, getStatusBadge, parseQuery } = ShopAdmin.utils;
   const { paginate, sortItems } = ShopAdmin.pagination;
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
-  const orderRepo = ShopAdmin.storage.createRepository('orders');
-  const orderItemRepo = ShopAdmin.storage.createRepository('orderItems');
-  const customerRepo = ShopAdmin.storage.createRepository('customers');
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
+
+  const normalizeStatus = (status) => String(status || 'pending').trim().toLowerCase();
+
+  const toApiStatus = (status) => {
+    const s = normalizeStatus(status);
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
+  const derivePaymentStatus = (status) => {
+    const s = normalizeStatus(status);
+    if (s === 'cancelled') return 'refunded';
+    if (s === 'pending') return 'unpaid';
+    return 'paid';
+  };
+
+  const mapListItem = (dto) => {
+    const id = pick(dto, 'id', 'Id');
+    const status = normalizeStatus(pick(dto, 'status', 'Status'));
+    return {
+      id,
+      orderNumber: pick(dto, 'orderNumber', 'OrderNumber') || `ORD-${String(id).padStart(6, '0')}`,
+      customerId: pick(dto, 'userId', 'UserId'),
+      customerName: pick(dto, 'customerName', 'CustomerName') || '—',
+      total: Number(pick(dto, 'totalAmount', 'TotalAmount') ?? pick(dto, 'total', 'Total') ?? 0),
+      status,
+      paymentStatus: normalizeStatus(
+        pick(dto, 'paymentStatus', 'PaymentStatus') || derivePaymentStatus(status)
+      ),
+      createdAt: pick(dto, 'orderDate', 'OrderDate') || pick(dto, 'createdAt', 'CreatedAt'),
+      itemCount: pick(dto, 'itemCount', 'ItemCount') ?? 0
+    };
+  };
+
+  const mapDetails = (dto) => {
+    const base = mapListItem(dto);
+    const items = (pick(dto, 'items', 'Items') || []).map((line) => {
+      const qty = Number(pick(line, 'quantity', 'Quantity')) || 0;
+      const unitPrice = Number(pick(line, 'unitPrice', 'UnitPrice')) || 0;
+      return {
+        productId: pick(line, 'productId', 'ProductId'),
+        productName: pick(line, 'productName', 'ProductName') || '—',
+        quantity: qty,
+        unitPrice,
+        total: unitPrice * qty
+      };
+    });
+    const subtotal = items.reduce((sum, i) => sum + i.total, 0);
+    return {
+      ...base,
+      shippingAddress: pick(dto, 'shippingAddress', 'ShippingAddress') || '',
+      recipientName: pick(dto, 'recipientName', 'RecipientName') || '',
+      recipientMobile: pick(dto, 'recipientMobile', 'RecipientMobile') || '',
+      postalCode: pick(dto, 'postalCode', 'PostalCode') || '',
+      customerNote: pick(dto, 'customerNote', 'CustomerNote') || '',
+      adminNote: pick(dto, 'adminNote', 'AdminNote') || '',
+      items,
+      subtotal,
+      shippingCost: Number(pick(dto, 'shippingCost', 'ShippingCost')) || 0,
+      discount: Number(pick(dto, 'discount', 'Discount')) || 0,
+      statusHistory: pick(dto, 'statusHistory', 'StatusHistory') || []
+    };
+  };
 
   const PAGE_SIZE = 10;
-  const listState = { page: 1, filters: {} };
+  const listState = { page: 1, filters: {}, orders: [], loading: false };
 
   const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
-  const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded'];
 
   const STATUS_ORDER = { pending: 0, processing: 1, shipped: 2, delivered: 3, cancelled: 4 };
 
@@ -35,14 +96,7 @@
     return false;
   };
 
-  const getCustomerName = (customerId) => {
-    const c = customerRepo.getById(customerId);
-    return c ? `${c.firstName} ${c.lastName}` : '—';
-  };
-
-  const getStatusLabel = (status) => ShopAdmin.utils.STATUS_BADGES[status]?.label || status;
-
-  // ─── List page ───────────────────────────────────────────────
+  const getStatusLabel = (status) => ShopAdmin.utils.STATUS_BADGES[normalizeStatus(status)]?.label || status;
 
   const applyOrderFilters = (orders, filters) => {
     let result = [...orders];
@@ -52,10 +106,12 @@
       result = result.filter((o) => (o.orderNumber || '').toLowerCase().includes(q));
     }
     if (filters.customerId) {
-      result = result.filter((o) => o.customerId === Number(filters.customerId));
+      result = result.filter((o) => String(o.customerId) === String(filters.customerId));
     }
-    if (filters.status) result = result.filter((o) => o.status === filters.status);
-    if (filters.paymentStatus) result = result.filter((o) => o.paymentStatus === filters.paymentStatus);
+    if (filters.status) result = result.filter((o) => o.status === normalizeStatus(filters.status));
+    if (filters.paymentStatus) {
+      result = result.filter((o) => o.paymentStatus === normalizeStatus(filters.paymentStatus));
+    }
 
     if (filters.dateFrom) {
       const from = new Date(filters.dateFrom);
@@ -82,13 +138,38 @@
     return result;
   };
 
+  const fetchAllOrders = async () => {
+    const pageSize = 50;
+    let pageIndex = 0;
+    let all = [];
+    let total = Infinity;
+
+    while (all.length < total && pageIndex < 20) {
+      const data = await ShopAdmin.api.searchOrders({ pageIndex, pageSize });
+      const items = (data?.items || data?.Items || []).map(mapListItem);
+      const search = data?.searchModel || data?.SearchModel || {};
+      total = Number(search.recordCount ?? search.RecordCount ?? items.length) || items.length;
+      all = all.concat(items);
+      if (!items.length || items.length < pageSize) break;
+      pageIndex += 1;
+    }
+
+    return all;
+  };
+
   const renderOrdersList = () => {
     const tbody = document.getElementById('orders-body');
     if (!tbody) return;
 
-    const all = orderRepo.getAll();
-    const filtered = applyOrderFilters(all, listState.filters);
+    const filtered = applyOrderFilters(listState.orders, listState.filters);
     const { items, page, totalItems, totalPages } = paginate(filtered, listState.page, PAGE_SIZE);
+
+    if (listState.loading) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted py-5">
+        <span class="spinner-border spinner-border-sm me-2"></span>در حال بارگذاری...
+      </td></tr>`;
+      return;
+    }
 
     if (!items.length) {
       tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-5"><i class="bi bi-cart-check display-6 d-block mb-2 opacity-50"></i>سفارشی یافت نشد</td></tr>';
@@ -96,7 +177,7 @@
       tbody.innerHTML = items.map((order) => `
         <tr>
           <td><a href="order-details.html?id=${order.id}">${escapeHtml(order.orderNumber)}</a></td>
-          <td>${escapeHtml(getCustomerName(order.customerId))}</td>
+          <td>${escapeHtml(order.customerName)}</td>
           <td>${escapeHtml(formatPrice(order.total))}</td>
           <td>${getStatusBadge(order.status)}</td>
           <td>${getStatusBadge(order.paymentStatus)}</td>
@@ -125,15 +206,51 @@
     });
   };
 
+  const loadOrdersList = async () => {
+    const tbody = document.getElementById('orders-body');
+    if (!tbody) return;
+
+    listState.loading = true;
+    renderOrdersList();
+
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      listState.orders = await fetchAllOrders();
+      populateCustomerFilter();
+    } catch (err) {
+      listState.orders = [];
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-5">${escapeHtml(apiError(err))}</td></tr>`;
+      ShopAdmin.ui.showToast('error', apiError(err));
+    } finally {
+      listState.loading = false;
+      renderOrdersList();
+    }
+  };
+
   const populateCustomerFilter = () => {
     const select = document.getElementById('filter-customer');
     if (!select) return;
-    sortItems(customerRepo.getAll(), 'lastName', 'asc').forEach((c) => {
-      const opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = `${c.firstName} ${c.lastName}`;
-      select.appendChild(opt);
+
+    const current = select.value;
+    while (select.options.length > 1) select.remove(1);
+
+    const customers = new Map();
+    listState.orders.forEach((o) => {
+      if (o.customerId && !customers.has(o.customerId)) {
+        customers.set(o.customerId, o.customerName || o.customerId);
+      }
     });
+
+    [...customers.entries()]
+      .sort((a, b) => String(a[1]).localeCompare(String(b[1]), 'fa'))
+      .forEach(([id, name]) => {
+        const opt = document.createElement('option');
+        opt.value = id;
+        opt.textContent = name;
+        select.appendChild(opt);
+      });
+
+    if (current) select.value = current;
   };
 
   const initOrdersList = () => {
@@ -141,8 +258,6 @@
       { label: 'داشبورد', href: 'index.html' },
       { label: 'سفارش‌ها' }
     ]);
-
-    populateCustomerFilter();
 
     const form = document.getElementById('filter-form');
     if (form) {
@@ -165,15 +280,15 @@
       });
     }
 
-    renderOrdersList();
+    loadOrdersList();
   };
 
   // ─── Detail page ─────────────────────────────────────────────
 
-  let currentOrderId = null;
+  let currentOrder = null;
 
   const renderOrderItems = (order) => {
-    const items = orderItemRepo.getAll().filter((i) => i.orderId === order.id);
+    const items = order.items || [];
     const tbody = document.getElementById('order-items-body');
     const tfoot = document.getElementById('order-items-foot');
     if (!tbody) return;
@@ -208,7 +323,7 @@
     );
 
     if (!history.length) {
-      container.innerHTML = '<p class="text-muted mb-0">تاریخچه‌ای ثبت نشده است.</p>';
+      container.innerHTML = `<p class="text-muted mb-0">وضعیت فعلی: ${getStatusBadge(order.status)}</p>`;
       return;
     }
 
@@ -232,21 +347,28 @@
     document.getElementById('print-order-number').textContent = order.orderNumber;
 
     document.getElementById('info-orderNumber').textContent = order.orderNumber;
-    document.getElementById('info-customer').innerHTML = `<a href="customer-form.html?id=${order.customerId}">${escapeHtml(getCustomerName(order.customerId))}</a>`;
+    document.getElementById('info-customer').textContent = order.customerName || '—';
     document.getElementById('info-createdAt').textContent = formatDateTime(order.createdAt);
-    document.getElementById('info-recipient').textContent = order.recipientName || '—';
+    document.getElementById('info-recipient').textContent = order.recipientName || order.customerName || '—';
     document.getElementById('info-recipientMobile').textContent = order.recipientMobile || '—';
     document.getElementById('info-address').textContent = order.shippingAddress || '—';
     document.getElementById('info-postalCode').textContent = order.postalCode || '—';
-    document.getElementById('info-customerNote').textContent = order.customerNote || order.notes || '—';
+    document.getElementById('info-customerNote').textContent = order.customerNote || '—';
 
     const statusSelect = document.getElementById('order-status');
     const paymentSelect = document.getElementById('payment-status');
     const adminNote = document.getElementById('admin-note');
 
     if (statusSelect) statusSelect.value = order.status;
-    if (paymentSelect) paymentSelect.value = order.paymentStatus;
-    if (adminNote) adminNote.value = order.adminNote || '';
+    if (paymentSelect) {
+      paymentSelect.value = order.paymentStatus;
+      paymentSelect.disabled = true;
+      paymentSelect.title = 'وضعیت پرداخت از API قابل ویرایش نیست.';
+    }
+    if (adminNote) {
+      adminNote.value = order.adminNote || '';
+      adminNote.disabled = true;
+    }
 
     renderOrderItems(order);
     renderStatusHistory(order);
@@ -258,71 +380,47 @@
     ]);
   };
 
-  const appendStatusHistory = (order, newStatus, note) => {
-    const history = [...(order.statusHistory || [])];
-    history.push({
-      status: newStatus,
-      at: new Date().toISOString(),
-      by: 'admin',
-      note: note || `تغییر وضعیت به ${getStatusLabel(newStatus)}`
-    });
-    return history;
-  };
+  const handleSaveOrder = async () => {
+    if (!currentOrder) return;
 
-  const saveOrderChanges = (order, updates, confirmMessage) => {
-    const doSave = () => {
-      orderRepo.update(order.id, updates);
-      ShopAdmin.ui.showToast('success', 'سفارش بروزرسانی شد.');
-      const updated = orderRepo.getById(order.id);
-      renderOrderDetail(updated);
-    };
-
-    if (confirmMessage) {
-      ShopAdmin.ui.showConfirmModal('تأیید تغییر', confirmMessage, doSave);
-    } else {
-      doSave();
+    const newStatus = normalizeStatus(document.getElementById('order-status').value);
+    if (newStatus === currentOrder.status) {
+      ShopAdmin.ui.showToast('info', 'تغییری اعمال نشد.');
+      return;
     }
-  };
 
-  const handleSaveOrder = () => {
-    const order = orderRepo.getById(currentOrderId);
-    if (!order) return;
-
-    const newStatus = document.getElementById('order-status').value;
-    const newPayment = document.getElementById('payment-status').value;
-    const adminNote = document.getElementById('admin-note').value.trim();
-
-    const updates = { adminNote };
+    const forward = FORWARD_TRANSITIONS[currentOrder.status] || [];
+    const allowedForward = forward.includes(newStatus);
     let confirmMsg = null;
 
-    if (newStatus !== order.status) {
-      const forward = FORWARD_TRANSITIONS[order.status] || [];
-      const allowedForward = forward.includes(newStatus);
-
-      if (!allowedForward && isBackwardTransition(order.status, newStatus)) {
-        confirmMsg = `شما در حال بازگرداندن وضعیت از «${getStatusLabel(order.status)}» به «${getStatusLabel(newStatus)}» هستید. این عمل غیرمعمول است. ادامه می‌دهید؟`;
-      } else if (order.status === 'delivered' && newStatus !== 'delivered') {
-        confirmMsg = 'این سفارش تحویل شده است. تغییر وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
-      } else if (order.status === 'cancelled' && newStatus !== 'cancelled') {
-        confirmMsg = 'این سفارش لغو شده است. بازگردانی وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
-      }
-
-      updates.status = newStatus;
-      updates.statusHistory = appendStatusHistory(order, newStatus, `تغییر وضعیت توسط مدیر`);
+    if (!allowedForward && isBackwardTransition(currentOrder.status, newStatus)) {
+      confirmMsg = `شما در حال بازگرداندن وضعیت از «${getStatusLabel(currentOrder.status)}» به «${getStatusLabel(newStatus)}» هستید. ادامه می‌دهید؟`;
+    } else if (currentOrder.status === 'delivered' && newStatus !== 'delivered') {
+      confirmMsg = 'این سفارش تحویل شده است. تغییر وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
+    } else if (currentOrder.status === 'cancelled' && newStatus !== 'cancelled') {
+      confirmMsg = 'این سفارش لغو شده است. بازگردانی وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
     }
 
-    if (newPayment !== order.paymentStatus) {
-      if (order.paymentStatus === 'refunded' && newPayment !== 'refunded') {
-        const paymentConfirm = 'وضعیت پرداخت از مرجوعی تغییر می‌کند. ادامه می‌دهید؟';
-        confirmMsg = confirmMsg ? `${confirmMsg}\n${paymentConfirm}` : paymentConfirm;
+    const doSave = async () => {
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+        const dto = await ShopAdmin.api.updateOrderStatus(currentOrder.id, toApiStatus(newStatus));
+        currentOrder = mapDetails(dto);
+        ShopAdmin.ui.showToast('success', 'وضعیت سفارش بروزرسانی شد.');
+        renderOrderDetail(currentOrder);
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
       }
-      updates.paymentStatus = newPayment;
-    }
+    };
 
-    saveOrderChanges(order, updates, confirmMsg);
+    if (confirmMsg) {
+      ShopAdmin.ui.showConfirmModal('تأیید تغییر', confirmMsg, doSave);
+    } else {
+      await doSave();
+    }
   };
 
-  const initOrderDetail = () => {
+  const initOrderDetail = async () => {
     const params = parseQuery();
     const id = params.id ? Number(params.id) : null;
 
@@ -331,32 +429,35 @@
       return;
     }
 
-    const order = orderRepo.getById(id);
-    if (!order) {
-      document.getElementById('order-not-found')?.classList.remove('d-none');
-      return;
-    }
-
-    currentOrderId = id;
-    renderOrderDetail(order);
-
-    document.getElementById('save-order-btn')?.addEventListener('click', handleSaveOrder);
-
-    document.getElementById('print-btn')?.addEventListener('click', () => {
-      window.print();
-    });
-
-    const statusSelect = document.getElementById('order-status');
-    statusSelect?.addEventListener('change', () => {
-      const order = orderRepo.getById(currentOrderId);
-      const newVal = statusSelect.value;
-      if (order && (order.status === 'delivered' || order.status === 'cancelled') && newVal !== order.status) {
-        ShopAdmin.ui.showToast('warning', 'تغییر از وضعیت نهایی نیاز به تأیید هنگام ذخیره دارد.');
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const dto = await ShopAdmin.api.getOrder(id);
+      if (!dto) {
+        document.getElementById('order-not-found')?.classList.remove('d-none');
+        return;
       }
-    });
-  };
 
-  // ─── Init ────────────────────────────────────────────────────
+      currentOrder = mapDetails(dto);
+      renderOrderDetail(currentOrder);
+
+      document.getElementById('save-order-btn')?.addEventListener('click', handleSaveOrder);
+
+      document.getElementById('print-btn')?.addEventListener('click', () => {
+        window.print();
+      });
+
+      const statusSelect = document.getElementById('order-status');
+      statusSelect?.addEventListener('change', () => {
+        const newVal = normalizeStatus(statusSelect.value);
+        if ((currentOrder.status === 'delivered' || currentOrder.status === 'cancelled') && newVal !== currentOrder.status) {
+          ShopAdmin.ui.showToast('warning', 'تغییر از وضعیت نهایی نیاز به تأیید هنگام ذخیره دارد.');
+        }
+      });
+    } catch (err) {
+      document.getElementById('order-not-found')?.classList.remove('d-none');
+      ShopAdmin.ui.showToast('error', apiError(err));
+    }
+  };
 
   const init = () => {
     if (!ShopAdmin.auth.requireAuth()) return;

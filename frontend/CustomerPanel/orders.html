@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel|CustomerPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+  }
+})();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سفارش‌ها — پنل مشتری</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
+</head>
+<body data-page="orders">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand customer-sidebar-brand">
+      <div class="customer-avatar-wrap">
+        <img src="assets/img/customer-avatar.png" alt="" class="customer-avatar" data-customer-avatar>
+      </div>
+      <span data-customer-brand>مشتری</span>
+      <span class="customer-sidebar-chip"><i class="bi bi-stars" aria-hidden="true"></i> حساب من</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link sidebar-toggle-btn" data-sidebar-toggle aria-label="منو"><i class="bi bi-layout-sidebar-reverse"></i></button>
+        <h2 class="header-title">سفارش‌های من</h2>
+      </div>
+      <div class="header-actions">
+        <span class="fun-tag fun-tag--sky me-2">سفارش‌ها</span>
+        <span class="text-muted small" data-customer-name></span>
+      </div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <div>
+          <h1>سفارش‌های من</h1>
+          <p class="text-muted mb-0 small">تاریخچه خرید و وضعیت پرداخت سفارش‌ها</p>
+        </div>
+      </div>
+
+      <form id="filter-form" class="filter-bar">
+        <div class="filter-field filter-field--grow">
+          <label class="form-label" for="search">جستجو</label>
+          <input type="search" id="search" class="form-control form-control-sm" placeholder="شماره سفارش یا نام کالا...">
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-status">وضعیت سفارش</label>
+          <select id="filter-status" class="form-select form-select-sm">
+            <option value="">همه</option>
+            <option value="pending">در انتظار</option>
+            <option value="shipping">در حال ارسال</option>
+            <option value="delivered">تحویل‌شده</option>
+            <option value="cancelled">لغو‌شده</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label class="form-label" for="filter-payment">پرداخت</label>
+          <select id="filter-payment" class="form-select form-select-sm">
+            <option value="">همه</option>
+            <option value="paid">پرداخت‌شده</option>
+            <option value="unpaid">پرداخت‌نشده</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-search"></i> اعمال</button>
+        <button type="button" id="btn-reset" class="btn btn-outline-secondary btn-sm">پاک کردن</button>
+      </form>
+
+      <div class="content-card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table admin-table mb-0">
+              <thead>
+                <tr>
+                  <th>شماره</th>
+                  <th>وضعیت</th>
+                  <th>پرداخت</th>
+                  <th>اقلام</th>
+                  <th>مبلغ</th>
+                  <th>تاریخ</th>
+                  <th class="text-center">جزئیات</th>
+                </tr>
+              </thead>
+              <tbody id="orders-body"></tbody>
+            </table>
+          </div>
+          <div id="orders-empty" class="empty-state d-none">
+            <i class="bi bi-bag-x"></i>
+            <p>سفارشی یافت نشد.</p>
+          </div>
+          <div class="pagination-wrapper px-3">
+            <span class="text-muted small" id="pagination-info"></span>
+            <div id="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div class="modal fade admin-modal" id="order-detail-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content admin-modal__content">
+      <div class="modal-header">
+        <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="بستن">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+        <h5 class="modal-title">جزئیات سفارش <span data-order-number></span></h5>
+      </div>
+      <div class="modal-body">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <span data-order-status></span>
+          <span data-order-payment></span>
+        </div>
+        <p class="mb-2"><strong>تاریخ:</strong> <span data-order-date></span></p>
+        <p class="mb-3"><strong>آدرس:</strong> <span data-order-address></span></p>
+        <h6 class="mb-2">اقلام سفارش</h6>
+        <ul class="order-detail-list" data-order-items></ul>
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+          <strong>جمع کل</strong>
+          <strong data-order-total></strong>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary modal-btn" data-bs-dismiss="modal">بستن</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="../shared/js/api-config.js"></script>
+<script src="../shared/vendor/axios.min.js"></script>
+<script src="../shared/js/http-client.js"></script>
+<script src="assets/js/config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/api-client.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/orders.js"></script>
+</body>
+</html>

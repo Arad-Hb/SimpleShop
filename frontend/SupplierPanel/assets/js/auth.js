@@ -1,16 +1,19 @@
 /**
- * auth.js — ورود دمو تأمین‌کننده (رمز در LocalStorage ذخیره نمی‌شود)
+ * auth.js — احراز هویت پنل تأمین‌کننده (API + session)
  */
 (function (ShopSupplier) {
   'use strict';
 
-  const DEMO_USERNAME = 'supplier';
-  const DEMO_PASSWORD = 'Supplier@123';
+  const ROLE = 'Supplier';
   const SESSION_KEY = 'shopSupplierSession';
 
-  const buildSession = (username, rememberMe = false) => ({
-    username,
-    role: 'Supplier',
+  const buildSession = (authData, rememberMe = false) => ({
+    username: authData.username || authData.mobile || '',
+    mobile: authData.mobile || '',
+    userId: authData.userId || '',
+    role: authData.role || ROLE,
+    fullName: authData.fullName || '',
+    token: authData.token || '',
     loggedInAt: new Date().toISOString(),
     rememberMe,
     expiresAt: rememberMe
@@ -39,16 +42,42 @@
     }
   };
 
-  const isAuthenticated = () => getSession() !== null;
+  const getToken = () => getSession()?.token || null;
 
-  const login = (username, password, rememberMe = false) => {
+  const isAuthenticated = () => {
+    const session = getSession();
+    return session !== null && !!session.token;
+  };
+
+  /**
+   * @returns {Promise<{ success: boolean, message?: string }>}
+   */
+  const login = async (username, password, rememberMe = false) => {
     const user = String(username || '').trim();
     const pass = String(password || '');
-    if (user !== DEMO_USERNAME || pass !== DEMO_PASSWORD) {
-      return { success: false, message: 'نام کاربری یا رمز عبور اشتباه است.' };
+
+    if (!user || !pass) {
+      return { success: false, message: 'شماره موبایل و رمز عبور الزامی است.' };
     }
-    saveSession(buildSession(user, rememberMe));
-    return { success: true };
+
+    try {
+      const data = await SimpleShopAuthApi.login({
+        apiBaseUrl: ShopSupplier.config?.API_BASE_URL,
+        username: user,
+        password: pass,
+        role: ROLE,
+        timeoutMs: ShopSupplier.config?.REQUEST_TIMEOUT_MS
+      });
+
+      if (!data?.token) {
+        return { success: false, message: 'پاسخ سرور نامعتبر است.' };
+      }
+
+      saveSession(buildSession(data, rememberMe));
+      return { success: true };
+    } catch (err) {
+      return { success: false, message: SimpleShopAuthApi.formatError(err) };
+    }
   };
 
   const logout = () => {
@@ -69,11 +98,11 @@
   };
 
   ShopSupplier.auth = {
-    DEMO_USERNAME,
-    DEMO_PASSWORD,
+    ROLE,
     login,
     logout,
     getSession,
+    getToken,
     isAuthenticated,
     requireAuth
   };

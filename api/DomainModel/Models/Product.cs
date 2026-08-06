@@ -10,6 +10,9 @@ public class Product
     public int CategoryId { get; set; }
     public int? SupplierId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public string? Sku { get; set; }
+    public string? BrandName { get; set; }
+    public bool IsActive { get; set; } = true;
 
     // SEO
     public string? Slug { get; set; }
@@ -32,5 +35,4 @@ public class Product
     public Supplier? Supplier { get; set; }
     public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-    public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
 }

@@ -4,6 +4,7 @@ using DataAccess.Services;
 using DomainModel.DataSeeder;
 using DomainModel.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SimpleShop.Api.Services;
@@ -13,17 +14,31 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SimpleShopDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services
+    .AddIdentity<ApplicationUser, ApplicationRole>(options =>
+    {
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.User.RequireUniqueEmail = false;
+        options.SignIn.RequireConfirmedAccount = false;
+    })
+    .AddEntityFrameworkStores<SimpleShopDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
 builder.Services.AddSingleton<JwtTokenService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -53,7 +68,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<SimpleShopDbContext>();
+    await context.Database.MigrateAsync();
+    await IdentitySeeder.SeedAsync(scope.ServiceProvider);
     await DbSeeder.SeedAsync(context, app.Environment.WebRootPath);
+    await IdentityUserSeeder.SeedAsync(scope.ServiceProvider, context);
 }
 
 if (app.Environment.IsDevelopment())

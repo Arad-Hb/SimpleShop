@@ -6,7 +6,7 @@
 
   const initLogin = () => {
     if (ShopAdmin.auth.isAuthenticated()) {
-      window.location.href = './';
+      window.location.href = 'index.html';
       return;
     }
 
@@ -38,7 +38,7 @@
 
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorEl?.classList.add('d-none');
 
@@ -65,10 +65,10 @@
       submitText?.classList.add('d-none');
       submitLoading?.classList.remove('d-none');
 
-      const result = ShopAdmin.auth.login(username, password, rememberMe);
+      const result = await ShopAdmin.auth.login(username, password, rememberMe);
 
       if (result.success) {
-        window.location.href = './';
+        window.location.href = 'index.html';
         return;
       }
 

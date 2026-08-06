@@ -13,10 +13,10 @@ html.login-html {
 body.login-page {
   --login-navy: #152363;
   --login-logo-blue: #2b9bff;
-  --login-logo-blue-soft: rgba(43, 155, 255, 0.14);
-  --login-ink: #1a2438;
-  --login-field: rgba(232, 236, 244, 0.78);
-  --login-shadow: 0 8px 20px rgba(12, 20, 48, 0.1);
+  --login-logo-blue-soft: rgba(43, 155, 255, 0.16);
+  --login-ink: #152363;
+  --login-field: rgba(232, 242, 250, 0.9);
+  --login-shadow: 0 10px 28px rgba(34, 113, 165, 0.12);
   --login-font: "Vazirmatn", Tahoma, sans-serif;
 
   margin: 0 !important;
@@ -28,10 +28,12 @@ body.login-page {
   justify-content: center !important;
   font-family: var(--login-font) !important;
   color: var(--login-ink) !important;
+  /* Lighter airy background inspired by logo sky-blue */
   background:
-    radial-gradient(ellipse 55% 45% at 92% 8%, rgba(180, 205, 240, 0.55), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 8% 92%, rgba(21, 35, 99, 0.28), transparent 58%),
-    linear-gradient(225deg, #c5d0e4 0%, #9eacc6 42%, #6f7d9a 78%, #4f5d7a 100%) !important;
+    radial-gradient(ellipse 60% 50% at 88% 12%, rgba(43, 155, 255, 0.28), transparent 58%),
+    radial-gradient(ellipse 55% 45% at 10% 88%, rgba(193, 222, 240, 0.7), transparent 60%),
+    radial-gradient(ellipse 40% 35% at 50% 40%, rgba(255, 255, 255, 0.65), transparent 55%),
+    linear-gradient(165deg, #f7fbff 0%, #e8f4fc 38%, #d9eefb 72%, #eef7fc 100%) !important;
   padding: 2.5rem 1.25rem 2rem !important;
 }
 
@@ -46,11 +48,11 @@ body.login-page .login-card {
   max-width: none;
   background: linear-gradient(
     165deg,
-    rgba(255, 255, 255, 0.72) 0%,
-    rgba(248, 250, 255, 0.55) 55%,
-    rgba(240, 244, 252, 0.48) 100%
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(247, 251, 255, 0.78) 55%,
+    rgba(236, 246, 253, 0.72) 100%
   );
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(43, 155, 255, 0.18);
   border-radius: 22px;
   box-shadow: var(--login-shadow);
   backdrop-filter: blur(18px) saturate(1.15);
@@ -270,9 +272,9 @@ body.login-page .demo-hint {
   margin-top: 1rem;
   padding: 0.7rem 0.85rem;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  color: #1a2438;
+  background: rgba(43, 155, 255, 0.08);
+  border: 1px solid rgba(43, 155, 255, 0.18);
+  color: #152363;
   font-size: 0.78rem;
   line-height: 1.65;
 }

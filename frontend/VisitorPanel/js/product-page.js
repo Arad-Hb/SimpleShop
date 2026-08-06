@@ -120,11 +120,11 @@
             </div>
           </div>
           <div class="d-flex flex-wrap gap-2">
-            <button type="button" class="btn btn-primary btn-lg px-4" id="btn-add-cart">افزودن به سبد</button>
+            <button type="button" class="btn btn-primary btn-lg px-4" id="btn-add-card">افزودن به کارت</button>
             ${product.amazing || product.tag === 'amazing'
               ? `<button type="button" class="btn-amazing" id="btn-amazing">خرید شگفت‌انگیز</button>`
               : ''}
-            <a href="cart.html" class="btn btn-outline-secondary btn-lg">مشاهده سبد</a>
+            <a href="card.html" class="btn btn-outline-secondary btn-lg">مشاهده کارت</a>
           </div>
         </div>
       </div>
@@ -158,10 +158,10 @@
     });
 
     const add = () => {
-      Store.cart.addToCart(product.id, qty);
-      showToast(`${TAG_LABELS[product.tag] ? '✓ ' : ''}به سبد اضافه شد`);
+      Store.card.addToCard(product.id, qty);
+      showToast(`${TAG_LABELS[product.tag] ? '✓ ' : ''}به کارت اضافه شد`);
     };
-    document.getElementById('btn-add-cart')?.addEventListener('click', add);
+    document.getElementById('btn-add-card')?.addEventListener('click', add);
     document.getElementById('btn-amazing')?.addEventListener('click', add);
 
     const related = getRelated(product, 4);

@@ -7,43 +7,44 @@
   --sidebar-collapsed-width: 78px;
   --header-height: 64px;
 
-  /* Charcoal-navy sidebar — also primary text ink */
+  /* Tahlildadeh webinar palette — navy / logo blue / orange */
   --sidebar-bg: #152363;
-  --sidebar-text: #a3aed0;
-  --sidebar-active: #4318ff;
-  --sidebar-active-soft: rgba(67, 24, 255, 0.18);
+  --sidebar-text: #a9bdd4;
+  --sidebar-active: #2b9bff;
+  --sidebar-active-soft: rgba(43, 155, 255, 0.2);
 
-  --bg: #f4f7fe;
+  --bg: #e8f2f8;
   --surface: #ffffff;
-  --surface-soft: #eef2ff;
-  --surface-strong: #e0e7ff;
+  --surface-soft: #f0f7fc;
+  --surface-strong: #d7e8f4;
   --text: #152363;
-  --muted: #6b7a9c;
-  --line: #e9edf7;
-  --border: #e9edf7;
+  --muted: #5f7390;
+  --line: #d5e4ef;
+  --border: #d5e4ef;
 
-  /* Vibrant blue accents from the reference dashboard */
-  --primary: #4318ff;
-  --primary-dark: #3311db;
-  --primary-hover: #3311db;
-  --primary-light: #e9e3ff;
-  --primary-soft: #f4f7fe;
-  --primary-mid: #4318ff;
-  --secondary: #6ad2ff;
-  --accent: #ffb547;
+  /* Logo sky-blue primary + orange accent from cover */
+  --primary: #2b9bff;
+  --primary-dark: #1a7ad4;
+  --primary-hover: #1a7ad4;
+  --primary-light: #d9efff;
+  --primary-soft: #f0f7fc;
+  --primary-mid: #2b9bff;
+  --secondary: #7ab2d7;
+  --accent: #d95c04;
+  --brand-mid: #2271a5;
 
   --success: #05cd99;
   --danger: #ee5d50;
-  --warning: #ffce20;
-  --info: #3965ff;
+  --warning: #d95c04;
+  --info: #2b9bff;
 
-  --hero-from: #f4f7fe;
-  --hero-to: #e9e3ff;
+  --hero-from: #e8f2f8;
+  --hero-to: #d4e8f5;
   --shadow-color: 21, 35, 99;
 
-  --table-header-bg: #f4f7fe;
+  --table-header-bg: #eef5fb;
   --table-header-color: #152363;
-  --control-bg: #f4f7fe;
+  --control-bg: #eef5fb;
 
   --font-fa: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
 
@@ -64,10 +65,10 @@ html {
 body {
   font-family: var(--font-fa);
   background:
-    radial-gradient(ellipse 70% 45% at 100% -5%, rgba(67, 24, 255, 0.14), transparent 55%),
-    radial-gradient(ellipse 55% 40% at -5% 100%, rgba(106, 210, 255, 0.18), transparent 50%),
-    radial-gradient(ellipse 40% 30% at 70% 80%, rgba(255, 181, 71, 0.08), transparent 45%),
-    linear-gradient(165deg, #ebefff 0%, #f4f7fe 38%, #eef6ff 72%, #f7f9fc 100%);
+    radial-gradient(ellipse 70% 45% at 100% -5%, rgba(43, 155, 255, 0.16), transparent 55%),
+    radial-gradient(ellipse 55% 40% at -5% 100%, rgba(122, 178, 215, 0.22), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 70% 80%, rgba(217, 92, 4, 0.07), transparent 45%),
+    linear-gradient(165deg, #e4f0f8 0%, #eef5fb 40%, #e8f2f8 72%, #f5fafc 100%);
   color: var(--text);
   margin: 0;
   height: 100%;
@@ -302,7 +303,7 @@ a { text-decoration: none; color: inherit; }
   background: var(--sidebar-active);
   color: #fff;
   font-weight: 700;
-  box-shadow: 0 12px 28px rgba(67, 24, 255, 0.35);
+  box-shadow: 0 12px 28px rgba(43, 155, 255, 0.32);
 }
 
 .sidebar-link i {
@@ -2421,14 +2422,14 @@ textarea.form-control::-moz-placeholder {
   background: var(--primary);
   border: 1px solid var(--primary);
   color: #fff;
-  box-shadow: 0 10px 24px rgba(67, 24, 255, 0.28);
+  box-shadow: 0 10px 24px rgba(43, 155, 255, 0.26);
 }
 .btn-primary:hover,
 .btn-primary:focus {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
   color: #fff;
-  box-shadow: 0 14px 28px rgba(67, 24, 255, 0.34);
+  box-shadow: 0 14px 28px rgba(43, 155, 255, 0.3);
 }
 .btn-primary:focus-visible {
   box-shadow: var(--focus-ring);
@@ -3109,7 +3110,7 @@ body.sidebar-collapsed [data-sidebar-toggle] i {
 
 /* ─── Settings / Sales organization page ─── */
 .settings-page {
-  --settings-accent: #e85d4c;
+  --settings-accent: #d95c04;
   max-width: 1180px;
 }
 
@@ -3150,7 +3151,7 @@ body.sidebar-collapsed [data-sidebar-toggle] i {
   color: var(--primary);
   background: color-mix(in srgb, var(--primary) 10%, #fff);
   border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--line));
-  box-shadow: 0 8px 18px rgba(67, 24, 255, 0.12);
+  box-shadow: 0 8px 18px rgba(43, 155, 255, 0.12);
 }
 
 .settings-page__desc {

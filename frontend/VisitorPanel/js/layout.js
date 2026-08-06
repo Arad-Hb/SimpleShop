@@ -6,7 +6,7 @@
 
   const headerHTML = () => `
   <div class="preview-banner">
-    فروشگاه آزمایشی SimpleShop — سبد خرید و صفحات محصول فعال است
+    فروشگاه آزمایشی SimpleShop — کارت خرید و صفحات محصول فعال است
   </div>
   <div class="top-bar">
     <div class="container-xxl d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -17,7 +17,7 @@
       </div>
       <div class="d-flex align-items-center gap-3 flex-wrap top-bar-links">
         <a href="login.html"><i class="bi bi-box-arrow-in-left"></i> ورود / ثبت‌نام</a>
-        <a href="cart.html"><i class="bi bi-truck"></i> پیگیری سفارش</a>
+        <a href="card.html"><i class="bi bi-truck"></i> پیگیری سفارش</a>
       </div>
     </div>
   </div>
@@ -38,12 +38,12 @@
         </form>
         <div class="header-actions">
           <a href="category.html?id=digital" class="action-btn" title="دسته‌ها"><i class="bi bi-grid"></i></a>
-          <a href="cart.html" class="action-btn cart-btn" title="سبد خرید">
-            <i class="bi bi-cart3"></i>
-            <span class="cart-badge" data-cart-count>0</span>
+          <a href="card.html" class="action-btn cart-btn" title="کارت خرید">
+            <i class="bi bi-credit-card-2-front"></i>
+            <span class="cart-badge" data-card-count data-cart-count>0</span>
             <span class="cart-meta d-none d-lg-inline">
-              <small>سبد خرید</small>
-              <strong data-cart-total>۰ ت</strong>
+              <small>کارت خرید</small>
+              <strong data-card-total data-cart-total>۰ ت</strong>
             </span>
           </a>
         </div>
@@ -142,7 +142,7 @@
           <a href="index.html">صفحه اصلی</a>
           <a href="category.html">محصولات</a>
           <a href="login.html">ورود</a>
-          <a href="cart.html">سبد خرید</a>
+          <a href="card.html">کارت خرید</a>
         </div>
         <div>
           <h5>خدمات مشتریان</h5>
@@ -213,7 +213,7 @@
     if (headerHost) headerHost.innerHTML = headerHTML();
     if (footerHost) footerHost.innerHTML = footerHTML();
     applyBranding();
-    Store.cart?.updateCartUI?.();
+    Store.card?.updateCardUI?.();
   };
 
   // Mount as soon as hosts exist (scripts are at end of body)

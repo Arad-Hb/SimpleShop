@@ -1,10 +1,13 @@
 /**
- * SimpleShop visitor store — catalog, cart, shared UI helpers
+ * SimpleShop visitor store — catalog, card, shared UI helpers
  */
 (function (Store) {
   'use strict';
 
-  const CART_KEY = 'simpleShopVisitorCart';
+  const CARD_KEY = 'simpleShopVisitorCard';
+  const LEGACY_CART_KEY = 'simpleShopVisitorCart';
+  const CARD_VERSION = 1;
+  const CARD_EXPIRY_DAYS = 30;
   const ICONS = ['bi-box-seam', 'bi-phone', 'bi-laptop', 'bi-headphones', 'bi-watch', 'bi-house-heart', 'bi-controller'];
 
   const DEMO_CATEGORIES = [
@@ -323,8 +326,30 @@
       }));
     }
     source = 'api';
+    refreshCategoryNav();
     document.dispatchEvent(new CustomEvent('catalog:ready', { detail: { source } }));
     return true;
+  };
+
+  const categoryHref = (catId) => `category.html?id=${encodeURIComponent(String(catId))}`;
+
+  const refreshCategoryNav = () => {
+    const catCol = document.querySelector('.mega-col.categories');
+    if (catCol && CATEGORIES.length) {
+      catCol.innerHTML = CATEGORIES.slice(0, 8).map((c, i) => `
+        <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryHref(c.id)}" data-panel="${escapeHtml(String(c.id))}">
+          <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i> ${escapeHtml(c.name)}
+        </a>`).join('');
+    }
+
+    document.querySelectorAll('[data-category-link]').forEach((el) => {
+      const catId = el.dataset.categoryLink;
+      if (catId) el.setAttribute('href', categoryHref(catId));
+    });
+
+    document.querySelectorAll('.mega-nav-list a[href*="cat="]').forEach((el) => {
+      el.setAttribute('href', 'category.html');
+    });
   };
 
   const ready = (async () => {
@@ -339,6 +364,7 @@
     PRODUCTS = DEMO_PRODUCTS.slice();
     CATEGORIES = DEMO_CATEGORIES.slice();
     source = 'demo';
+    refreshCategoryNav();
     document.dispatchEvent(new CustomEvent('catalog:ready', { detail: { source } }));
     return { source };
   })();
@@ -380,62 +406,233 @@
     return pool.slice(0, limit);
   };
 
-  /* ─── Cart ─── */
-  const getCart = () => {
+  /* ─── Virtual card (browser-only, no login required) ─── */
+  const cardExpiryMs = () => CARD_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+
+  const resolveProductImage = (p) => {
+    const raw = p?.thumbnailUrl || p?.imageUrl || '';
+    if (!raw) return '';
+    return Store.api?.mediaUrl ? Store.api.mediaUrl(raw) : raw;
+  };
+
+  const snapshotFromProduct = (p, quantity) => ({
+    productId: String(p.id),
+    quantity,
+    unitPrice: p.price,
+    lineTotal: p.price * quantity,
+    title: p.title,
+    imageUrl: resolveProductImage(p),
+    brand: p.brand || '',
+    categoryName: p.categoryName || '',
+    categoryId: p.category || '',
+    stock: p.stock ?? 0,
+    discount: p.discount || 0,
+    icon: p.icon || 'bi-box-seam'
+  });
+
+  const computeItemsTotal = (cardItems) =>
+    cardItems.reduce((sum, row) => sum + (Number(row.lineTotal) || 0), 0);
+
+  const emptyCardEntity = () => {
+    const now = new Date();
+    return {
+      version: CARD_VERSION,
+      collectedAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+      expiresAt: new Date(now.getTime() + cardExpiryMs()).toISOString(),
+      itemsTotal: 0,
+      cardItems: []
+    };
+  };
+
+  const normalizeCardEntity = (raw) => {
+    if (!raw) return emptyCardEntity();
+    const now = new Date();
+
+    if (Array.isArray(raw)) {
+      const cardItems = raw.map((row) => {
+        const p = getProduct(row.id ?? row.productId);
+        const qty = Number(row.qty ?? row.quantity) || 1;
+        return p ? snapshotFromProduct(p, qty) : null;
+      }).filter(Boolean);
+      return {
+        version: CARD_VERSION,
+        collectedAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+        expiresAt: new Date(now.getTime() + cardExpiryMs()).toISOString(),
+        itemsTotal: computeItemsTotal(cardItems),
+        cardItems
+      };
+    }
+
+    if (raw && Array.isArray(raw.items) && !raw.cardItems) {
+      raw = {
+        ...raw,
+        cardItems: raw.items.map((row) => ({
+          productId: String(row.productId ?? row.id),
+          quantity: Number(row.quantity ?? row.qty) || 1,
+          unitPrice: row.unitPrice ?? 0,
+          lineTotal: row.lineTotal ?? 0,
+          title: row.title || '',
+          imageUrl: row.imageUrl || ''
+        }))
+      };
+    }
+
+    if (raw && Array.isArray(raw.cardItems)) {
+      return {
+        version: raw.version || CARD_VERSION,
+        collectedAt: raw.collectedAt || raw.updatedAt || now.toISOString(),
+        updatedAt: raw.updatedAt || now.toISOString(),
+        expiresAt: raw.expiresAt || new Date(now.getTime() + cardExpiryMs()).toISOString(),
+        itemsTotal: Number.isFinite(raw.itemsTotal) ? raw.itemsTotal : computeItemsTotal(raw.cardItems),
+        cardItems: raw.cardItems.map((row) => ({
+          productId: String(row.productId),
+          quantity: Number(row.quantity) || 1,
+          unitPrice: Number(row.unitPrice) || 0,
+          lineTotal: Number(row.lineTotal) || (Number(row.unitPrice) || 0) * (Number(row.quantity) || 1),
+          title: row.title || '',
+          imageUrl: row.imageUrl || '',
+          brand: row.brand || '',
+          categoryName: row.categoryName || '',
+          categoryId: row.categoryId || '',
+          stock: row.stock ?? 0,
+          discount: row.discount || 0,
+          icon: row.icon || 'bi-box-seam'
+        }))
+      };
+    }
+
+    return emptyCardEntity();
+  };
+
+  const isCardExpired = (entity) => {
+    if (!entity?.expiresAt) return false;
+    return new Date(entity.expiresAt) < new Date();
+  };
+
+  const notifyIfStoredCardExpired = () => {
     try {
-      return JSON.parse(localStorage.getItem(CART_KEY) || '[]');
+      const raw = localStorage.getItem(CARD_KEY) || localStorage.getItem(LEGACY_CART_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      const expiresAt = parsed?.expiresAt;
+      if (expiresAt && new Date(expiresAt) < new Date()) {
+        localStorage.removeItem(CARD_KEY);
+        localStorage.removeItem(LEGACY_CART_KEY);
+        showToast('کارت خرید شما منقضی شده بود و پاک شد.');
+      }
     } catch {
-      return [];
+      /* ignore */
     }
   };
 
-  const saveCart = (items) => {
-    localStorage.setItem(CART_KEY, JSON.stringify(items));
-    updateCartUI();
-    document.dispatchEvent(new CustomEvent('cart:updated', { detail: items }));
+  /** Full virtual card entity */
+  const getCardEntity = () => {
+    try {
+      let raw = localStorage.getItem(CARD_KEY);
+      if (!raw) raw = localStorage.getItem(LEGACY_CART_KEY);
+      const entity = normalizeCardEntity(raw ? JSON.parse(raw) : null);
+      if (isCardExpired(entity)) {
+        localStorage.removeItem(CARD_KEY);
+        localStorage.removeItem(LEGACY_CART_KEY);
+        return emptyCardEntity();
+      }
+      return entity;
+    } catch {
+      return emptyCardEntity();
+    }
   };
 
-  const cartCount = () => getCart().reduce((s, i) => s + i.qty, 0);
+  /** Legacy-compatible line list: [{ id, qty }] */
+  const getCardLines = () =>
+    getCardEntity().cardItems.map((row) => ({
+      id: row.productId,
+      qty: row.quantity
+    }));
 
-  const cartTotal = () =>
-    getCart().reduce((s, i) => {
-      const p = getProduct(i.id);
-      return s + (p ? p.price * i.qty : 0);
-    }, 0);
+  const saveCardEntity = (entity) => {
+    const payload = {
+      ...entity,
+      version: CARD_VERSION,
+      updatedAt: new Date().toISOString(),
+      itemsTotal: computeItemsTotal(entity.cardItems || [])
+    };
+    localStorage.setItem(CARD_KEY, JSON.stringify(payload));
+    localStorage.removeItem(LEGACY_CART_KEY);
+    updateCardUI();
+    document.dispatchEvent(new CustomEvent('card:updated', { detail: payload }));
+  };
 
-  const addToCart = (id, qty = 1) => {
+  const cardCount = () => getCardEntity().cardItems.reduce((s, i) => s + i.quantity, 0);
+
+  const cardTotal = () => getCardEntity().itemsTotal || computeItemsTotal(getCardEntity().cardItems);
+
+  const getExpiryInfo = () => {
+    const entity = getCardEntity();
+    const expires = new Date(entity.expiresAt);
+    const daysLeft = Math.max(0, Math.ceil((expires - Date.now()) / (24 * 60 * 60 * 1000)));
+    return { expiresAt: entity.expiresAt, daysLeft, isExpired: isCardExpired(entity) };
+  };
+
+  const addToCard = (id, qty = 1) => {
     const product = getProduct(id);
     if (!product) return false;
-    const items = getCart();
-    const row = items.find((i) => i.id === id);
-    if (row) row.qty += qty;
-    else items.push({ id, qty });
-    saveCart(items);
+    const entity = getCardEntity();
+    const cardItems = [...entity.cardItems];
+    const pid = String(id);
+    const existing = cardItems.find((i) => i.productId === pid);
+    if (existing) {
+      existing.quantity += qty;
+      Object.assign(existing, snapshotFromProduct(product, existing.quantity));
+    } else {
+      cardItems.push(snapshotFromProduct(product, qty));
+    }
+    saveCardEntity({ ...entity, cardItems });
     return true;
   };
 
   const setQty = (id, qty) => {
-    let items = getCart();
-    if (qty <= 0) items = items.filter((i) => i.id !== id);
-    else {
-      const row = items.find((i) => i.id === id);
-      if (row) row.qty = qty;
+    const entity = getCardEntity();
+    let cardItems = [...entity.cardItems];
+    const pid = String(id);
+    if (qty <= 0) {
+      cardItems = cardItems.filter((i) => i.productId !== pid);
+    } else {
+      const row = cardItems.find((i) => i.productId === pid);
+      const product = getProduct(pid);
+      if (row && product) Object.assign(row, snapshotFromProduct(product, qty));
     }
-    saveCart(items);
+    saveCardEntity({ ...entity, cardItems });
   };
 
-  const removeFromCart = (id) => saveCart(getCart().filter((i) => i.id !== id));
+  const removeFromCard = (id) => {
+    const entity = getCardEntity();
+    saveCardEntity({
+      ...entity,
+      cardItems: entity.cardItems.filter((i) => i.productId !== String(id))
+    });
+  };
 
-  const clearCart = () => saveCart([]);
+  const clearCard = () => saveCardEntity(emptyCardEntity());
 
-  const updateCartUI = () => {
-    const count = cartCount();
-    const total = cartTotal();
-    document.querySelectorAll('[data-cart-count]').forEach((el) => {
+  /** Map virtual card → API order lines */
+  const toOrderItems = () =>
+    getCardEntity().cardItems
+      .map((row) => ({
+        productId: parseInt(row.productId, 10),
+        quantity: row.quantity
+      }))
+      .filter((line) => Number.isFinite(line.productId) && line.productId > 0 && line.quantity > 0);
+
+  const updateCardUI = () => {
+    const count = cardCount();
+    const total = cardTotal();
+    document.querySelectorAll('[data-card-count], [data-cart-count]').forEach((el) => {
       el.textContent = count.toLocaleString('fa-IR');
       el.classList.toggle('is-empty', count === 0);
     });
-    document.querySelectorAll('[data-cart-total]').forEach((el) => {
+    document.querySelectorAll('[data-card-total], [data-cart-total]').forEach((el) => {
       el.textContent = formatPrice(total, true);
     });
   };
@@ -490,8 +687,8 @@
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (addToCart(btn.dataset.add, 1)) {
-          showToast('به سبد خرید اضافه شد');
+        if (addToCard(btn.dataset.add, 1)) {
+          showToast('به کارت خرید اضافه شد');
         }
       });
       btn.dataset.bound = 'true';
@@ -553,7 +750,7 @@
   };
 
   const headerHTML = () => `
-  <div class="preview-banner">فروشگاه آزمایشی SimpleShop — سبد خرید و صفحات محصول فعال است</div>
+  <div class="preview-banner">فروشگاه آزمایشی SimpleShop — کارت خرید و صفحات محصول فعال است</div>
   <div class="top-bar">
     <div class="container-xxl d-flex align-items-center justify-content-between flex-wrap gap-2">
       <div class="d-flex align-items-center gap-3 flex-wrap top-bar-links">
@@ -562,7 +759,7 @@
       </div>
       <div class="d-flex align-items-center gap-3 flex-wrap top-bar-links">
         <a href="login.html"><i class="bi bi-box-arrow-in-left"></i> ورود / ثبت‌نام</a>
-        <a href="cart.html"><i class="bi bi-truck"></i> سبد و سفارش</a>
+        <a href="card.html"><i class="bi bi-truck"></i> کارت و سفارش</a>
       </div>
     </div>
   </div>
@@ -582,12 +779,12 @@
           <a href="amazing.html" class="action-btn action-amazing" title="شگفت‌انگیزها">
             <i class="bi bi-lightning-charge-fill"></i>
           </a>
-          <a href="cart.html" class="action-btn cart-btn" title="سبد خرید">
-            <i class="bi bi-cart3"></i>
-            <span class="cart-badge" data-cart-count>0</span>
+          <a href="card.html" class="action-btn cart-btn" title="کارت خرید">
+            <i class="bi bi-credit-card-2-front"></i>
+            <span class="cart-badge" data-card-count data-cart-count>0</span>
             <span class="cart-meta d-none d-lg-inline">
-              <small>سبد خرید</small>
-              <strong data-cart-total>۰ ت</strong>
+              <small>کارت خرید</small>
+              <strong data-card-total data-cart-total>۰ ت</strong>
             </span>
           </a>
         </div>
@@ -602,16 +799,16 @@
           <div class="mega-panel">
             <div class="mega-cols">
               <div class="mega-col categories">
-                <a class="mega-cat active" href="category.html?cat=digital"><i class="bi bi-phone"></i> کالای دیجیتال</a>
-                <a class="mega-cat" href="category.html?cat=home"><i class="bi bi-house"></i> خانه و آشپزخانه</a>
-                <a class="mega-cat" href="category.html?cat=fashion"><i class="bi bi-handbag"></i> مد و پوشاک</a>
-                <a class="mega-cat" href="category.html?cat=beauty"><i class="bi bi-flower1"></i> زیبایی و سلامت</a>
-                <a class="mega-cat" href="category.html?cat=sport"><i class="bi bi-trophy"></i> ورزش و سفر</a>
-                <a class="mega-cat" href="category.html?cat=gaming"><i class="bi bi-controller"></i> گیمینگ</a>
+                <a class="mega-cat active" href="category.html?id=digital" data-panel="digital"><i class="bi bi-phone"></i> کالای دیجیتال</a>
+                <a class="mega-cat" href="category.html?id=home" data-panel="home"><i class="bi bi-house"></i> خانه و آشپزخانه</a>
+                <a class="mega-cat" href="category.html?id=fashion" data-panel="fashion"><i class="bi bi-handbag"></i> مد و پوشاک</a>
+                <a class="mega-cat" href="category.html?id=beauty" data-panel="beauty"><i class="bi bi-flower1"></i> زیبایی و سلامت</a>
+                <a class="mega-cat" href="category.html?id=sport" data-panel="sport"><i class="bi bi-trophy"></i> ورزش و سفر</a>
+                <a class="mega-cat" href="category.html?id=gaming" data-panel="gaming"><i class="bi bi-controller"></i> گیمینگ</a>
               </div>
               <div class="mega-col links" id="mega-panel-digital">
                 <h6>میانبرها</h6>
-                <a href="category.html?cat=digital">همه کالای دیجیتال</a>
+                <a href="category.html?id=digital">همه کالای دیجیتال</a>
                 <a href="amazing.html" class="text-amazing-link">پیشنهادهای شگفت‌انگیز</a>
                 <a href="search.html?q=Samsung">برند Samsung</a>
                 <a href="search.html?q=Sony">برند Sony</a>
@@ -628,9 +825,9 @@
         </li>
         <li><a href="amazing.html" class="nav-amazing"><i class="bi bi-lightning-charge-fill"></i> شگفت‌انگیزها</a></li>
         <li><a href="category.html">همه محصولات</a></li>
-        <li><a href="category.html?cat=digital">پرفروش‌ها</a></li>
+        <li><a href="category.html?id=digital">پرفروش‌ها</a></li>
         <li><a href="search.html?q=%D9%81%D8%B1%D9%88%D8%B4">تخفیف‌ها</a></li>
-        <li class="ms-auto d-none d-xl-block"><a href="cart.html" class="mega-highlight"><i class="bi bi-bag-check"></i> تکمیل خرید</a></li>
+        <li class="ms-auto d-none d-xl-block"><a href="checkout.html" class="mega-highlight"><i class="bi bi-bag-check"></i> تکمیل خرید</a></li>
       </ul>
     </div>
   </nav>`;
@@ -644,7 +841,7 @@
             <span class="brand-mark"><i class="bi bi-bag-heart-fill"></i></span>
             <span class="brand-text"><strong>SimpleShop</strong><small>خرید مطمئن، ارسال سریع</small></span>
           </div>
-          <p>فروشگاه اینترنتی SimpleShop — پیش‌نمایش کامل فروشگاهی با سبد خرید و صفحه محصول.</p>
+          <p>فروشگاه اینترنتی SimpleShop — پیش‌نمایش کامل فروشگاهی با کارت خرید و صفحه محصول.</p>
           <div class="socials">
             <a href="#" aria-label="اینستاگرام"><i class="bi bi-instagram"></i></a>
             <a href="#" aria-label="تلگرام"><i class="bi bi-telegram"></i></a>
@@ -656,7 +853,7 @@
           <a href="index.html">صفحه اصلی</a>
           <a href="category.html">محصولات</a>
           <a href="amazing.html">شگفت‌انگیزها</a>
-          <a href="cart.html">سبد خرید</a>
+          <a href="card.html">کارت خرید</a>
         </div>
         <div>
           <h5>حساب کاربری</h5>
@@ -690,7 +887,8 @@
 
   const boot = () => {
     mountShell();
-    updateCartUI();
+    notifyIfStoredCardExpired();
+    updateCardUI();
     initMegaMenu();
     initSearchForms();
     initDealTimer();
@@ -707,22 +905,37 @@
     ready,
     loadFromApi,
     mapApiProduct,
+    refreshCategoryNav,
+    categoryHref,
     getProduct,
     getByCategory,
     searchProducts,
     getAmazing,
     getRelated
   };
-  Store.cart = {
-    getCart,
-    addToCart,
+  Store.card = {
+    getCardEntity,
+    getCardLines,
+    getCartEntity: getCardEntity,
+    getCart: getCardLines,
+    addToCard,
+    addToCart: addToCard,
     setQty,
-    removeFromCart,
-    clearCart,
-    cartCount,
-    cartTotal,
-    updateCartUI
+    removeFromCard,
+    removeFromCart: removeFromCard,
+    clearCard,
+    clearCart: clearCard,
+    cardCount,
+    cartCount: cardCount,
+    cardTotal,
+    cartTotal: cardTotal,
+    getExpiryInfo,
+    toOrderItems,
+    updateCardUI,
+    updateCartUI: updateCardUI,
+    CARD_EXPIRY_DAYS
   };
+  Store.cart = Store.card;
   Store.ui = {
     escapeHtml,
     formatPrice,

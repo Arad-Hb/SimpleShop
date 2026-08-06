@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel|CustomerPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+  }
+})();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروفایل — پنل مشتری</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
+</head>
+<body data-page="profile">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand customer-sidebar-brand">
+      <div class="customer-avatar-wrap">
+        <img src="assets/img/customer-avatar.png" alt="" class="customer-avatar" data-customer-avatar>
+      </div>
+      <span data-customer-brand>مشتری</span>
+      <span class="customer-sidebar-chip"><i class="bi bi-stars" aria-hidden="true"></i> حساب من</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link sidebar-toggle-btn" data-sidebar-toggle aria-label="منو"><i class="bi bi-layout-sidebar-reverse"></i></button>
+        <h2 class="header-title">پروفایل من</h2>
+      </div>
+      <div class="header-actions">
+        <span class="fun-tag fun-tag--coral me-2">پروفایل</span>
+        <span class="text-muted small" data-customer-name></span>
+      </div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="settings-page">
+        <div class="settings-page__hero">
+          <div>
+            <h1 class="settings-page__title">
+              <span>پروفایل من</span>
+              <i class="bi bi-person" aria-hidden="true"></i>
+            </h1>
+            <p class="settings-page__desc">اطلاعات شخصی و آدرس خود را ویرایش کنید</p>
+          </div>
+        </div>
+
+        <form id="profile-form" novalidate>
+          <article class="settings-card">
+            <div class="settings-card__top">
+              <div class="settings-card__brand">
+                <span class="settings-card__logo settings-card__logo--soft"><i class="bi bi-person-badge"></i></span>
+                <div>
+                  <h3 class="settings-card__title">اطلاعات شخصی</h3>
+                  <p class="settings-card__subtitle">این اطلاعات برای ارسال سفارش استفاده می‌شود</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card__body">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label" for="username">نام کاربری</label>
+                  <input type="text" class="form-control" id="username" readonly dir="ltr">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="firstName">نام *</label>
+                  <input type="text" class="form-control" id="firstName" required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="lastName">نام خانوادگی *</label>
+                  <input type="text" class="form-control" id="lastName" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label" for="email">ایمیل *</label>
+                  <input type="email" class="form-control" id="email" dir="ltr" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label" for="mobile">موبایل *</label>
+                  <input type="text" class="form-control" id="mobile" dir="ltr" required>
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label" for="phone">تلفن</label>
+                  <input type="text" class="form-control" id="phone" dir="ltr">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="nationalId">کد ملی</label>
+                  <input type="text" class="form-control" id="nationalId" dir="ltr">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label" for="postalCode">کد پستی</label>
+                  <input type="text" class="form-control" id="postalCode" dir="ltr">
+                </div>
+                <div class="col-md-12">
+                  <label class="form-label" for="address">آدرس</label>
+                  <textarea class="form-control" id="address" rows="3" placeholder="آدرس کامل تحویل..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="settings-card__note">
+              <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+              <span>نام کاربری پس از ثبت‌نام قابل تغییر نیست.</span>
+            </div>
+          </article>
+
+          <div class="settings-page__actions">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره پروفایل</button>
+            <a href="financial.html" class="btn btn-outline-secondary">اطلاعات مالی</a>
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/profile.js"></script>
+</body>
+</html>

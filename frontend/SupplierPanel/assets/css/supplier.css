@@ -90,6 +90,10 @@
   color: var(--sidebar-bg);
 }
 
-.settings-panel[hidden] {
-  display: none !important;
+.profile-section-title {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--sidebar-bg);
+  font-family: var(--font-fa);
 }

@@ -12,13 +12,68 @@
   const { paginate, sortItems } = ShopAdmin.pagination;
   const { getProductStockStatus } = ShopAdmin.storage;
 
-  const productRepo = ShopAdmin.storage.createRepository('products');
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
+
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
+
+  const mapApiProduct = (dto) => {
+    const gallery = Array.isArray(dto.gallery) ? dto.gallery : (Array.isArray(dto.Gallery) ? dto.Gallery : []);
+    const imageUrl = pick(dto, 'imageUrl', 'ImageUrl') || '';
+    const thumbnailUrl = pick(dto, 'thumbnailUrl', 'ThumbnailUrl') || imageUrl || '';
+    const images = gallery.length
+      ? gallery.map((g, i) => ({
+          id: `api-img-${pick(dto, 'id', 'Id')}-${pick(g, 'id', 'Id') || i}`,
+          alt: pick(g, 'altText', 'AltText') || pick(dto, 'name', 'Name') || '',
+          isPrimary: pick(g, 'isPrimary', 'IsPrimary') === true || i === 0,
+          sortOrder: pick(g, 'sortOrder', 'SortOrder') ?? i,
+          url: pick(g, 'url', 'Url') || imageUrl,
+          thumbnailUrl: pick(g, 'thumbnailUrl', 'ThumbnailUrl') || thumbnailUrl
+        }))
+      : (imageUrl || thumbnailUrl
+        ? [{
+            id: `api-img-${pick(dto, 'id', 'Id')}-primary`,
+            alt: pick(dto, 'name', 'Name') || '',
+            isPrimary: true,
+            sortOrder: 0,
+            url: imageUrl,
+            thumbnailUrl
+          }]
+        : []);
+
+    return {
+      id: pick(dto, 'id', 'Id'),
+      name: pick(dto, 'name', 'Name') || 'محصول',
+      sku: pick(dto, 'sku', 'Sku') || `API-${String(pick(dto, 'id', 'Id')).padStart(4, '0')}`,
+      categoryId: pick(dto, 'categoryId', 'CategoryId') ?? null,
+      categoryName: pick(dto, 'categoryName', 'CategoryName') || '',
+      supplierId: pick(dto, 'supplierId', 'SupplierId') ?? null,
+      supplierName: pick(dto, 'supplierName', 'SupplierName') || '',
+      price: Number(pick(dto, 'price', 'Price')) || 0,
+      discountPrice: null,
+      stock: Number(pick(dto, 'stock', 'Stock')) || 0,
+      minimumStock: 5,
+      isActive: pick(dto, 'isActive', 'IsActive') !== false,
+      description: pick(dto, 'description', 'Description') || '',
+      imageId: images[0]?.id || null,
+      imageUrl,
+      thumbnailUrl,
+      images,
+      rating: 0,
+      reviewCount: 0,
+      createdAt: pick(dto, 'createdAt', 'CreatedAt') || new Date().toISOString(),
+      source: 'api'
+    };
+  };
+
   const categoryRepo = ShopAdmin.storage.createRepository('categories');
   const supplierRepo = ShopAdmin.storage.createRepository('suppliers');
-  const orderItemRepo = ShopAdmin.storage.createRepository('orderItems');
   const { imageStore } = ShopAdmin.storage;
 
   const thumbCache = new Map();
+  let apiProducts = [];
+  let categoriesLoaded = [];
+  let suppliersLoaded = [];
 
   const state = {
     page: 1,
@@ -70,8 +125,7 @@
     if (!imageId) return null;
     if (thumbCache.has(imageId)) return thumbCache.get(imageId);
 
-    // Remote id placeholder from API sync: try matching product images
-    const product = productRepo.getAll().find((p) =>
+    const product = apiProducts.find((p) =>
       p.imageId === imageId || (p.images || []).some((i) => i.id === imageId)
     );
     if (product) {
@@ -97,18 +151,17 @@
 
   const getCategoryMap = () => {
     const map = new Map();
-    categoryRepo.getAll().forEach((c) => map.set(c.id, c.name));
+    (categoriesLoaded.length ? categoriesLoaded : categoryRepo.getAll())
+      .forEach((c) => map.set(c.id, c.name));
     return map;
   };
 
   const getSupplierMap = () => {
     const map = new Map();
-    supplierRepo.getAll().forEach((s) => map.set(s.id, s.name));
+    (suppliersLoaded.length ? suppliersLoaded : supplierRepo.getAll())
+      .forEach((s) => map.set(s.id, s.name));
     return map;
   };
-
-  const productHasOrders = (productId) =>
-    orderItemRepo.getAll().some((item) => item.productId === productId);
 
   const applyFilters = (products) => {
     const f = state.filters;
@@ -187,7 +240,10 @@
     catSel.innerHTML = '<option value="">همه</option>';
     supSel.innerHTML = '<option value="">همه</option>';
 
-    categoryRepo.getAll()
+    const categories = categoriesLoaded.length ? categoriesLoaded : categoryRepo.getAll();
+    const suppliers = suppliersLoaded.length ? suppliersLoaded : supplierRepo.getAll();
+
+    categories
       .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
       .forEach((c) => {
         const opt = document.createElement('option');
@@ -196,7 +252,7 @@
         catSel.appendChild(opt);
       });
 
-    supplierRepo.getAll().forEach((s) => {
+    suppliers.forEach((s) => {
       const opt = document.createElement('option');
       opt.value = s.id;
       opt.textContent = `${s.name}${s.isActive === false ? ' (غیرفعال)' : ''}`;
@@ -225,7 +281,7 @@
 
     const categories = getCategoryMap();
     const suppliers = getSupplierMap();
-    let products = applyFilters(productRepo.getAll());
+    let products = applyFilters(apiProducts.map(normalizeProduct));
     products = sortItems(products, state.sortField, state.sortDir);
 
     const pageSize = state.pageSize || 10;
@@ -300,12 +356,27 @@
     });
   };
 
-  const toggleActive = (id) => {
-    const product = productRepo.getById(id);
+  const toApiPayload = (product) => ({
+    name: product.name,
+    description: product.description || null,
+    price: Number(product.price) || 0,
+    stock: Number(product.stock) || 0,
+    categoryId: Number(product.categoryId),
+    supplierId: product.supplierId ? Number(product.supplierId) : null,
+    slug: product.slug || null,
+    metaTitle: product.seo?.metaTitle || null,
+    metaDescription: product.seo?.metaDescription || null,
+    metaKeywords: product.seo?.keywords || null,
+    canonicalUrl: product.seo?.canonicalUrl || null,
+    ogTitle: product.seo?.ogTitle || null,
+    ogDescription: product.seo?.ogDescription || null
+  });
+
+  const toggleActive = async (id) => {
+    const product = apiProducts.find((p) => p.id === id);
     if (!product) return;
-    const next = product.isActive === false;
-    productRepo.update(id, { isActive: next });
-    ShopAdmin.ui.showToast('success', next ? 'محصول فعال شد.' : 'محصول غیرفعال شد.');
+    product.isActive = product.isActive === false;
+    ShopAdmin.ui.showToast('info', product.isActive ? 'محصول در UI فعال شد.' : 'محصول در UI غیرفعال شد. (API فعلاً isActive را پشتیبانی نمی‌کند)');
     renderTable();
   };
 
@@ -320,32 +391,67 @@
   };
 
   const deleteProduct = (id) => {
-    const product = productRepo.getById(id);
+    const product = apiProducts.find((p) => p.id === id);
     if (!product) return;
-
-    if (productHasOrders(id)) {
-      ShopAdmin.ui.showConfirmModal(
-        'غیرفعال‌سازی محصول',
-        'این محصول در سفارش‌ها استفاده شده و قابل حذف نیست. آیا می‌خواهید آن را غیرفعال کنید؟',
-        () => {
-          productRepo.update(id, { isActive: false });
-          ShopAdmin.ui.showToast('warning', 'محصول غیرفعال شد.');
-          renderTable();
-        }
-      );
-      return;
-    }
 
     ShopAdmin.ui.showConfirmModal(
       'حذف محصول',
       `آیا از حذف «${product.name}» مطمئن هستید؟`,
       async () => {
-        await deleteProductImages(product);
-        productRepo.remove(id);
-        ShopAdmin.ui.showToast('success', 'محصول حذف شد.');
-        renderTable();
+        try {
+          await ShopAdmin.api.ensureApiAuth();
+          await ShopAdmin.api.deleteProduct(id);
+          await deleteProductImages(product);
+          apiProducts = apiProducts.filter((p) => p.id !== id);
+          ShopAdmin.ui.showToast('success', 'محصول حذف شد.');
+          renderTable();
+        } catch (err) {
+          ShopAdmin.ui.showToast('error', apiError(err));
+        }
       }
     );
+  };
+
+  const fetchProductsFromApi = async () => {
+    const pageSize = 50;
+    let page = 1;
+    let all = [];
+    let total = Infinity;
+
+    while (all.length < total && page <= 20) {
+      const data = await ShopAdmin.api.getProducts({ page, pageSize, sortBy: 'name', sortDir: 'asc' });
+      const items = data?.items || data?.Items || [];
+      const search = data?.searchModel || data?.SearchModel || {};
+      total = Number(search.recordCount ?? search.RecordCount ?? items.length) || items.length;
+      all = all.concat(items.map(mapApiProduct));
+      if (!items.length || items.length < pageSize) break;
+      page += 1;
+    }
+
+    return all;
+  };
+
+  const loadCatalogMeta = async () => {
+    try {
+      const [cats, supPage] = await Promise.all([
+        ShopAdmin.api.getCategories(),
+        ShopAdmin.api.getSuppliers()
+      ]);
+      categoriesLoaded = (Array.isArray(cats) ? cats : []).map((c) => ({
+        id: pick(c, 'id', 'Id'),
+        name: pick(c, 'name', 'Name') || '',
+        sortOrder: pick(c, 'sortOrder', 'SortOrder') ?? 0,
+        isActive: pick(c, 'isActive', 'IsActive') !== false
+      }));
+      suppliersLoaded = (supPage?.items || supPage?.Items || []).map((s) => ({
+        id: pick(s, 'id', 'Id'),
+        name: pick(s, 'name', 'Name') || '',
+        isActive: pick(s, 'isActive', 'IsActive') !== false
+      }));
+    } catch {
+      categoriesLoaded = [];
+      suppliersLoaded = [];
+    }
   };
 
   const clearFilters = () => {
@@ -361,9 +467,13 @@
       { label: 'محصولات' }
     ]);
 
-    // Wait for API catalog sync so the table shows DB products + photos
-    if (typeof ShopAdmin.sync?.syncCatalogFromApi === 'function') {
-      await ShopAdmin.sync.syncCatalogFromApi();
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      await loadCatalogMeta();
+      apiProducts = await fetchProductsFromApi();
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
+      apiProducts = [];
     }
 
     populateFilterDropdowns();
@@ -399,17 +509,6 @@
       state.sortField = field;
       state.sortDir = dir;
       renderTable();
-    });
-
-    document.getElementById('btn-resync-api')?.addEventListener('click', async () => {
-      const result = await ShopAdmin.sync.syncCatalogFromApi({ force: true });
-      if (result.ok) {
-        ShopAdmin.ui.showToast('success', `${result.products.toLocaleString('fa-IR')} محصول از دیتابیس بارگذاری شد`);
-        populateFilterDropdowns();
-        renderTable();
-      } else {
-        ShopAdmin.ui.showToast('error', result.message || 'همگام‌سازی ناموفق بود');
-      }
     });
 
     renderTable();

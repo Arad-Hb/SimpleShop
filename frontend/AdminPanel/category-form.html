@@ -62,6 +62,13 @@
                 <label for="category-description" class="form-label">توضیحات</label>
                 <textarea class="form-control" id="category-description" name="description" rows="3"></textarea>
               </div>
+              <div class="col-md-6">
+                <label for="category-parent" class="form-label">دسته والد</label>
+                <select class="form-select" id="category-parent" name="parentId">
+                  <option value="">— بدون والد (ریشه) —</option>
+                </select>
+                <div class="form-text">حداکثر ۳ سطح زیردسته مجاز است.</div>
+              </div>
               <div class="col-md-4">
                 <label for="category-sort-order" class="form-label">ترتیب نمایش</label>
                 <input type="number" class="form-control" id="category-sort-order" name="sortOrder" min="0" value="0">
@@ -106,6 +113,8 @@
 <script src="assets/js/ui.js"></script>
 <script src="assets/js/auth.js"></script>
 <script src="assets/js/config.js"></script>
+<script src="../shared/vendor/axios.min.js"></script>
+<script src="../shared/js/http-client.js"></script>
 <script src="assets/js/api-client.js"></script>
 <script src="assets/js/seed-data.js"></script>
 <script src="assets/js/sync.js"></script>

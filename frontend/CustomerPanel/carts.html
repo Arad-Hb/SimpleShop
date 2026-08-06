@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <script>
+(function () {
+  var path = location.pathname || '';
+  if (/\/(AdminPanel|SupplierPanel|CustomerPanel)$/i.test(path)) {
+    location.replace(path + '/' + location.search + location.hash);
+  }
+})();
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سبدهای ناتمام — پنل مشتری</title>
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
+  <link rel="stylesheet" href="assets/css/customer.css">
+</head>
+<body data-page="carts">
+<div class="admin-wrapper">
+  <aside id="sidebar" class="admin-sidebar" data-sidebar>
+    <div class="sidebar-brand customer-sidebar-brand">
+      <div class="customer-avatar-wrap">
+        <img src="assets/img/customer-avatar.png" alt="" class="customer-avatar" data-customer-avatar>
+      </div>
+      <span data-customer-brand>مشتری</span>
+      <span class="customer-sidebar-chip"><i class="bi bi-stars" aria-hidden="true"></i> حساب من</span>
+    </div>
+    <nav class="sidebar-nav"></nav>
+    <div class="sidebar-footer"><a href="#" class="sidebar-link" data-action="logout"><i class="bi bi-box-arrow-left"></i><span>خروج</span></a></div>
+  </aside>
+  <div class="admin-main">
+    <header class="admin-header">
+      <div class="d-flex align-items-center gap-3">
+        <button type="button" class="btn btn-link sidebar-toggle-btn" data-sidebar-toggle aria-label="منو"><i class="bi bi-layout-sidebar-reverse"></i></button>
+        <h2 class="header-title">سبدهای ناتمام</h2>
+      </div>
+      <div class="header-actions">
+        <span class="fun-tag fun-tag--amber me-2">سبد باز</span>
+        <span class="text-muted small" data-customer-name></span>
+      </div>
+    </header>
+    <main class="admin-content">
+      <nav class="breadcrumb-nav" aria-label="مسیر">
+        <ol class="breadcrumb mb-0" data-breadcrumb></ol>
+      </nav>
+
+      <div class="page-header">
+        <div>
+          <h1>سبدهای ناتمام</h1>
+          <p class="text-muted mb-0 small">سبدهایی که هنوز پرداخت نشده‌اند، رها شده‌اند یا خالی مانده‌اند</p>
+        </div>
+        <a href="../VisitorPanel/index.html" class="btn btn-primary"><i class="bi bi-shop"></i> ادامه خرید در فروشگاه</a>
+      </div>
+
+      <div class="soft-hint mb-3">
+        <i class="bi bi-cart"></i>
+        <span>این سبدها تکمیل نشده‌اند؛ تا وقتی پرداخت انجام نشود سفارش ثبت نمی‌شود.</span>
+      </div>
+
+      <div id="carts-empty" class="empty-state d-none">
+        <i class="bi bi-cart-check"></i>
+        <p>سبد ناتمامی وجود ندارد.</p>
+        <a href="../VisitorPanel/index.html" class="btn btn-primary btn-sm">مشاهده فروشگاه</a>
+      </div>
+
+      <div class="row g-3" id="carts-grid"></div>
+    </main>
+  </div>
+</div>
+
+<script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
+<script src="assets/js/utils.js"></script>
+<script src="assets/js/storage.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/seed-data.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/carts.js"></script>
+</body>
+</html>
