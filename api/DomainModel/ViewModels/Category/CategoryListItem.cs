@@ -11,10 +11,12 @@ public class CategoryListItem
     public string? MetaDescription { get; set; }
     public string? ImageUrl { get; set; }
     public string? ThumbnailUrl { get; set; }
+    public string? OgImageUrl { get; set; }
     public bool IsActive { get; set; }
     public int? ParentId { get; set; }
     public string? ParentName { get; set; }
     public int SortOrder { get; set; }
     public int Depth { get; set; }
     public int ChildCount { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

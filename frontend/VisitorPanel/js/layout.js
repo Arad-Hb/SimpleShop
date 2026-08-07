@@ -119,85 +119,100 @@
       </header>`;
   }
 
-  function renderMegaCategoryList() {
-    return DEMO_CATEGORIES.map((c, i) => `
-      <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryLink(c.id)}" data-panel="${c.id}">
-        <i class="bi ${c.icon}"></i> ${c.name}
+  function renderMegaCategoryList(tree) {
+    const roots = tree?.length ? tree : DEMO_CATEGORIES;
+    return roots.map((c, i) => `
+      <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryLink(c.id)}" data-panel="${escapeHtml(String(c.id))}">
+        <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i>
+        <span>${escapeHtml(c.name)}</span>
       </a>`).join('');
   }
 
-  function renderMegaSubPanel(id, title, links) {
-    const hidden = id === 'digital' ? '' : ' d-none';
-    const items = links.map((l) => `<a href="${l.href}">${l.label}</a>`).join('');
+  function renderMegaSubPanelFromNode(node, isFirst) {
+    const id = escapeHtml(String(node.id));
+    const name = escapeHtml(node.name || 'دسته');
+    const children = node.children || [];
+    const hidden = isFirst ? '' : ' d-none';
+
+    const columns = children.map((child) => {
+      const l1Href = categoryLink(child.id);
+      const l1Name = escapeHtml(child.name);
+      const l2Items = (child.children || []).map((gc) =>
+        `<a href="${categoryLink(gc.id)}" class="mega-sub-l2">${escapeHtml(gc.name)}</a>`
+      ).join('');
+      return `
+        <div class="mega-sub-column">
+          <a href="${l1Href}" class="mega-sub-heading">
+            <span class="mega-sub-heading-bar" aria-hidden="true"></span>
+            ${l1Name}
+          </a>
+          ${l2Items ? `<div class="mega-sub-links">${l2Items}</div>` : ''}
+        </div>`;
+    }).join('');
+
+    const body = columns
+      ? `<div class="mega-sub-columns">${columns}</div>`
+      : '<p class="mega-empty-sub mb-0">زیردسته‌ای وجود ندارد.</p>';
+
     return `
-      <div class="mega-col links${hidden}" id="mega-panel-${id}">
-        <h6>${title}</h6>
-        ${items}
+      <div class="mega-col links${hidden}" id="mega-panel-${id}" data-mega-panel="${id}">
+        <a href="${categoryLink(node.id)}" class="mega-all-link">
+          <span>همه کالاهای ${name}</span>
+          <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        </a>
+        ${body}
+      </div>`;
+  }
+
+  function renderMobileCategoryDrawer() {
+    return `
+      <div class="mobile-cat-drawer" id="mobile-cat-drawer" aria-hidden="true">
+        <div class="mobile-cat-backdrop" data-mobile-cat-close tabindex="-1"></div>
+        <aside class="mobile-cat-panel" role="dialog" aria-modal="true" aria-labelledby="mobile-cat-title">
+          <div class="mobile-cat-header">
+            <button type="button" class="mobile-cat-back d-none" data-mobile-cat-back aria-label="بازگشت">
+              <i class="bi bi-arrow-right" aria-hidden="true"></i>
+            </button>
+            <strong id="mobile-cat-title" data-mobile-cat-title>دسته‌بندی‌ها</strong>
+            <button type="button" class="mobile-cat-close" data-mobile-cat-close aria-label="بستن">
+              <i class="bi bi-x-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+          <nav class="mobile-cat-body" data-mobile-cat-body aria-label="منوی دسته‌بندی"></nav>
+        </aside>
       </div>`;
   }
 
   function renderMegaNav() {
-    const subPanels = [
-      renderMegaSubPanel('digital', 'پیشنهادها', [
-        { href: categoryLink('digital'), label: 'همه کالای دیجیتال' },
-        { href: 'search.html?q=گوشی', label: 'گوشی موبایل' },
-        { href: 'search.html?q=لپ‌تاپ', label: 'لپ‌تاپ' },
-        { href: 'search.html?q=هدفون', label: 'هدفون' }
-      ]),
-      renderMegaSubPanel('home', 'خانه', [
-        { href: categoryLink('home'), label: 'همه خانه و آشپزخانه' },
-        { href: 'search.html?q=قهوه', label: 'قهوه‌ساز' },
-        { href: 'search.html?q=جارو', label: 'جارو رباتیک' }
-      ]),
-      renderMegaSubPanel('fashion', 'مد', [
-        { href: categoryLink('fashion'), label: 'همه مد و پوشاک' },
-        { href: 'search.html?q=مانتو', label: 'مانتو' },
-        { href: 'search.html?q=کفش', label: 'کفش ورزشی' }
-      ]),
-      renderMegaSubPanel('beauty', 'زیبایی', [
-        { href: categoryLink('beauty'), label: 'همه زیبایی و سلامت' },
-        { href: 'search.html?q=عطر', label: 'عطر' },
-        { href: 'search.html?q=کرم', label: 'مراقبت پوست' }
-      ]),
-      renderMegaSubPanel('sport', 'ورزش', [
-        { href: categoryLink('sport'), label: 'همه ورزش و سفر' }
-      ]),
-      renderMegaSubPanel('gaming', 'گیمینگ', [
-        { href: categoryLink('gaming'), label: 'همه گیمینگ' },
-        { href: 'search.html?q=کنسول', label: 'کنسول بازی' }
-      ])
-    ].join('');
+    const demoTree = DEMO_CATEGORIES.map((c) => ({ ...c, children: [] }));
+    const subPanels = demoTree.map((node, i) => renderMegaSubPanelFromNode(node, i === 0)).join('');
 
     return `
       <nav class="mega-nav">
         <div class="container-xxl">
           <ul class="mega-nav-list">
             <li class="mega-item">
-              <a href="category.html" class="mega-trigger">
+              <button type="button" class="mega-trigger" data-mega-toggle data-mobile-cat-open aria-expanded="false" aria-controls="mega-panel-desktop">
                 <i class="bi bi-list" aria-hidden="true"></i>
                 <span>دسته‌بندی کالاها</span>
-              </a>
-              <div class="mega-panel">
+              </button>
+              <div class="mega-panel" id="mega-panel-desktop" aria-hidden="true">
                 <div class="mega-cols">
-                  <div class="mega-col categories">${renderMegaCategoryList()}</div>
-                  ${subPanels}
-                  <div class="mega-col promo">
-                    <div class="mega-promo-card">
-                      <span class="offer-tag tag-amazing">پیشنهاد شگفت‌انگیز</span>
-                      <strong>تا ۴۰٪ تخفیف کالای دیجیتال</strong>
-                      <a href="category.html?tag=amazing">مشاهده همه</a>
-                    </div>
+                  <div class="mega-col categories">${renderMegaCategoryList(demoTree)}</div>
+                  <div class="mega-col-content">
+                    ${subPanels}
                   </div>
                 </div>
               </div>
             </li>
-            <li class="mega-nav-divider" aria-hidden="true"></li>
+            <li class="mega-nav-divider d-none d-lg-block" aria-hidden="true"></li>
             <li><a href="category.html?tag=amazing" class="mega-nav-link"><i class="bi bi-percent" aria-hidden="true"></i><span>شگفت‌انگیزها</span></a></li>
             <li><a href="category.html" class="mega-nav-link"><i class="bi bi-basket2" aria-hidden="true"></i><span>پرفروش‌ترین‌ها</span></a></li>
             <li><a href="category.html?tag=sale" class="mega-nav-link"><i class="bi bi-tags" aria-hidden="true"></i><span>تخفیف‌ها</span></a></li>
           </ul>
         </div>
-      </nav>`;
+      </nav>
+      ${renderMobileCategoryDrawer()}`;
   }
 
   function renderHeaderShell() {
@@ -331,32 +346,231 @@
       .replace(/"/g, '&quot;');
   }
 
-  function refreshMegaSubPanels(categories) {
+  let mobileCategoryTree = [];
+  let mobileNavStack = [];
+
+  function refreshMegaMenu(tree) {
+    const roots = Array.isArray(tree) && tree.length ? tree : DEMO_CATEGORIES.map((c) => ({ ...c, children: [] }));
+    mobileCategoryTree = roots;
+
     const container = document.querySelector('.mega-cols');
-    if (!container || !Array.isArray(categories) || !categories.length) return;
-
-    container.querySelectorAll('.mega-col.links').forEach((el) => el.remove());
-
-    const promoCol = container.querySelector('.mega-col.promo');
-    if (!promoCol) return;
-
-    const panels = categories.slice(0, 8).map((c, i) => {
-      const id = escapeHtml(String(c.id));
-      const name = escapeHtml(c.name || 'دسته');
-      const hidden = i === 0 ? '' : ' d-none';
-      return `
-        <div class="mega-col links${hidden}" id="mega-panel-${id}">
-          <h6>${name}</h6>
-          <a href="${categoryLink(c.id)}">همه ${name}</a>
-          <a href="search.html">جستجو در فروشگاه</a>
-        </div>`;
-    }).join('');
-
-    promoCol.insertAdjacentHTML('beforebegin', panels);
+    if (!container) {
+      initMobileCategoryMenu(roots);
+      return;
+    }
 
     const catCol = container.querySelector('.mega-col.categories');
-    if (catCol) delete catCol.dataset.megaBound;
+    if (catCol) {
+      const rootsSlice = roots.slice(0, 20);
+      catCol.innerHTML = rootsSlice.map((c, i) => `
+        <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryLink(c.id)}" data-panel="${escapeHtml(String(c.id))}">
+          <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i>
+          <span>${escapeHtml(c.name)}</span>
+        </a>`).join('');
+      catCol.classList.toggle('mega-col--scrollable', rootsSlice.length > 6);
+      delete catCol.dataset.megaBound;
+    }
+
+    container.querySelectorAll('.mega-col-content .mega-col.links').forEach((el) => el.remove());
+    const contentCol = container.querySelector('.mega-col-content');
+    if (contentCol) {
+      contentCol.innerHTML = roots.slice(0, 20).map((node, i) => renderMegaSubPanelFromNode(node, i === 0)).join('');
+    }
+
     initMegaMenuHover();
+    initMegaMenuToggle();
+    initMobileCategoryMenu(roots);
+  }
+
+  function refreshMegaSubPanels(categories) {
+    const tree = (categories || []).map((c) => ({ ...c, children: [] }));
+    refreshMegaMenu(tree);
+  }
+
+  function renderMobileCategoryLevel(nodes, parentNode) {
+    const items = [];
+
+    if (parentNode) {
+      items.push(`
+        <a href="${categoryLink(parentNode.id)}" class="mobile-cat-item mobile-cat-item--all">
+          <span>همه ${escapeHtml(parentNode.name)}</span>
+          <i class="bi bi-box-arrow-up-left" aria-hidden="true"></i>
+        </a>`);
+    }
+
+    nodes.forEach((node) => {
+      const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+      if (hasChildren) {
+        items.push(`
+          <button type="button" class="mobile-cat-item" data-mobile-drill="${escapeHtml(String(node.id))}">
+            <span>${escapeHtml(node.name)}</span>
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+          </button>`);
+      } else {
+        items.push(`
+          <a href="${categoryLink(node.id)}" class="mobile-cat-item">
+            <span>${escapeHtml(node.name)}</span>
+            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+          </a>`);
+      }
+    });
+
+    return items.join('');
+  }
+
+  function findNodeInTree(tree, id) {
+    const sid = String(id);
+    for (const node of tree) {
+      if (String(node.id) === sid) return node;
+      for (const child of node.children || []) {
+        if (String(child.id) === sid) return child;
+        for (const gc of child.children || []) {
+          if (String(gc.id) === sid) return gc;
+        }
+      }
+    }
+    return null;
+  }
+
+  function updateMobileCategoryView() {
+    const drawer = document.getElementById('mobile-cat-drawer');
+    const body = drawer?.querySelector('[data-mobile-cat-body]');
+    const titleEl = drawer?.querySelector('[data-mobile-cat-title]');
+    const backBtn = drawer?.querySelector('[data-mobile-cat-back]');
+    if (!body || !titleEl || !backBtn) return;
+
+    const frame = mobileNavStack[mobileNavStack.length - 1];
+    if (!frame) return;
+
+    titleEl.textContent = frame.title;
+    backBtn.classList.toggle('d-none', mobileNavStack.length <= 1);
+    body.innerHTML = renderMobileCategoryLevel(frame.nodes, frame.parentNode || null);
+  }
+
+  function openMobileCategoryDrawer() {
+    const drawer = document.getElementById('mobile-cat-drawer');
+    if (!drawer) return;
+
+    mobileNavStack = [{
+      nodes: mobileCategoryTree,
+      title: 'دسته‌بندی‌ها',
+      parentNode: null
+    }];
+    updateMobileCategoryView();
+
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('mobile-cat-open');
+    document.querySelector('.mega-item')?.classList.add('is-open');
+  }
+
+  function closeMobileCategoryDrawer() {
+    const drawer = document.getElementById('mobile-cat-drawer');
+    if (!drawer || !drawer.classList.contains('is-open')) return;
+
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('mobile-cat-open');
+    document.querySelector('.mega-item')?.classList.remove('is-open');
+    mobileNavStack = [];
+  }
+
+  function initMobileCategoryMenu(tree) {
+    if (Array.isArray(tree) && tree.length) {
+      mobileCategoryTree = tree;
+    }
+    const drawer = document.getElementById('mobile-cat-drawer');
+    if (!drawer) return;
+    if (drawer.dataset.mobileCatBound === '1') return;
+    drawer.dataset.mobileCatBound = '1';
+
+    drawer.addEventListener('click', (event) => {
+      if (event.target.closest('[data-mobile-cat-close]')) {
+        closeMobileCategoryDrawer();
+        return;
+      }
+
+      const backBtn = event.target.closest('[data-mobile-cat-back]');
+      if (backBtn) {
+        if (mobileNavStack.length > 1) {
+          mobileNavStack.pop();
+          updateMobileCategoryView();
+        }
+        return;
+      }
+
+      const drillBtn = event.target.closest('[data-mobile-drill]');
+      if (drillBtn) {
+        const node = findNodeInTree(mobileCategoryTree, drillBtn.dataset.mobileDrill);
+        if (!node?.children?.length) return;
+        mobileNavStack.push({
+          nodes: node.children,
+          title: node.name,
+          parentNode: node
+        });
+        updateMobileCategoryView();
+      }
+    });
+
+    if (!document.documentElement.dataset.mobileCatDocBound) {
+      document.documentElement.dataset.mobileCatDocBound = '1';
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMobileCategoryDrawer();
+      });
+    }
+  }
+
+  function openMegaMenu() {
+    const megaItem = document.querySelector('.mega-item');
+    const panel = document.getElementById('mega-panel-desktop');
+    const trigger = document.querySelector('[data-mega-toggle]');
+    if (!megaItem || !panel) return;
+    megaItem.classList.add('is-open');
+    panel.setAttribute('aria-hidden', 'false');
+    trigger?.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeMegaMenu() {
+    const megaItem = document.querySelector('.mega-item');
+    const panel = document.getElementById('mega-panel-desktop');
+    const trigger = document.querySelector('[data-mega-toggle]');
+    if (!megaItem || !panel) return;
+    megaItem.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    trigger?.setAttribute('aria-expanded', 'false');
+  }
+
+  function initMegaMenuToggle() {
+    const megaItem = document.querySelector('.mega-item');
+    const trigger = document.querySelector('[data-mega-toggle]');
+    if (!megaItem || !trigger || megaItem.dataset.megaToggleBound === '1') return;
+    megaItem.dataset.megaToggleBound = '1';
+
+    trigger.addEventListener('click', (event) => {
+      if (window.matchMedia('(max-width: 991.98px)').matches) {
+        event.preventDefault();
+        openMobileCategoryDrawer();
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      if (megaItem.classList.contains('is-open')) {
+        closeMegaMenu();
+      } else {
+        openMegaMenu();
+      }
+    });
+
+    megaItem.addEventListener('mouseleave', (event) => {
+      if (!window.matchMedia('(min-width: 992px)').matches) return;
+      const related = event.relatedTarget;
+      if (related && megaItem.contains(related)) return;
+      closeMegaMenu();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeMegaMenu();
+    });
   }
 
   function initMegaMenuHover() {
@@ -622,9 +836,14 @@
     mountFooter();
     applyBranding();
     initMegaMenuHover();
+    initMegaMenuToggle();
     initSearchForms();
     initMiniCart();
     syncCardBadge();
+    const tree = Store.catalog?.CATEGORY_TREE?.length
+      ? Store.catalog.CATEGORY_TREE
+      : DEMO_CATEGORIES.map((c) => ({ ...c, children: [] }));
+    initMobileCategoryMenu(tree);
   }
 
   mountLayout();
@@ -633,7 +852,12 @@
     mount: mountLayout,
     applyBranding,
     initMegaMenuHover,
+    initMegaMenuToggle,
+    openMegaMenu,
+    closeMegaMenu,
+    refreshMegaMenu,
     refreshMegaSubPanels,
+    initMobileCategoryMenu,
     initSearchForms,
     initMiniCart,
     refreshMiniCart,

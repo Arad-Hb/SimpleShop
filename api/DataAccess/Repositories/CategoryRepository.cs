@@ -8,7 +8,24 @@ namespace DataAccess.Repositories;
 
 public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
 {
-    private static CategoryAddEditModel ToViewModel(Category c) => new()
+    private static void ApplyModel(Category entity, CategoryAddEditModel model)
+    {
+        entity.Name = model.Name;
+        entity.Description = model.Description;
+        entity.Slug = model.Slug;
+        entity.MetaTitle = model.MetaTitle;
+        entity.MetaDescription = model.MetaDescription;
+        entity.MetaKeywords = model.MetaKeywords;
+        entity.CanonicalUrl = model.CanonicalUrl;
+        entity.OgTitle = model.OgTitle;
+        entity.OgDescription = model.OgDescription;
+        entity.ImageFileId = model.ImageFileId;
+        entity.OgImageId = model.OgImageId;
+        entity.IsActive = model.IsActive;
+        entity.ParentId = model.ParentId;
+    }
+
+    private static CategoryAddEditModel ToViewModel(Category c, int childCount = 0, string? parentName = null) => new()
     {
         Id = c.Id,
         Name = c.Name,
@@ -16,11 +33,22 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
         Slug = c.Slug,
         MetaTitle = c.MetaTitle,
         MetaDescription = c.MetaDescription,
+        MetaKeywords = c.MetaKeywords,
+        CanonicalUrl = c.CanonicalUrl,
+        OgTitle = c.OgTitle,
+        OgDescription = c.OgDescription,
         ImageFileId = c.ImageFileId,
+        OgImageId = c.OgImageId,
+        ImageUrl = c.ImageFile?.Url,
+        OgImageUrl = c.OgImage?.Url,
         IsActive = c.IsActive,
         ParentId = c.ParentId,
+        ParentName = parentName ?? c.Parent?.Name,
         SortOrder = c.SortOrder,
-        Depth = c.Depth
+        Depth = c.Depth,
+        ProductCount = c.Products?.Count ?? 0,
+        ChildCount = childCount,
+        CreatedAt = c.CreatedAt
     };
 
     private static CategoryListItem ToListItem(Category c, int childCount, string? parentName) => new()
@@ -34,12 +62,14 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
         MetaDescription = c.MetaDescription,
         ImageUrl = c.ImageFile?.Url,
         ThumbnailUrl = c.ImageFile?.ThumbnailUrl,
+        OgImageUrl = c.OgImage?.Url,
         IsActive = c.IsActive,
         ParentId = c.ParentId,
         ParentName = parentName,
         SortOrder = c.SortOrder,
         Depth = c.Depth,
-        ChildCount = childCount
+        ChildCount = childCount,
+        CreatedAt = c.CreatedAt
     };
 
     private async Task<Dictionary<int, Category>> LoadLookupAsync()
@@ -89,6 +119,16 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
         return null;
     }
 
+    private async Task<string?> ValidateSlugAsync(string? slug, int? excludeId)
+    {
+        if (string.IsNullOrWhiteSpace(slug)) return null;
+
+        var normalized = slug.Trim();
+        var exists = await db.Categories.AsNoTracking()
+            .AnyAsync(c => c.Slug == normalized && (!excludeId.HasValue || c.Id != excludeId.Value));
+        return exists ? "شناسه URL (Slug) تکراری است." : null;
+    }
+
     private static bool IsDescendant(int ancestorId, int nodeId, IReadOnlyDictionary<int, Category> lookup)
     {
         if (!lookup.TryGetValue(nodeId, out var node)) return false;
@@ -125,6 +165,10 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
         if (parentError != null)
             return CategorySaveResult.Fail(parentError);
 
+        var slugError = await ValidateSlugAsync(model.Slug, isNew ? null : model.Id);
+        if (slugError != null)
+            return CategorySaveResult.Fail(slugError);
+
         try
         {
             if (isNew)
@@ -137,17 +181,11 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
                 var depth = await ResolveDepthAsync(model.ParentId);
                 var entity = new Category
                 {
-                    Name = model.Name,
-                    Description = model.Description,
-                    Slug = model.Slug,
-                    MetaTitle = model.MetaTitle,
-                    MetaDescription = model.MetaDescription,
-                    ImageFileId = model.ImageFileId,
-                    IsActive = model.IsActive,
-                    ParentId = model.ParentId,
                     SortOrder = sortOrder,
-                    Depth = depth
+                    Depth = depth,
+                    CreatedAt = DateTime.UtcNow
                 };
+                ApplyModel(entity, model);
 
                 db.Categories.Add(entity);
                 await db.SaveChangesAsync();
@@ -159,17 +197,10 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
                 return CategorySaveResult.Fail("دسته پیدا نشد");
 
             var parentChanged = entityExisting.ParentId != model.ParentId;
-            var sortRequested = model.SortOrder is > 0;
+            var sortChanged = model.SortOrder is > 0 && model.SortOrder != entityExisting.SortOrder;
             var siblings = await GetSiblingsTrackedAsync(model.ParentId, model.Id);
 
-            entityExisting.Name = model.Name;
-            entityExisting.Description = model.Description;
-            entityExisting.Slug = model.Slug;
-            entityExisting.MetaTitle = model.MetaTitle;
-            entityExisting.MetaDescription = model.MetaDescription;
-            entityExisting.ImageFileId = model.ImageFileId;
-            entityExisting.IsActive = model.IsActive;
-            entityExisting.ParentId = model.ParentId;
+            ApplyModel(entityExisting, model);
 
             if (parentChanged)
             {
@@ -177,7 +208,7 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
                 await CascadeDepthToDescendantsAsync(entityExisting.Id, entityExisting.Depth);
             }
 
-            if (parentChanged || sortRequested)
+            if (parentChanged || sortChanged)
             {
                 var (sortOrder, conflict) = CategorySortHelper.Resolve(model, siblings);
                 if (conflict != null)
@@ -230,14 +261,21 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
 
     public async Task<CategoryAddEditModel?> Get(int id)
     {
-        var entity = await db.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-        return entity == null ? null : ToViewModel(entity);
+        var entity = await db.Categories.AsNoTracking()
+            .Include(c => c.ImageFile)
+            .Include(c => c.OgImage)
+            .Include(c => c.Parent)
+            .Include(c => c.Products)
+            .Include(c => c.Children)
+            .FirstOrDefaultAsync(x => x.Id == id);
+        return entity == null ? null : ToViewModel(entity, entity.Children.Count, entity.Parent?.Name);
     }
 
     public async Task<List<CategoryListItem>> GetAll()
     {
         var categories = await db.Categories.AsNoTracking()
             .Include(c => c.ImageFile)
+            .Include(c => c.OgImage)
             .Include(c => c.Products)
             .Include(c => c.Children)
             .Include(c => c.Parent)
@@ -297,6 +335,7 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
         if (searchModel.PageSize <= 0) searchModel.PageSize = 20;
 
         var query = db.Categories.AsNoTracking().AsQueryable();
+
         if (!string.IsNullOrWhiteSpace(searchModel.Search))
         {
             var term = searchModel.Search.Trim();
@@ -305,6 +344,12 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
                 (c.Description != null && c.Description.Contains(term)) ||
                 (c.Slug != null && c.Slug.Contains(term)));
         }
+
+        if (searchModel.IsActive.HasValue)
+            query = query.Where(c => c.IsActive == searchModel.IsActive.Value);
+
+        if (searchModel.ParentId.HasValue)
+            query = query.Where(c => c.ParentId == searchModel.ParentId.Value);
 
         var result = new CategoryListComplex { SearchModel = searchModel };
         result.SearchModel.RecordCount = await query.CountAsync();
@@ -324,6 +369,7 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
 
         var categories = await db.Categories.AsNoTracking()
             .Include(c => c.ImageFile)
+            .Include(c => c.OgImage)
             .Include(c => c.Products)
             .Include(c => c.Children)
             .Include(c => c.Parent)

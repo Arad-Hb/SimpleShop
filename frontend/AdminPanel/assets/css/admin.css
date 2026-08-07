@@ -1262,22 +1262,146 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   white-space: nowrap;
 }
 
-.admin-table--categories th:nth-child(1),
-.admin-table--categories td:nth-child(1) { width: 48px; text-align: center; }
-.admin-table--categories th:nth-child(2),
-.admin-table--categories td:nth-child(2) { width: 16%; max-width: 140px; }
-.admin-table--categories th:nth-child(3),
-.admin-table--categories td:nth-child(3) { width: 18%; }
-.admin-table--categories th:nth-child(4),
-.admin-table--categories td:nth-child(4) { width: 58px; text-align: center; }
-.admin-table--categories th:nth-child(5),
-.admin-table--categories td:nth-child(5) { width: 72px; text-align: center; }
-.admin-table--categories th:nth-child(6),
-.admin-table--categories td:nth-child(6) { width: 68px; text-align: center; }
-.admin-table--categories th:nth-child(7),
-.admin-table--categories td:nth-child(7) { width: 100px; }
-.admin-table--categories th:nth-child(8),
-.admin-table--categories td:nth-child(8) { width: 132px; text-align: center; overflow: visible; }
+.content-card--categories .table-responsive--categories {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+.admin-table--categories {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 0;
+}
+
+.admin-table--categories th,
+.admin-table--categories td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-size: 0.8125rem;
+  padding: 0.45rem 0.35rem;
+}
+
+.admin-table--categories .col-id {
+  width: 2.5rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.admin-table--categories .col-img {
+  width: 2.75rem;
+  text-align: center;
+}
+.admin-table--categories .col-img img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+}
+.admin-table--categories .col-name {
+  width: 12%;
+  max-width: 9rem;
+}
+.admin-table--categories .category-name-cell {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-table--categories .col-slug {
+  width: 8%;
+  max-width: 6.5rem;
+}
+.admin-table--categories .col-slug code {
+  font-size: 0.72rem;
+}
+.admin-table--categories .col-desc {
+  width: auto;
+  min-width: 6rem;
+  white-space: normal;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.admin-table--categories .col-sort {
+  width: 3rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.admin-table--categories .col-status {
+  width: 4.25rem;
+  text-align: center;
+}
+.admin-table--categories .col-status .badge {
+  font-size: 0.68rem;
+  padding: 0.25em 0.45em;
+}
+.admin-table--categories .col-products {
+  width: 3.75rem;
+  text-align: center;
+}
+.admin-table--categories .col-parent {
+  width: 9%;
+  max-width: 7rem;
+}
+.admin-table--categories .col-depth {
+  width: 2.75rem;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.admin-table--categories .col-actions {
+  width: 7.5rem;
+  text-align: center;
+  overflow: visible;
+  white-space: nowrap;
+}
+.admin-table--categories .col-actions .table-actions .btn {
+  padding: 0.2rem 0.35rem;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 1199.98px) {
+  .admin-table--categories .col-depth,
+  .admin-table--categories th.col-depth,
+  .admin-table--categories td.col-depth {
+    display: none;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .admin-table--categories .col-slug,
+  .admin-table--categories th.col-slug,
+  .admin-table--categories td.col-slug,
+  .admin-table--categories .col-parent,
+  .admin-table--categories th.col-parent,
+  .admin-table--categories td.col-parent {
+    display: none;
+  }
+  .admin-table--categories .col-name {
+    width: 14%;
+    max-width: 8rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-table--categories .col-id,
+  .admin-table--categories th.col-id,
+  .admin-table--categories td.col-id {
+    display: none;
+  }
+  .admin-table--categories .col-sort,
+  .admin-table--categories th.col-sort,
+  .admin-table--categories td.col-sort {
+    display: none;
+  }
+  .admin-table--categories .col-desc {
+    -webkit-line-clamp: 3;
+  }
+  .admin-table--categories .col-actions {
+    width: 6.75rem;
+  }
+}
 
 .admin-table--customers th:nth-child(1),
 .admin-table--customers td:nth-child(1) { width: 14%; max-width: 130px; }

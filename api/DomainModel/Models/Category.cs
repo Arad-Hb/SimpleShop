@@ -10,9 +10,16 @@ public class Category
     public string? Slug { get; set; }
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
+    public string? MetaKeywords { get; set; }
+    public string? CanonicalUrl { get; set; }
+    public string? OgTitle { get; set; }
+    public string? OgDescription { get; set; }
     public int? ImageFileId { get; set; }
     public FileManager? ImageFile { get; set; }
+    public int? OgImageId { get; set; }
+    public FileManager? OgImage { get; set; }
     public bool IsActive { get; set; } = true;
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>Null = root category.</summary>
     public int? ParentId { get; set; }

@@ -43,62 +43,168 @@
         </a>
       </div>
 
-      <div class="content-card">
-        <div class="card-body">
-          <form id="category-form" novalidate>
-            <input type="hidden" name="id" id="category-id">
+      <form id="category-form" novalidate>
+        <input type="hidden" name="id" id="category-id">
 
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="category-name" class="form-label">نام <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="category-name" name="name" required>
-              </div>
-              <div class="col-md-6">
-                <label for="category-slug" class="form-label">شناسه URL (slug)</label>
-                <input type="text" class="form-control" id="category-slug" name="slug" dir="ltr">
-                <div class="form-text">به‌صورت خودکار از نام ساخته می‌شود.</div>
-              </div>
-              <div class="col-12">
-                <label for="category-description" class="form-label">توضیحات</label>
-                <textarea class="form-control" id="category-description" name="description" rows="3"></textarea>
-              </div>
-              <div class="col-md-6">
-                <label for="category-parent" class="form-label">دسته والد</label>
-                <select class="form-select" id="category-parent" name="parentId">
-                  <option value="">— بدون والد (ریشه) —</option>
-                </select>
-                <div class="form-text">حداکثر ۳ سطح زیردسته مجاز است.</div>
-              </div>
-              <div class="col-md-4">
-                <label for="category-sort-order" class="form-label">ترتیب نمایش</label>
-                <input type="number" class="form-control" id="category-sort-order" name="sortOrder" min="0" value="0">
-              </div>
-              <div class="col-md-4 d-flex align-items-end">
-                <div class="form-check form-switch mb-2">
-                  <input class="form-check-input" type="checkbox" id="category-is-active" name="isActive" checked>
-                  <label class="form-check-label" for="category-is-active">فعال</label>
+        <ul class="nav nav-tabs mb-3" id="category-tabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="tab-main-btn" data-bs-toggle="tab" data-bs-target="#tab-main" type="button" role="tab" data-tab="main">اطلاعات اصلی</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-image-btn" data-bs-toggle="tab" data-bs-target="#tab-image" type="button" role="tab" data-tab="image">تصویر</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-seo-btn" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab" data-tab="seo">تنظیمات SEO</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link d-none" id="tab-system-btn" data-bs-toggle="tab" data-bs-target="#tab-system" type="button" role="tab" data-tab="system">اطلاعات سیستمی</button>
+          </li>
+        </ul>
+
+        <div class="content-card">
+          <div class="card-body">
+            <div class="tab-content">
+              <!-- Tab 1: Main -->
+              <div class="tab-pane fade show active" id="tab-main" role="tabpanel">
+                <div class="row g-3">
+                  <div class="col-md-8">
+                    <label for="category-name" class="form-label">نام <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="category-name" name="name" required maxlength="100">
+                  </div>
+                  <div class="col-md-4">
+                    <label for="category-sort-order" class="form-label">ترتیب نمایش</label>
+                    <input type="number" class="form-control" id="category-sort-order" name="sortOrder" min="0" value="0">
+                  </div>
+                  <div class="col-12">
+                    <label for="category-description" class="form-label">توضیحات</label>
+                    <textarea class="form-control" id="category-description" name="description" rows="3" maxlength="500"></textarea>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="category-parent" class="form-label">دسته والد</label>
+                    <select class="form-select" id="category-parent" name="parentId">
+                      <option value="">— بدون والد (ریشه) —</option>
+                    </select>
+                    <div class="form-text">حداکثر ۳ سطح زیردسته مجاز است.</div>
+                  </div>
+                  <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check form-switch mb-2">
+                      <input class="form-check-input" type="checkbox" id="category-is-active" name="isActive" checked>
+                      <label class="form-check-label" for="category-is-active">فعال</label>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div class="col-md-4 d-none" id="meta-dates">
-                <div class="small text-muted">
-                  <div>ایجاد: <span id="category-created-at">—</span></div>
-                  <div>آخرین ویرایش: <span id="category-updated-at">—</span></div>
+
+              <!-- Tab 2: Image -->
+              <div class="tab-pane fade" id="tab-image" role="tabpanel">
+                <div id="image-error" class="alert alert-danger d-none" role="alert"></div>
+                <p class="text-muted small">تصویر اصلی دسته‌بندی (برای نمایش در فروشگاه و لیست مدیریت)</p>
+                <div class="drop-zone mb-3" id="image-drop-zone" tabindex="0">
+                  <i class="bi bi-cloud-upload display-6 d-block mb-2"></i>
+                  <p class="mb-1">تصویر را اینجا بکشید و رها کنید یا کلیک کنید</p>
+                  <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت</p>
+                  <input type="file" id="image-file-input" class="visually-hidden" accept="image/jpeg,image/png,image/webp">
+                </div>
+                <div id="image-preview-wrap" class="d-none mb-3">
+                  <img id="image-preview" class="img-thumbnail" style="max-height:160px" alt="پیش‌نمایش">
+                  <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="btn-remove-image">
+                    <i class="bi bi-trash"></i> حذف تصویر
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tab 3: SEO -->
+              <div class="tab-pane fade" id="tab-seo" role="tabpanel">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label" for="category-slug">شناسه URL (Slug) <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="category-slug" name="slug" dir="ltr" required maxlength="150">
+                    <div class="form-text">به‌صورت خودکار از نام ساخته می‌شود</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="metaTitle">عنوان SEO</label>
+                    <input type="text" class="form-control" id="metaTitle" name="metaTitle" maxlength="200">
+                    <div class="form-text"><span id="metaTitle-count">۰</span> / ۶۰ کاراکتر <span id="metaTitle-warn" class="text-warning d-none">— طول پیشنهادی ۳۰–۶۰</span></div>
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" for="metaDescription">توضیحات SEO</label>
+                    <textarea class="form-control" id="metaDescription" name="metaDescription" rows="3" maxlength="500"></textarea>
+                    <div class="form-text"><span id="metaDescription-count">۰</span> / ۱۶۰ کاراکتر <span id="metaDescription-warn" class="text-warning d-none">— طول پیشنهادی ۱۲۰–۱۶۰</span></div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="keywords">کلمات کلیدی</label>
+                    <input type="text" class="form-control" id="keywords" name="keywords" placeholder="با ویرگول جدا کنید">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="canonicalUrl">آدرس Canonical</label>
+                    <input type="url" class="form-control" id="canonicalUrl" name="canonicalUrl" dir="ltr" placeholder="https://...">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="ogTitle">عنوان Open Graph</label>
+                    <input type="text" class="form-control" id="ogTitle" name="ogTitle" maxlength="200">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="ogDescription">توضیحات Open Graph</label>
+                    <input type="text" class="form-control" id="ogDescription" name="ogDescription" maxlength="500">
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label" for="ogImageFile">تصویر Open Graph</label>
+                    <input type="file" class="form-control" id="ogImageFile" accept="image/jpeg,image/png,image/webp">
+                    <div id="og-image-preview" class="mt-2"></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="seo-preview mb-3">
+                      <div class="small text-muted mb-1">پیش‌نمایش گوگل</div>
+                      <div class="seo-title" id="seo-preview-title">عنوان دسته‌بندی</div>
+                      <div class="seo-url" id="seo-preview-url">https://shop.example/category/slug</div>
+                      <div class="seo-desc" id="seo-preview-desc">توضیحات SEO دسته‌بندی...</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 4: System -->
+              <div class="tab-pane fade" id="tab-system" role="tabpanel">
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">شناسه</label>
+                    <input type="text" class="form-control" id="sys-id" readonly disabled>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">سطح (Depth)</label>
+                    <input type="text" class="form-control" id="sys-depth" readonly disabled>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">تاریخ ایجاد</label>
+                    <input type="text" class="form-control" id="sys-createdAt" readonly disabled>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">تعداد محصولات</label>
+                    <input type="text" class="form-control" id="sys-productCount" readonly disabled>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">تعداد زیردسته</label>
+                    <input type="text" class="form-control" id="sys-childCount" readonly disabled>
+                  </div>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div class="d-flex flex-wrap gap-2 mt-4 pt-3 border-top">
-              <button type="submit" class="btn btn-primary" id="btn-save">
-                <i class="bi bi-check-lg"></i> ذخیره
-              </button>
-              <a href="categories.html" class="btn btn-outline-secondary">انصراف</a>
-              <button type="button" class="btn btn-danger ms-auto d-none" id="btn-delete">
+          <div class="card-body border-top d-flex flex-wrap gap-2 justify-content-between">
+            <a href="categories.html" class="btn btn-outline-secondary">انصراف</a>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-danger d-none" id="btn-delete">
                 <i class="bi bi-trash"></i> حذف
               </button>
+              <button type="submit" class="btn btn-primary" id="btn-save">
+                <span class="submit-text"><i class="bi bi-check-lg"></i> ذخیره</span>
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              </button>
             </div>
-          </form>
+          </div>
         </div>
-      </div>
+      </form>
     </main>
   </div>
 </div>
@@ -120,6 +226,6 @@
 <script src="assets/js/seed-data.js"></script>
 <script src="assets/js/sync.js"></script>
 <script src="assets/js/app.js"></script>
-<script src="assets/js/categories.js"></script>
+<script src="assets/js/category-form.js"></script>
 </body>
 </html>

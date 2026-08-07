@@ -31,6 +31,8 @@
 
   const getCategories = () => request('/api/categories');
 
+  const getCategoriesTree = () => request('/api/categories/tree');
+
   const getBanners = (placement) => {
     const qs = placement ? `?placement=${encodeURIComponent(placement)}` : '';
     return request(`/api/banners${qs}`);
@@ -75,6 +77,7 @@
     getProducts,
     getProduct,
     getCategories,
+    getCategoriesTree,
     getBanners,
     mediaUrl,
     login,

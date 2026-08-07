@@ -82,6 +82,60 @@ public class MediaStorageService
         };
     }
 
+    public async Task<FileManager> SaveUploadedFileAsync(
+        Stream stream,
+        string originalFileName,
+        string folder,
+        string? altText = null,
+        CancellationToken cancellationToken = default)
+    {
+        folder = SanitizeFolder(folder);
+        var fileName = $"{Guid.NewGuid():N}.jpg";
+
+        var relativeDir = Path.Combine("uploads", folder).Replace('\\', '/');
+        var relativeThumbDir = Path.Combine("uploads", folder, "thumbs").Replace('\\', '/');
+
+        var absDir = Path.Combine(_webRootPath, "uploads", folder);
+        var absThumbDir = Path.Combine(absDir, "thumbs");
+        Directory.CreateDirectory(absDir);
+        Directory.CreateDirectory(absThumbDir);
+
+        var absPath = Path.Combine(absDir, fileName);
+        var absThumbPath = Path.Combine(absThumbDir, fileName);
+
+        await using (stream)
+        using (var image = await Image.LoadAsync(stream, cancellationToken))
+        {
+            var encoder = new JpegEncoder { Quality = 85 };
+            await image.SaveAsJpegAsync(absPath, encoder, cancellationToken);
+
+            using var thumb = image.Clone(ctx =>
+            {
+                ctx.Resize(new ResizeOptions
+                {
+                    Size = new Size(ThumbSize, ThumbSize),
+                    Mode = ResizeMode.Crop
+                });
+            });
+            await thumb.SaveAsJpegAsync(absThumbPath, new JpegEncoder { Quality = 80 }, cancellationToken);
+        }
+
+        var size = new FileInfo(absPath).Length;
+
+        return new FileManager
+        {
+            FileName = fileName,
+            OriginalFileName = string.IsNullOrWhiteSpace(originalFileName) ? fileName : originalFileName,
+            Url = $"/{relativeDir}/{fileName}",
+            ThumbnailUrl = $"/{relativeThumbDir}/{fileName}",
+            MimeType = "image/jpeg",
+            SizeBytes = size,
+            AltText = altText,
+            Folder = folder,
+            CreatedAt = DateTime.UtcNow
+        };
+    }
+
     private static string SanitizeFolder(string folder)
     {
         var clean = string.Join("-", (folder ?? "general")

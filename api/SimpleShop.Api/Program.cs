@@ -3,6 +3,7 @@ using DataAccess.Repositories;
 using DataAccess.Services;
 using DomainModel.DataSeeder;
 using DomainModel.Models;
+using DomainModel.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,8 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
+builder.Services.AddSingleton(sp =>
+    new MediaStorageService(sp.GetRequiredService<IWebHostEnvironment>().WebRootPath));
 builder.Services.AddSingleton<JwtTokenService>();
 
 var jwtKey = builder.Configuration["Jwt:Key"]!;

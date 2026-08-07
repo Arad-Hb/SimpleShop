@@ -12,6 +12,10 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         e.Property(c => c.Slug).HasMaxLength(150);
         e.Property(c => c.MetaTitle).HasMaxLength(200);
         e.Property(c => c.MetaDescription).HasMaxLength(500);
+        e.Property(c => c.MetaKeywords).HasMaxLength(500);
+        e.Property(c => c.CanonicalUrl).HasMaxLength(500);
+        e.Property(c => c.OgTitle).HasMaxLength(200);
+        e.Property(c => c.OgDescription).HasMaxLength(500);
         e.HasIndex(c => c.Slug);
         e.HasIndex(c => new { c.ParentId, c.SortOrder });
 
@@ -19,6 +23,11 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .WithMany()
             .HasForeignKey(c => c.ImageFileId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        e.HasOne(c => c.OgImage)
+            .WithMany()
+            .HasForeignKey(c => c.OgImageId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         e.HasOne(c => c.Parent)
             .WithMany(c => c.Children)

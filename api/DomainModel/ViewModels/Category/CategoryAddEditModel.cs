@@ -21,17 +21,38 @@ public class CategoryAddEditModel
     [StringLength(500)]
     public string? MetaDescription { get; set; }
 
+    [StringLength(500)]
+    public string? MetaKeywords { get; set; }
+
+    [StringLength(500)]
+    public string? CanonicalUrl { get; set; }
+
+    [StringLength(200)]
+    public string? OgTitle { get; set; }
+
+    [StringLength(500)]
+    public string? OgDescription { get; set; }
+
     public int? ImageFileId { get; set; }
+    public int? OgImageId { get; set; }
+
+    /// <summary>Read-only on GET — primary image URL for admin preview.</summary>
+    public string? ImageUrl { get; set; }
+
+    /// <summary>Read-only on GET — OG image URL for admin preview.</summary>
+    public string? OgImageUrl { get; set; }
 
     public bool IsActive { get; set; } = true;
 
     /// <summary>Null = root category.</summary>
     public int? ParentId { get; set; }
 
+    /// <summary>Read-only on GET.</summary>
+    public string? ParentName { get; set; }
+
     /// <summary>
     /// Desired display order among siblings (same <see cref="ParentId"/>).
     /// <c>null</c> or <c>0</c> means append at the end (next available SortOrder).
-    /// Values &gt; 0 insert at that position; may require sibling shift (see <see cref="ConfirmShiftSortOrder"/>).
     /// </summary>
     public int? SortOrder { get; set; }
 
@@ -40,4 +61,13 @@ public class CategoryAddEditModel
 
     /// <summary>Computed hierarchy depth (read-only on GET).</summary>
     public int Depth { get; set; }
+
+    /// <summary>Read-only on GET.</summary>
+    public int ProductCount { get; set; }
+
+    /// <summary>Read-only on GET.</summary>
+    public int ChildCount { get; set; }
+
+    /// <summary>Read-only on GET.</summary>
+    public DateTime? CreatedAt { get; set; }
 }

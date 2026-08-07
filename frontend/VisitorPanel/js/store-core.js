@@ -22,6 +22,7 @@
   ];
 
   let CATEGORIES = DEMO_CATEGORIES.slice();
+  let CATEGORY_TREE = [];
   let source = 'demo';
 
   const DEMO_PRODUCTS = [
@@ -312,22 +313,54 @@
     };
   };
 
+  const normalizeTreeNode = (dto, iconIndex = 0) => {
+    const isActive = dto.isActive ?? dto.IsActive !== false;
+    if (!isActive) return null;
+
+    const rawChildren = dto.children ?? dto.Children ?? [];
+    const children = rawChildren
+      .map((child, i) => normalizeTreeNode(child, iconIndex + i + 1))
+      .filter(Boolean)
+      .map((child) => ({
+        ...child,
+        children: (child.children || []).map((grandchild) => ({
+          ...grandchild,
+          children: []
+        }))
+      }));
+
+    return {
+      id: String(dto.id ?? dto.Id),
+      name: dto.name ?? dto.Name ?? '',
+      slug: dto.slug ?? dto.Slug ?? '',
+      icon: ICONS[iconIndex % ICONS.length],
+      children
+    };
+  };
+
+  const buildTreeFromFlat = (flat) =>
+    flat.slice(0, 8).map((c, i) => ({
+      id: String(c.id),
+      name: c.name,
+      icon: c.icon || ICONS[i % ICONS.length],
+      children: []
+    }));
+
   const loadFromApi = async () => {
     if (!Store.config?.USE_API || !Store.api) return false;
-    const [paged, cats] = await Promise.all([
+    const [paged, tree] = await Promise.all([
       Store.api.getProducts({ page: 1, pageSize: 48, sortBy: 'name', sortDir: 'asc' }),
-      Store.api.getCategories()
+      Store.api.getCategoriesTree()
     ]);
     const items = paged?.items || paged?.Items || [];
     if (!Array.isArray(items) || !items.length) return false;
 
     PRODUCTS = items.map((dto, i) => mapApiProduct(dto, i));
-    if (Array.isArray(cats) && cats.length) {
-      CATEGORIES = cats.map((c, i) => ({
-        id: String(c.id ?? c.Id),
-        name: c.name || c.Name || `دسته ${i + 1}`,
-        icon: ICONS[i % ICONS.length]
-      }));
+    if (Array.isArray(tree) && tree.length) {
+      CATEGORY_TREE = tree
+        .map((node, i) => normalizeTreeNode(node, i))
+        .filter(Boolean);
+      CATEGORIES = CATEGORY_TREE.map(({ id, name, icon }) => ({ id, name, icon }));
     }
     source = 'api';
     refreshCategoryNav();
@@ -347,18 +380,8 @@
   };
 
   const refreshCategoryNav = () => {
-    const catCol = document.querySelector('.mega-col.categories');
-    if (catCol && CATEGORIES.length) {
-      catCol.innerHTML = CATEGORIES.slice(0, 8).map((c, i) => `
-        <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryHref(c.id)}" data-panel="${escapeHtml(String(c.id))}">
-          <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i> ${escapeHtml(c.name)}
-        </a>`).join('');
-      Store.layout?.initMegaMenuHover?.();
-    }
-
-    if (source === 'api' && CATEGORIES.length) {
-      Store.layout?.refreshMegaSubPanels?.(CATEGORIES);
-    }
+    const tree = CATEGORY_TREE.length ? CATEGORY_TREE : buildTreeFromFlat(CATEGORIES);
+    Store.layout?.refreshMegaMenu?.(tree);
 
     document.querySelectorAll('[data-category-link]').forEach((el) => {
       const catId = el.dataset.categoryLink;
@@ -386,6 +409,7 @@
     }
     PRODUCTS = DEMO_PRODUCTS.slice();
     CATEGORIES = DEMO_CATEGORIES.slice();
+    CATEGORY_TREE = buildTreeFromFlat(DEMO_CATEGORIES);
     source = 'demo';
     refreshCategoryNav();
     document.dispatchEvent(new CustomEvent('catalog:ready', { detail: { source } }));
@@ -767,6 +791,7 @@
   Store.catalog = {
     get PRODUCTS() { return PRODUCTS; },
     get CATEGORIES() { return CATEGORIES; },
+    get CATEGORY_TREE() { return CATEGORY_TREE; },
     get source() { return source; },
     TAG_LABELS,
     ready,

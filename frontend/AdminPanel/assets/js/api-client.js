@@ -20,7 +20,7 @@
     }
   };
 
-  const { request } = SimpleShopHttp.createClient({
+  const { request, client } = SimpleShopHttp.createClient({
     baseURL: ShopAdmin.config?.API_BASE_URL,
     getToken,
     timeout: ShopAdmin.config?.REQUEST_TIMEOUT_MS,
@@ -61,14 +61,29 @@
   const searchCategories = async ({
     pageIndex = 0,
     pageSize = 10,
-    search = ''
+    search = '',
+    isActive = undefined,
+    parentId = undefined
   } = {}) => {
     const params = new URLSearchParams({
       pageIndex: String(pageIndex),
       pageSize: String(pageSize)
     });
     if (search) params.set('search', search);
+    if (isActive === true) params.set('isActive', 'true');
+    else if (isActive === false) params.set('isActive', 'false');
+    if (parentId != null && parentId !== '') params.set('parentId', String(parentId));
     return request(`/api/categories/search?${params}`);
+  };
+
+  const uploadFile = async (file, folder = 'categories') => {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folder) formData.append('folder', folder);
+    const response = await client.post('/api/files/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.status === 204 ? null : response.data;
   };
 
   const createCategory = (body) => request('/api/categories', { method: 'POST', body });
@@ -174,6 +189,7 @@
     getCategoriesTree,
     getCategory,
     searchCategories,
+    uploadFile,
     createCategory,
     updateCategory,
     deleteCategory,
