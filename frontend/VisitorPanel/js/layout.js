@@ -68,19 +68,18 @@
 
   function renderSearchForm() {
     return `
-      <form class="search-box" role="search" data-store-search>
-        <input type="search" name="q" placeholder="جستجو در محصولات، برندها و دسته‌ها..." aria-label="جستجو">
-        <button type="submit" class="btn-search" aria-label="جستجو"><i class="bi bi-search"></i></button>
+      <form class="search-box search-box--minimal" role="search" data-store-search>
+        <input type="search" name="q" placeholder="جستجو..." aria-label="جستجو">
+        <button type="submit" class="btn-search" aria-label="جستجو"><i class="bi bi-search" aria-hidden="true"></i></button>
       </form>`;
   }
 
   function renderHeaderActions() {
     return `
       <div class="header-actions">
-        <a href="auth.html?tab=register&amp;role=Supplier"><i class="bi bi-shop-window"></i> فروشنده شوید</a>
         <a href="auth.html"><i class="bi bi-box-arrow-in-left"></i> ورود / ثبت‌نام</a>
-        <a href="card.html" class="action-btn cart-btn" title="کارت خرید">
-          <i class="bi bi-credit-card-2-front"></i>
+        <a href="card.html" class="action-btn card-btn cart-btn" title="کارت خرید">
+          <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
           <span class="cart-badge" data-card-count data-cart-count>0</span>
           <span class="cart-meta d-none d-lg-inline">
             <small>کارت خرید</small>

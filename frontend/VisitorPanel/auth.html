@@ -84,25 +84,24 @@
           </button>
         </div>
 
-        <form id="register-form" novalidate>
+        <form id="register-form" class="auth-register-form" novalidate>
           <input type="hidden" id="register-role" name="role" value="Customer">
 
-          <div class="auth-name-row mb-3">
-            <div class="login-field-group mb-0">
-              <div class="login-field">
-                <span class="login-field__icon"><i class="bi bi-person-fill" aria-hidden="true"></i></span>
-                <input type="text" id="register-firstName" name="firstName" placeholder="نام" required>
-              </div>
-            </div>
-            <div class="login-field-group mb-0">
-              <div class="login-field">
-                <span class="login-field__icon"><i class="bi bi-person-badge-fill" aria-hidden="true"></i></span>
-                <input type="text" id="register-lastName" name="lastName" placeholder="نام خانوادگی" required>
-              </div>
+          <div class="login-field-group">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-person-fill" aria-hidden="true"></i></span>
+              <input type="text" id="register-firstName" name="firstName" placeholder="نام" autocomplete="given-name" required>
             </div>
           </div>
 
-          <div class="login-field-group mb-3">
+          <div class="login-field-group">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-person-badge-fill" aria-hidden="true"></i></span>
+              <input type="text" id="register-lastName" name="lastName" placeholder="نام خانوادگی" autocomplete="family-name" required>
+            </div>
+          </div>
+
+          <div class="login-field-group">
             <div class="login-field">
               <span class="login-field__icon"><i class="bi bi-phone-fill" aria-hidden="true"></i></span>
               <input type="tel" id="register-mobile" name="mobile"
@@ -110,7 +109,7 @@
             </div>
           </div>
 
-          <div class="login-field-group mb-3">
+          <div class="login-field-group login-field-group--hint">
             <div class="login-field">
               <span class="login-field__icon"><i class="bi bi-lock-fill" aria-hidden="true"></i></span>
               <input type="password" id="register-password" name="password"
@@ -123,7 +122,7 @@
             <p class="auth-field-hint">حداقل ۶ کاراکتر</p>
           </div>
 
-          <button type="submit" class="login-btn" id="register-submit">
+          <button type="submit" class="login-btn auth-register-submit" id="register-submit">
             <span class="submit-text">ثبت‌نام</span>
             <span class="submit-loading d-none">
               <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>

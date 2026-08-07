@@ -6,7 +6,7 @@ Customer storefront for SimpleShop.
 
 - `index.html` — home
 - `product.html?id=` — product detail
-- `card.html` — virtual shopping card (replaces legacy `cart.html` redirect)
+- `card.html` — virtual shopping card
 - `checkout.html` — guest or logged-in checkout
 - `category.html` / `search.html` — browse and search
 - `auth.html` — login / register (Admin-style UI)
