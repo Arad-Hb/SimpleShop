@@ -5,6 +5,7 @@
 (function (ShopAdmin) {
   'use strict';
 
+  const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
   const STORAGE_KEY = 'shopAdminData';
   /** Shared with VisitorPanel (same browser origin under frontend/). */
   const PUBLIC_BRANDING_KEY = 'simpleShopPublicBranding';
@@ -31,7 +32,7 @@
     orderItems: [],
     reviews: [],
     settings: {
-      shopName: 'فروشگاه من',
+      shopName: DEFAULT_SHOP_NAME,
       currency: 'تومان',
       lowStockThreshold: 10,
       taxRate: 9,
@@ -252,7 +253,7 @@
   /** Publish shop name + logo for VisitorPanel home/header. */
   const syncPublicBranding = async (settings = {}) => {
     const payload = {
-      shopName: settings.shopName || 'SimpleShop',
+      shopName: settings.shopName || DEFAULT_SHOP_NAME,
       shopDescription: settings.shopDescription || '',
       logoDataUrl: null,
       updatedAt: Date.now()

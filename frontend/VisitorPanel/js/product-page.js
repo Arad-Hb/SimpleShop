@@ -31,7 +31,7 @@
                 rating: base.rating || 4.5,
                 reviews: base.reviews || 100,
                 category: String(dto.categoryId ?? base.category ?? ''),
-                brand: dto.supplierName || dto.categoryName || base.brand || 'SimpleShop',
+                brand: dto.supplierName || dto.categoryName || base.brand || ((window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده'),
                 tag: base.tag || '',
                 amazing: base.amazing || false,
                 discount: base.discount || 0,

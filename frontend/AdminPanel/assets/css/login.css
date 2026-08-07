@@ -2,12 +2,14 @@
  * login.css — طراحی ورود (از login-design-model.html)
  * برای AdminPanel و SupplierPanel
  */
+@import url("../../../shared/css/layout-base.css");
 @import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap");
 
 html:has(body.login-page),
 html.login-html {
   height: auto !important;
-  overflow: auto !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
 }
 
 body.login-page {
@@ -22,7 +24,8 @@ body.login-page {
   margin: 0 !important;
   min-height: 100vh !important;
   height: auto !important;
-  overflow: auto !important;
+  overflow-x: clip !important;
+  overflow-y: auto !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;

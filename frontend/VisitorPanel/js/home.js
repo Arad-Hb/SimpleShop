@@ -99,17 +99,22 @@
     }
   };
 
+  const toFaDigits = (n) => String(n).replace(/\d/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
+
   const initDealTimer = () => {
     const timer = document.getElementById('deal-timer');
     if (!timer) return;
-    let total = 12 * 3600 + 45 * 60 + 33;
+    let total = 5 * 3600 + 40 * 60 + 10;
     const tick = () => {
       if (total <= 0) total = 12 * 3600;
       const h = Math.floor(total / 3600);
       const m = Math.floor((total % 3600) / 60);
       const s = total % 60;
-      const pad = (n) => String(n).padStart(2, '0');
-      timer.innerHTML = `<span>${pad(h)}</span>:<span>${pad(m)}</span>:<span>${pad(s)}</span>`;
+      const pad = (n) => toFaDigits(String(n).padStart(2, '0'));
+      timer.innerHTML =
+        `<span>${pad(h)}</span><span class="deal-timer__sep">:</span>` +
+        `<span>${pad(m)}</span><span class="deal-timer__sep">:</span>` +
+        `<span>${pad(s)}</span>`;
       total -= 1;
     };
     tick();
@@ -131,7 +136,13 @@
         : 'حالت دمو — API در دسترس نیست؛ کاتالوگ محلی نمایش داده می‌شود';
     }
 
-    const deals = getAmazing();
+    const buildDeals = () => {
+      const amazing = getAmazing();
+      if (amazing.length >= 6) return amazing.slice(0, 6);
+      const rest = PRODUCTS.filter((p) => !p.amazing && p.tag !== 'amazing');
+      const merged = amazing.length ? [...amazing, ...rest] : PRODUCTS.slice();
+      return merged.slice(0, 6);
+    };
     const best = PRODUCTS.slice().sort((a, b) => b.reviews - a.reviews).slice(0, 5);
     const newest = PRODUCTS.slice().reverse().slice(0, 5);
 
@@ -141,7 +152,7 @@
       el.innerHTML = items.map((p) => productCard(p, opts)).join('');
     };
 
-    fill('#deals-rail', deals.length ? deals : PRODUCTS.slice(0, 6), { deal: true });
+    fill('#deals-rail', buildDeals(), { deal: true });
     fill('#best-grid', best);
     fill('#new-grid', newest);
     bindAddButtons(document);

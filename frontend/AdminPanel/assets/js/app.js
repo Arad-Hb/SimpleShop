@@ -5,6 +5,8 @@
 (function (ShopAdmin) {
   'use strict';
 
+  const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
+
   const initApp = async () => {
     // داده‌های نمونه (فقط بار اول — قبل از initStorage)
     ShopAdmin.seed.seedDemoData();
@@ -51,7 +53,7 @@
     const shopNameEl = document.querySelector('[data-shop-name]');
     if (shopNameEl) {
       const settings = ShopAdmin.storage.getData().settings;
-      shopNameEl.textContent = settings?.shopName || 'فروشگاه';
+      shopNameEl.textContent = settings?.shopName || DEFAULT_SHOP_NAME;
     }
 
     // نمایش نام مدیر

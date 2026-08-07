@@ -107,6 +107,10 @@
 
   // ─── Sidebar ─────────────────────────────────────────────────
 
+  const ensureSidebarBrand = (brand) => {
+    window.SimpleShopSidebarBrand?.ensure(brand, { escapeHtml });
+  };
+
   const initSidebar = (activePage) => {
     const sidebar = document.querySelector('#sidebar, [data-sidebar]');
     if (!sidebar) return;
@@ -130,6 +134,7 @@
     }
 
     const brand = sidebar.querySelector('.sidebar-brand');
+    ensureSidebarBrand(brand);
     if (brand && !brand.querySelector('[data-sidebar-collapse]')) {
       const collapseBtn = document.createElement('button');
       collapseBtn.type = 'button';

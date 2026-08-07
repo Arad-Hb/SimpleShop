@@ -205,8 +205,8 @@
       orderItems,
       reviews,
       settings: {
-        shopName: 'فروشگاه آنلاین ساده',
-        shopDescription: 'فروشگاه اینترنتی لوازم خانگی، پوشاک و دیجیتال',
+        shopName: 'فروشگاه ساده تحلیل داده',
+        shopDescription: 'فروشگاه اینترنتی آموزشی فروشگاه ساده تحلیل داده',
         currency: 'تومان',
         lowStockThreshold: 10,
         taxRate: 9,
@@ -222,8 +222,8 @@
         instagramEnabled: true,
         telegramEnabled: true,
         whatsappEnabled: true,
-        defaultSeoTitle: 'فروشگاه آنلاین ساده',
-        defaultSeoDescription: 'خرید آنلاین لوازم خانگی، پوشاک و دیجیتال با ارسال سریع',
+        defaultSeoTitle: 'فروشگاه ساده تحلیل داده',
+        defaultSeoDescription: 'فروشگاه اینترنتی آموزشی فروشگاه ساده تحلیل داده',
         logoId: null,
         faviconId: null,
         ogImageId: null

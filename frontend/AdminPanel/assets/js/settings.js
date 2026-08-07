@@ -7,6 +7,7 @@
   const { generateId } = ShopAdmin.utils;
   const { validateRequired, validateForm, validateImageFile } = ShopAdmin.validation;
   const { getData, saveData, imageStore, syncPublicBranding, STORAGE_KEY } = ShopAdmin.storage;
+  const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
 
   /** @type {Record<string, string|null>} */
   let objectUrls = {};
@@ -262,7 +263,7 @@
       removedImages = { logoId: false, faviconId: false, ogImageId: false };
 
       const shopNameEl = document.querySelector('[data-shop-name]');
-      if (shopNameEl) shopNameEl.textContent = next.shopName || 'فروشگاه';
+      if (shopNameEl) shopNameEl.textContent = next.shopName || DEFAULT_SHOP_NAME;
 
       try {
         await syncPublicBranding(next);

@@ -11,13 +11,22 @@
   'use strict';
 
   // ─── Shop defaults (override via localStorage branding) ─────────────
-  const SHOP = {
-    name: 'TahlilDadeh Simple Shop',
-    tagline: 'فروشگاه اینترنتی',
+  const SITE = window.SimpleShopSite || {
+    name: 'فروشگاه ساده تحلیل داده',
+    tagline: 'فروشگاه اینترنتی آموزشی',
     footerTagline: 'خرید مطمئن، ارسال سریع',
-    description:
-      'فروشگاه اینترنتی TahlilDadeh Simple Shop با تمرکز روی تجربه کاربری حرفه‌ای، قیمت شفاف و پشتیبانی واقعی.',
-    previewBanner: 'فروشگاه آزمایشی TahlilDadeh Simple Shop',
+    description: 'فروشگاه اینترنتی آموزشی فروشگاه ساده تحلیل داده.',
+    previewBanner: 'فروشگاه آزمایشی — فروشگاه ساده تحلیل داده',
+    logoPath: 'shared/assets/img/tahlildadeh-logo.png'
+  };
+
+  const SHOP = {
+    name: SITE.name,
+    tagline: SITE.tagline,
+    footerTagline: SITE.footerTagline,
+    description: SITE.description,
+    previewBanner: SITE.previewBanner,
+    logoUrl: '../shared/assets/img/tahlildadeh-logo.png',
     brandingKey: 'simpleShopPublicBranding',
     contact: {
       supportPhone: '09905283471',
@@ -55,13 +64,15 @@
     return `<div class="preview-banner">${SHOP.previewBanner}</div>`;
   }
 
-  function renderBrandBlock(tagline) {
+  function renderBrandBlock(subtitle) {
     return `
-      <a href="index.html" class="brand" data-store-brand>
-        <span class="brand-mark" data-brand-mark><i class="bi bi-bag-heart-fill"></i></span>
+      <a href="index.html" class="brand brand--tahlil" data-store-brand>
+        <span class="brand-mark brand-mark--logo has-logo" data-brand-mark>
+          <img src="${SHOP.logoUrl}" alt="${SHOP.name}" class="brand-logo-img" width="120" height="56">
+        </span>
         <span class="brand-text">
           <strong data-brand-name>${SHOP.name}</strong>
-          <small data-brand-tagline>${tagline}</small>
+          <small data-brand-tagline>${subtitle}</small>
         </span>
       </a>`;
   }
@@ -77,15 +88,21 @@
   function renderHeaderActions() {
     return `
       <div class="header-actions">
-        <a href="auth.html"><i class="bi bi-box-arrow-in-left"></i> ورود / ثبت‌نام</a>
-        <a href="card.html" class="action-btn card-btn cart-btn" title="کارت خرید">
-          <i class="bi bi-credit-card-2-front" aria-hidden="true"></i>
-          <span class="cart-badge" data-card-count data-cart-count>0</span>
-          <span class="cart-meta d-none d-lg-inline">
-            <small>کارت خرید</small>
-            <strong data-card-total data-cart-total>۰ ت</strong>
-          </span>
-        </a>
+        <div class="header-actions-group">
+          <a href="auth.html" class="header-auth-btn">
+            <span class="header-auth-text">ورود <span class="header-auth-sep">|</span> ثبت‌نام</span>
+            <span class="header-auth-icon" aria-hidden="true"><i class="bi bi-box-arrow-in-left"></i></span>
+          </a>
+          <span class="header-actions-divider" aria-hidden="true"></span>
+          <div class="header-cart-wrap">
+            <button type="button" class="header-cart-btn" id="header-cart-toggle"
+                    aria-expanded="false" aria-controls="header-mini-cart" aria-label="سبد خرید">
+              <i class="bi bi-cart3" aria-hidden="true"></i>
+              <span class="cart-badge" data-card-count data-cart-count>0</span>
+            </button>
+            <div class="mini-cart" id="header-mini-cart" aria-hidden="true"></div>
+          </div>
+        </div>
       </div>`;
   }
 
@@ -157,7 +174,8 @@
           <ul class="mega-nav-list">
             <li class="mega-item">
               <a href="category.html" class="mega-trigger">
-                <i class="bi bi-grid"></i> دسته‌بندی کالاها <i class="bi bi-chevron-down"></i>
+                <i class="bi bi-list" aria-hidden="true"></i>
+                <span>دسته‌بندی کالاها</span>
               </a>
               <div class="mega-panel">
                 <div class="mega-cols">
@@ -173,13 +191,10 @@
                 </div>
               </div>
             </li>
-            <li><a href="category.html?tag=amazing" class="nav-amazing"><i class="bi bi-lightning-charge-fill"></i> شگفت‌انگیزها</a></li>
-            <li><a href="category.html">پرفروش‌ترین‌ها</a></li>
-            <li><a href="category.html?tag=sale" class="nav-sale">تخفیف‌ها</a></li>
-            <li><a href="auth.html">حساب کاربری</a></li>
-            <li class="ms-auto d-none d-xl-block">
-              <a href="category.html?tag=special" class="mega-highlight"><i class="bi bi-gift"></i> پیشنهاد ویژه</a>
-            </li>
+            <li class="mega-nav-divider" aria-hidden="true"></li>
+            <li><a href="category.html?tag=amazing" class="mega-nav-link"><i class="bi bi-percent" aria-hidden="true"></i><span>شگفت‌انگیزها</span></a></li>
+            <li><a href="category.html" class="mega-nav-link"><i class="bi bi-basket2" aria-hidden="true"></i><span>پرفروش‌ترین‌ها</span></a></li>
+            <li><a href="category.html?tag=sale" class="mega-nav-link"><i class="bi bi-tags" aria-hidden="true"></i><span>تخفیف‌ها</span></a></li>
           </ul>
         </div>
       </nav>`;
@@ -211,8 +226,10 @@
   function renderFooterBrandColumn() {
     return `
       <div class="footer-col footer-brand">
-        <div class="brand" data-store-brand>
-          <span class="brand-mark" data-brand-mark><i class="bi bi-bag-heart-fill"></i></span>
+        <div class="brand brand--tahlil" data-store-brand>
+          <span class="brand-mark brand-mark--logo has-logo" data-brand-mark>
+            <img src="${SHOP.logoUrl}" alt="${SHOP.name}" class="brand-logo-img" width="100" height="48">
+          </span>
           <span class="brand-text">
             <strong data-brand-name>${SHOP.name}</strong>
             <small data-brand-tagline>${SHOP.footerTagline}</small>
@@ -295,11 +312,11 @@
 
     document.querySelectorAll('[data-brand-mark]').forEach((mark) => {
       if (logo) {
-        mark.classList.add('has-logo');
-        mark.innerHTML = `<img src="${logo}" alt="${name || 'لوگو'}" class="brand-logo-img">`;
+        mark.classList.add('has-logo', 'brand-mark--logo');
+        mark.innerHTML = `<img src="${logo}" alt="${name || SHOP.name}" class="brand-logo-img">`;
       } else {
-        mark.classList.remove('has-logo');
-        mark.innerHTML = '<i class="bi bi-bag-heart-fill"></i>';
+        mark.classList.add('has-logo', 'brand-mark--logo');
+        mark.innerHTML = `<img src="${SHOP.logoUrl}" alt="${name || SHOP.name}" class="brand-logo-img">`;
       }
     });
   }
@@ -378,6 +395,216 @@
     Store.card?.updateCardUI?.();
   }
 
+  const getRowOldUnit = (row) => {
+    const product = Store.catalog?.getProduct?.(row.productId);
+    if (product?.old) return product.old;
+    if (row.discount > 0 && row.unitPrice) {
+      return Math.round(row.unitPrice / (1 - row.discount / 100));
+    }
+    return null;
+  };
+
+  const formatPriceNumber = (n) => Number(n || 0).toLocaleString('fa-IR');
+
+  const renderMiniCartItem = (row) => {
+    const oldUnit = getRowOldUnit(row);
+    const hasDiscount = oldUnit && oldUnit > row.unitPrice;
+    const discountPct = hasDiscount
+      ? Math.round((1 - row.unitPrice / oldUnit) * 100)
+      : (row.discount || 0);
+    const thumb = row.imageUrl
+      ? `<img src="${escapeHtml(row.imageUrl)}" alt="">`
+      : `<i class="bi ${escapeHtml(row.icon || 'bi-box-seam')}"></i>`;
+
+    return `
+      <div class="mini-cart-item" data-mini-cart-item="${escapeHtml(row.productId)}">
+        <div class="mini-cart-item-thumb">${thumb}</div>
+        <div class="mini-cart-item-body">
+          <a href="product.html?id=${encodeURIComponent(row.productId)}" class="mini-cart-item-title">${escapeHtml(row.title)}</a>
+          <div class="mini-cart-item-qty">
+            <button type="button" class="mini-cart-qty-btn mini-cart-qty-remove" data-mini-remove="${escapeHtml(row.productId)}" aria-label="حذف">
+              <i class="bi bi-trash3" aria-hidden="true"></i>
+            </button>
+            <span class="mini-cart-qty-value">${row.quantity.toLocaleString('fa-IR')}</span>
+            <button type="button" class="mini-cart-qty-btn mini-cart-qty-add" data-mini-add="${escapeHtml(row.productId)}" aria-label="افزایش">
+              <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <div class="mini-cart-item-price">
+          ${hasDiscount || discountPct ? `
+            <div class="mini-cart-item-price-top">
+              <span class="mini-cart-price-old">${formatPriceNumber(oldUnit * row.quantity)}</span>
+              <span class="mini-cart-discount-badge">${discountPct}%</span>
+            </div>` : ''}
+          <div class="mini-cart-price-now">
+            <span class="mini-cart-price-amount">${formatPriceNumber(row.lineTotal)}</span>
+            <span class="mini-cart-price-unit">تومان</span>
+          </div>
+        </div>
+      </div>`;
+  };
+
+  const renderMiniCart = () => {
+    const panel = document.getElementById('header-mini-cart');
+    if (!panel) return;
+
+    const entity = Store.card?.getCardEntity?.() || { cardItems: [], itemsTotal: 0 };
+    const items = entity.cardItems || [];
+    const count = items.reduce((s, i) => s + i.quantity, 0);
+    const total = entity.itemsTotal || 0;
+
+    let totalOld = 0;
+    items.forEach((row) => {
+      const oldUnit = getRowOldUnit(row);
+      totalOld += (oldUnit && oldUnit > row.unitPrice ? oldUnit : row.unitPrice) * row.quantity;
+    });
+    const totalDiscount = totalOld > total ? Math.round((1 - total / totalOld) * 100) : 0;
+
+    if (!items.length) {
+      panel.innerHTML = `
+        <div class="mini-cart-empty">
+          <i class="bi bi-cart3" aria-hidden="true"></i>
+          <p>سبد خرید شما خالی است</p>
+          <a href="category.html" class="mini-cart-empty-link">مشاهده محصولات</a>
+        </div>`;
+      return;
+    }
+
+    panel.innerHTML = `
+      <div class="mini-cart-header">
+        <span class="mini-cart-header-title">خلاصه سبد خرید شما</span>
+        <span class="mini-cart-header-count">${count.toLocaleString('fa-IR')} کالا</span>
+      </div>
+      <div class="mini-cart-items">${items.map(renderMiniCartItem).join('')}</div>
+      <div class="mini-cart-footer">
+        <div class="mini-cart-footer-total">
+          ${totalDiscount ? `
+            <div class="mini-cart-footer-top">
+              <span class="mini-cart-price-old">${formatPriceNumber(totalOld)}</span>
+              <span class="mini-cart-discount-badge">${totalDiscount}%</span>
+            </div>` : ''}
+          <div class="mini-cart-price-now">
+            <span class="mini-cart-price-amount">${formatPriceNumber(total)}</span>
+            <span class="mini-cart-price-unit">تومان</span>
+          </div>
+        </div>
+        <a href="checkout.html" class="mini-cart-checkout-btn">ثبت سفارش</a>
+      </div>`;
+  };
+
+  const getMiniCartPanel = () => document.getElementById('header-mini-cart');
+  const getMiniCartToggle = () => document.getElementById('header-cart-toggle');
+  const isMiniCartOpen = () => getMiniCartPanel()?.classList.contains('is-open');
+
+  let miniCartCloseTimer = null;
+
+  const cancelMiniCartClose = () => {
+    if (miniCartCloseTimer) {
+      clearTimeout(miniCartCloseTimer);
+      miniCartCloseTimer = null;
+    }
+  };
+
+  const scheduleMiniCartClose = (delayMs = 140) => {
+    cancelMiniCartClose();
+    miniCartCloseTimer = setTimeout(() => {
+      miniCartCloseTimer = null;
+      closeMiniCart();
+    }, delayMs);
+  };
+
+  const isScrollInsideMiniCart = (target) => {
+    if (!target || !(target instanceof Node)) return false;
+    const panel = getMiniCartPanel();
+    const wrap = document.querySelector('.header-cart-wrap');
+    if (panel && (target === panel || panel.contains(target))) return true;
+    if (wrap && (target === wrap || wrap.contains(target))) return true;
+    return false;
+  };
+
+  const closeMiniCart = () => {
+    const panel = getMiniCartPanel();
+    const toggle = getMiniCartToggle();
+    if (!panel || !toggle || !isMiniCartOpen()) return;
+    cancelMiniCartClose();
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.classList.remove('is-open');
+  };
+
+  const openMiniCart = () => {
+    const panel = getMiniCartPanel();
+    const toggle = getMiniCartToggle();
+    if (!panel || !toggle) return;
+    cancelMiniCartClose();
+    renderMiniCart();
+    panel.setAttribute('aria-hidden', 'false');
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.classList.add('is-open');
+    requestAnimationFrame(() => {
+      panel.classList.add('is-open');
+    });
+  };
+
+  const initMiniCart = () => {
+    const wrap = document.querySelector('.header-cart-wrap');
+    const toggle = getMiniCartToggle();
+    if (!wrap || !toggle || wrap.dataset.miniCartBound === '1') return;
+    wrap.dataset.miniCartBound = '1';
+
+    toggle.addEventListener('click', (event) => {
+      event.stopPropagation();
+      if (isMiniCartOpen()) return;
+      openMiniCart();
+    });
+
+    wrap.addEventListener('mouseenter', cancelMiniCartClose);
+    wrap.addEventListener('mouseleave', (event) => {
+      const related = event.relatedTarget;
+      if (related && wrap.contains(related)) return;
+      scheduleMiniCartClose(120);
+    });
+
+    wrap.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const removeBtn = event.target.closest('[data-mini-remove]');
+      if (removeBtn) {
+        Store.card?.removeFromCard?.(removeBtn.dataset.miniRemove);
+        Store.card?.updateCardUI?.();
+        renderMiniCart();
+        cancelMiniCartClose();
+        return;
+      }
+      const addBtn = event.target.closest('[data-mini-add]');
+      if (addBtn) {
+        const id = addBtn.dataset.miniAdd;
+        const row = Store.card?.getCardEntity?.().cardItems.find((i) => i.productId === id);
+        if (row) Store.card?.setQty?.(id, row.quantity + 1);
+        Store.card?.updateCardUI?.();
+        renderMiniCart();
+        cancelMiniCartClose();
+      }
+    });
+
+    if (!document.documentElement.dataset.miniCartDocBound) {
+      document.documentElement.dataset.miniCartDocBound = '1';
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeMiniCart();
+      });
+      window.addEventListener('scroll', (event) => {
+        if (!isMiniCartOpen()) return;
+        if (isScrollInsideMiniCart(event.target)) return;
+        closeMiniCart();
+      }, { passive: true, capture: true });
+    }
+  };
+
+  const refreshMiniCart = () => {
+    if (isMiniCartOpen()) renderMiniCart();
+  };
+
   // ─── Mount ─────────────────────────────────────────────────────────
 
   function mountHeader() {
@@ -396,6 +623,7 @@
     applyBranding();
     initMegaMenuHover();
     initSearchForms();
+    initMiniCart();
     syncCardBadge();
   }
 
@@ -406,6 +634,9 @@
     applyBranding,
     initMegaMenuHover,
     refreshMegaSubPanels,
-    initSearchForms
+    initSearchForms,
+    initMiniCart,
+    refreshMiniCart,
+    renderMiniCart
   };
 })(window.SimpleStore = window.SimpleStore || {});

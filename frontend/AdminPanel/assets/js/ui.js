@@ -119,6 +119,12 @@
     { id: 'profile', label: 'پروفایل مدیر', icon: 'bi-person-circle', href: 'profile.html' }
   ];
 
+  const ensureAdminSidebarBrand = (brand) => {
+    if (window.SimpleShopSidebarBrand?.ensure) {
+      window.SimpleShopSidebarBrand.ensure(brand, { escapeHtml });
+    }
+  };
+
   const initSidebar = (activePage) => {
     const sidebar = document.querySelector('#sidebar, .sidebar, [data-sidebar]');
     if (!sidebar) return;
@@ -142,6 +148,7 @@
     }
 
     const brand = sidebar.querySelector('.sidebar-brand');
+    ensureAdminSidebarBrand(brand);
     if (brand && !brand.querySelector('[data-sidebar-collapse]')) {
       const collapseBtn = document.createElement('button');
       collapseBtn.type = 'button';

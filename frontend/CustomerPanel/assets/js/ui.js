@@ -108,6 +108,10 @@
 
   // ─── Sidebar ─────────────────────────────────────────────────
 
+  const ensureSidebarBrand = (brand) => {
+    window.SimpleShopSidebarBrand?.ensure(brand, { escapeHtml });
+  };
+
   const initSidebar = (activePage) => {
     const sidebar = document.querySelector('#sidebar, [data-sidebar]');
     if (!sidebar) return;
@@ -131,6 +135,7 @@
     }
 
     const brand = sidebar.querySelector('.sidebar-brand');
+    ensureSidebarBrand(brand);
     if (brand && !brand.querySelector('[data-sidebar-collapse]')) {
       const collapseBtn = document.createElement('button');
       collapseBtn.type = 'button';
@@ -140,12 +145,6 @@
       collapseBtn.setAttribute('title', 'جمع/باز کردن منو');
       collapseBtn.innerHTML = '<i class="bi bi-layout-sidebar-reverse" aria-hidden="true"></i>';
       brand.insertBefore(collapseBtn, brand.firstChild);
-    }
-
-    // Keep avatar visible when collapse button is injected into customer brand
-    const avatar = brand?.querySelector('.customer-avatar-wrap');
-    if (avatar && brand?.firstElementChild?.hasAttribute?.('data-sidebar-collapse')) {
-      brand.insertBefore(avatar, brand.children[1] || null);
     }
 
     const SIDEBAR_KEY = 'shopCustomerSidebarCollapsed';

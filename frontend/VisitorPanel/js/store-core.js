@@ -10,6 +10,8 @@
   const CARD_EXPIRY_DAYS = 30;
   const ICONS = ['bi-box-seam', 'bi-phone', 'bi-laptop', 'bi-headphones', 'bi-watch', 'bi-house-heart', 'bi-controller'];
 
+  const CAT_STRIP_TONES = ['purple', 'charcoal', 'pink', 'tan', 'gold', 'teal', 'orange', 'black'];
+
   const DEMO_CATEGORIES = [
     { id: 'digital', name: 'کالای دیجیتال', icon: 'bi-phone' },
     { id: 'home', name: 'خانه و آشپزخانه', icon: 'bi-house-heart' },
@@ -255,6 +257,8 @@
     return short ? `${formatted} ت` : `${formatted} تومان`;
   };
 
+  const formatPriceNumber = (n) => Number(n || 0).toLocaleString('fa-IR');
+
   const getProduct = (id) =>
     PRODUCTS.find((p) => String(p.id) === String(id)) || null;
 
@@ -296,7 +300,7 @@
       rating: 4.5,
       reviews: Math.max(12, (dto.id * 17) % 900),
       category: String(dto.categoryId ?? ''),
-      brand: dto.supplierName || dto.categoryName || 'SimpleShop',
+      brand: dto.supplierName || dto.categoryName || ((window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده'),
       stock,
       amazing,
       tag,
@@ -333,6 +337,15 @@
 
   const categoryHref = (catId) => `category.html?id=${encodeURIComponent(String(catId))}`;
 
+  const renderCatChip = (c, index) => {
+    const tone = CAT_STRIP_TONES[index % CAT_STRIP_TONES.length];
+    return `
+        <a href="${categoryHref(c.id)}" class="cat-chip" data-tone="${tone}">
+          <span class="cat-chip__icon"><i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i></span>
+          <span class="cat-chip__label">${escapeHtml(c.name)}</span>
+        </a>`;
+  };
+
   const refreshCategoryNav = () => {
     const catCol = document.querySelector('.mega-col.categories');
     if (catCol && CATEGORIES.length) {
@@ -356,12 +369,9 @@
       el.setAttribute('href', 'category.html');
     });
 
-    const catStrip = document.querySelector('.cat-strip');
+    const catStrip = document.querySelector('[data-cat-strip], .cat-strip');
     if (catStrip && CATEGORIES.length) {
-      catStrip.innerHTML = CATEGORIES.slice(0, 8).map((c) => `
-        <a href="${categoryHref(c.id)}" class="cat-chip">
-          <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i><span>${escapeHtml(c.name)}</span>
-        </a>`).join('');
+      catStrip.innerHTML = CATEGORIES.slice(0, 8).map(renderCatChip).join('');
     }
   };
 
@@ -667,6 +677,7 @@
     document.querySelectorAll('[data-card-total], [data-cart-total]').forEach((el) => {
       el.textContent = formatPrice(total, true);
     });
+    Store.layout?.refreshMiniCart?.();
   };
 
   const tagHtml = (p) => {
@@ -687,30 +698,34 @@
   const productCard = (p, { deal = false } = {}) => {
     const src = productMediaSrc(p);
     const media = src
-      ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(p.title)}" loading="lazy" width="320" height="320">`
-      : `<i class="bi ${escapeHtml(p.icon || 'bi-box-seam')}"></i>`;
+      ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(p.title)}" loading="lazy">`
+      : `<i class="bi ${escapeHtml(p.icon || 'bi-box-seam')} product-thumb-fallback" aria-hidden="true"></i>`;
+
+    const hasDiscount = Number(p.discount) > 0 && p.old;
+    const priceTop = hasDiscount
+      ? `<div class="product-price-top">
+          <span class="product-price-old">${formatPriceNumber(p.old)}</span>
+          <span class="product-discount-badge">${p.discount}%</span>
+        </div>`
+      : '<div class="product-price-top product-price-top--empty" aria-hidden="true"></div>';
+
     return `
     <article class="product-card" data-product-id="${escapeHtml(p.id)}">
       <a href="product.html?id=${encodeURIComponent(p.id)}" class="product-link">
-        <div class="product-thumb">
-          ${p.discount ? `<span class="product-badge">٪${p.discount}</span>` : ''}
-          ${tagHtml(p)}
-          ${media}
+        <div class="product-thumb">${media}</div>
+        <h3 class="product-title">${escapeHtml(p.title)}</h3>
+        <div class="product-price">
+          ${priceTop}
+          <div class="product-price-now">
+            <span class="product-price-amount">${formatPriceNumber(p.price)}</span>
+            <span class="product-price-unit">تومان</span>
+          </div>
         </div>
-        <h3>${escapeHtml(p.title)}</h3>
       </a>
-      <div class="product-meta">
-        <div class="price-block">
-          ${p.old ? `<span class="old">${formatPrice(p.old)}</span>` : ''}
-          <span class="now">${formatPrice(p.price)}</span>
-        </div>
-        <span class="rating"><i class="bi bi-star-fill"></i> ${p.rating}</span>
-      </div>
       <button type="button" class="add-btn ${deal || p.amazing ? 'add-btn-amazing' : ''}" data-add="${escapeHtml(p.id)}">
-        ${deal || p.amazing ? 'خرید شگفت‌انگیز' : 'افزودن به سبد'}
+        ${deal || p.amazing ? 'خرید شگفت‌انگیز' : 'افزودن به کارت'}
       </button>
-    </article>
-  `;
+    </article>`;
   };
 
   const bindAddButtons = (root = document) => {
@@ -792,6 +807,7 @@
   Store.ui = {
     escapeHtml,
     formatPrice,
+    formatPriceNumber,
     formatDate,
     formatDateTime,
     productCard,

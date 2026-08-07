@@ -15,7 +15,7 @@ body[data-page] {
   --primary-soft: #f0f7fc;
   --primary-mid: #2b9bff;
   --settings-accent: #d95c04;
-  --bg: #e8f2f8;
+  --bg: #f4fafd;
   --surface: #ffffff;
   --line: #d5e4ef;
   --text: #152363;
@@ -31,10 +31,18 @@ body[data-page] {
 
 body[data-page] {
   background:
-    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(43, 155, 255, 0.18), transparent 55%),
-    radial-gradient(ellipse 70% 45% at 100% 0%, rgba(217, 92, 4, 0.1), transparent 50%),
-    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(122, 178, 215, 0.16), transparent 55%),
+    radial-gradient(ellipse 80% 50% at 10% -10%, rgba(43, 155, 255, 0.12), transparent 55%),
+    radial-gradient(ellipse 70% 45% at 100% 0%, rgba(217, 92, 4, 0.07), transparent 50%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(122, 178, 215, 0.10), transparent 55%),
     var(--bg);
+}
+
+body[data-page] .admin-main {
+  background:
+    radial-gradient(ellipse 70% 45% at 100% -5%, rgba(43, 155, 255, 0.12), transparent 55%),
+    radial-gradient(ellipse 55% 40% at -5% 100%, rgba(122, 178, 215, 0.14), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 70% 80%, rgba(217, 92, 4, 0.04), transparent 45%),
+    linear-gradient(165deg, #f2f8fc 0%, #f8fbfe 42%, #f4fafd 74%, #fcfdfe 100%);
 }
 
 body[data-page] .admin-content {

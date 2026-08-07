@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TahlilDadeh Simple Shop — فروشگاه اینترنتی</title>
+  <title>فروشگاه ساده تحلیل داده — فروشگاه اینترنتی آموزشی</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,17 +78,41 @@
       </div>
     </section>
 
-    <section class="section-block">
+    <section class="section-block cat-strip-section">
       <div class="container-xxl">
-        <div class="cat-strip">
-          <a href="category.html?id=digital" class="cat-chip"><i class="bi bi-phone"></i><span>دیجیتال</span></a>
-          <a href="search.html?q=لپ‌تاپ" class="cat-chip"><i class="bi bi-laptop"></i><span>لپ‌تاپ</span></a>
-          <a href="search.html?q=هدفون" class="cat-chip"><i class="bi bi-headphones"></i><span>هدفون</span></a>
-          <a href="category.html?id=home" class="cat-chip"><i class="bi bi-house-heart"></i><span>خانه</span></a>
-          <a href="category.html?id=beauty" class="cat-chip"><i class="bi bi-balloon-heart"></i><span>زیبایی</span></a>
-          <a href="category.html?id=sport" class="cat-chip"><i class="bi bi-bicycle"></i><span>ورزش</span></a>
-          <a href="category.html?id=gaming" class="cat-chip"><i class="bi bi-controller"></i><span>گیمینگ</span></a>
-          <a href="category.html?id=fashion" class="cat-chip"><i class="bi bi-handbag"></i><span>مد</span></a>
+        <div class="cat-strip cat-strip--lg" data-cat-strip>
+          <a href="category.html?id=digital" class="cat-chip" data-tone="purple">
+            <span class="cat-chip__icon"><i class="bi bi-phone"></i></span>
+            <span class="cat-chip__label">کالای دیجیتال</span>
+          </a>
+          <a href="search.html?q=لپ‌تاپ" class="cat-chip" data-tone="charcoal">
+            <span class="cat-chip__icon"><i class="bi bi-laptop"></i></span>
+            <span class="cat-chip__label">لپ‌تاپ</span>
+          </a>
+          <a href="search.html?q=هدفون" class="cat-chip" data-tone="pink">
+            <span class="cat-chip__icon"><i class="bi bi-headphones"></i></span>
+            <span class="cat-chip__label">هدفون</span>
+          </a>
+          <a href="category.html?id=home" class="cat-chip" data-tone="tan">
+            <span class="cat-chip__icon"><i class="bi bi-house-heart"></i></span>
+            <span class="cat-chip__label">خانه و آشپزخانه</span>
+          </a>
+          <a href="category.html?id=beauty" class="cat-chip" data-tone="gold">
+            <span class="cat-chip__icon"><i class="bi bi-stars"></i></span>
+            <span class="cat-chip__label">زیبایی و سلامت</span>
+          </a>
+          <a href="category.html?id=sport" class="cat-chip" data-tone="teal">
+            <span class="cat-chip__icon"><i class="bi bi-bicycle"></i></span>
+            <span class="cat-chip__label">ورزش و سفر</span>
+          </a>
+          <a href="category.html?id=gaming" class="cat-chip" data-tone="orange">
+            <span class="cat-chip__icon"><i class="bi bi-controller"></i></span>
+            <span class="cat-chip__label">گیمینگ</span>
+          </a>
+          <a href="category.html?id=fashion" class="cat-chip" data-tone="black">
+            <span class="cat-chip__icon"><i class="bi bi-handbag"></i></span>
+            <span class="cat-chip__label">مد و پوشاک</span>
+          </a>
         </div>
       </div>
     </section>
@@ -96,17 +120,17 @@
     <section class="section-block">
       <div class="container-xxl">
         <div class="deals-band">
-          <div class="deals-head">
-            <div>
-              <h2><i class="bi bi-lightning-charge-fill"></i> پیشنهادهای شگفت‌انگیز</h2>
-              <p>فرصت محدود — رنگ قرمز/نارنجی یعنی پیشنهاد داغ</p>
+          <aside class="deals-promo">
+            <span class="deals-promo__icon" aria-hidden="true">
+              <img src="assets/img/amazing.png" alt="" width="88" height="88" decoding="async">
+            </span>
+            <h2 class="deals-promo__title">شگفت&zwnj;انگیز</h2>
+            <div class="deal-timer" id="deal-timer" aria-live="polite">
+              <span>۰۵</span><span class="deal-timer__sep">:</span><span>۴۰</span><span class="deal-timer__sep">:</span><span>۱۰</span>
             </div>
-            <div class="deal-timer" id="deal-timer">
-              <span>۱۲</span>:<span>۴۵</span>:<span>۳۳</span>
-            </div>
-            <a href="category.html?tag=amazing" class="see-all">همه شگفت‌انگیزها <i class="bi bi-chevron-left"></i></a>
-          </div>
-          <div class="product-rail" id="deals-rail"></div>
+            <a href="category.html?tag=amazing" class="deals-promo__cta">مشاهده همه <i class="bi bi-chevron-left" aria-hidden="true"></i></a>
+          </aside>
+          <div class="product-rail deals-rail" id="deals-rail"></div>
         </div>
       </div>
     </section>
@@ -157,11 +181,37 @@
 
     <section class="section-block trust-section">
       <div class="container-xxl">
-        <div class="trust-row">
-          <div class="trust-item"><i class="bi bi-shield-check"></i><div><strong>ضمانت اصالت</strong><span>کالای ۱۰۰٪ اصل</span></div></div>
-          <div class="trust-item"><i class="bi bi-truck"></i><div><strong>ارسال سریع</strong><span>در سراسر کشور</span></div></div>
-          <div class="trust-item"><i class="bi bi-arrow-repeat"></i><div><strong>۷ روز بازگشت</strong><span>بدون دردسر</span></div></div>
-          <div class="trust-item"><i class="bi bi-headset"></i><div><strong>پشتیبانی ۲۴/۷</strong><span>همیشه در کنار شما</span></div></div>
+        <div class="trust-row" role="list">
+          <div class="trust-item" role="listitem">
+            <span class="trust-item__icon" aria-hidden="true">
+              <img src="assets/img/trust/originality.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+            </span>
+            <p class="trust-item__label">ضمانت اصل بودن کالا</p>
+          </div>
+          <div class="trust-item" role="listitem">
+            <span class="trust-item__icon" aria-hidden="true">
+              <img src="assets/img/trust/return.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+            </span>
+            <p class="trust-item__label">هفت روز ضمانت بازگشت کالا</p>
+          </div>
+          <div class="trust-item" role="listitem">
+            <span class="trust-item__icon" aria-hidden="true">
+              <img src="assets/img/trust/support.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+            </span>
+            <p class="trust-item__label">۷ روز هفته، ۲۴ ساعته</p>
+          </div>
+          <div class="trust-item" role="listitem">
+            <span class="trust-item__icon" aria-hidden="true">
+              <img src="assets/img/trust/cash-on-delivery.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+            </span>
+            <p class="trust-item__label">امکان پرداخت در محل</p>
+          </div>
+          <div class="trust-item" role="listitem">
+            <span class="trust-item__icon" aria-hidden="true">
+              <img src="assets/img/trust/express-delivery.png" alt="" width="96" height="96" loading="lazy" decoding="async">
+            </span>
+            <p class="trust-item__label">امکان تحویل اکسپرس</p>
+          </div>
         </div>
       </div>
     </section>
@@ -174,6 +224,7 @@
   <script src="../shared/vendor/axios.min.js"></script>
 <script src="../shared/js/http-client.js"></script>
   <script src="js/api-client.js"></script>
+  <script src="../shared/js/site-brand.js"></script>
   <script src="js/store-core.js"></script>
   <script src="js/layout.js"></script>
   <script src="js/home.js"></script>

@@ -1,0 +1,51 @@
+/**
+ * layout-base.css — shared overflow guard + minimal scrollbars
+ * Imported by admin.css, store.css, and login.css across all frontend panels.
+ */
+
+/* Prevent unwanted horizontal page scroll at any viewport */
+html,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+/* Media should not exceed the viewport width */
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+video {
+  height: auto;
+}
+
+/* Global minimal scrollbars (Firefox) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 23, 42, 0.22) transparent;
+}
+
+/* Global minimal scrollbars (WebKit / Blink) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.32);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
