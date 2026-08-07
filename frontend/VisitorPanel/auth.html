@@ -1,112 +1,156 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa" dir="rtl" class="login-html">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ورود / ثبت‌نام — TahlilDadeh Simple Shop</title>
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.rtl.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="store.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap.rtl.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="../AdminPanel/assets/css/login.css">
+  <link rel="stylesheet" href="auth.css">
 </head>
-<body>
-  <div id="store-header"></div>
-  <main class="page-shell">
-    <div class="container-xxl">
-      <div class="auth-wrap panel-card">
-        <div class="text-center mb-3">
-          <span class="brand-mark d-inline-flex"><i class="bi bi-person-circle"></i></span>
-          <h1 class="h4 fw-bold mt-3 mb-1">حساب کاربری</h1>
-          <p class="text-muted small mb-0">ورود یا ثبت‌نام در فروشگاه</p>
-        </div>
+<body class="login-page">
+  <div class="login-shell">
+    <div class="login-card">
+      <div class="login-avatar" aria-hidden="true">
+        <img src="../shared/assets/img/tahlildadeh-logo.png" alt="Tahlildadeh Academy">
+      </div>
 
-        <div class="auth-tabs" role="tablist">
-          <button type="button" class="auth-tab active" data-auth-tab="login" role="tab" aria-selected="true">
-            <i class="bi bi-box-arrow-in-left"></i> ورود
-          </button>
-          <button type="button" class="auth-tab" data-auth-tab="register" role="tab" aria-selected="false">
-            <i class="bi bi-person-plus"></i> ثبت‌نام
-          </button>
-        </div>
+      <div class="login-title">
+        <h1>حساب کاربری فروشگاه</h1>
+        <p>ورود یا ثبت‌نام در TahlilDadeh Simple Shop</p>
+      </div>
 
-        <div id="auth-error" class="alert alert-danger d-none py-2 small" role="alert"></div>
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab active" data-auth-tab="login" role="tab" aria-selected="true">
+          <i class="bi bi-box-arrow-in-left"></i> ورود
+        </button>
+        <button type="button" class="auth-tab" data-auth-tab="register" role="tab" aria-selected="false">
+          <i class="bi bi-person-plus"></i> ثبت‌نام
+        </button>
+      </div>
 
-        <!-- Login -->
-        <div id="auth-pane-login" class="auth-pane" data-auth-pane="login">
-          <form id="login-form" novalidate>
-            <div class="mb-3">
-              <label class="form-label" for="login-mobile">موبایل</label>
-              <input type="tel" class="form-control" id="login-mobile" name="mobile"
-                     placeholder="09121234567" dir="ltr" autocomplete="username" required>
+      <div id="auth-hint" class="alert alert-info d-none py-2 small" role="status"></div>
+      <div id="auth-error" class="alert alert-danger d-none" role="alert"></div>
+
+      <!-- Login -->
+      <div id="auth-pane-login" class="auth-pane" data-auth-pane="login">
+        <form id="login-form" novalidate>
+          <div class="login-field-group mb-3">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-phone-fill" aria-hidden="true"></i></span>
+              <input type="tel" id="login-mobile" name="mobile"
+                     placeholder="شماره موبایل" dir="ltr" autocomplete="username" inputmode="numeric" required>
             </div>
-            <div class="mb-3">
-              <label class="form-label" for="login-password">رمز عبور</label>
-              <input type="password" class="form-control" id="login-password" name="password"
-                     autocomplete="current-password" required>
-            </div>
-            <input type="hidden" id="login-role" name="role" value="Customer">
-            <button type="submit" class="btn btn-primary w-100 mb-2">ورود</button>
-            <p class="text-center small text-muted mb-0">
-              فروشنده هستید؟
-              <button type="button" class="btn btn-link btn-sm p-0 align-baseline" id="login-as-supplier">
-                ورود با حساب فروشنده
-              </button>
-            </p>
-          </form>
-        </div>
-
-        <!-- Register -->
-        <div id="auth-pane-register" class="auth-pane d-none" data-auth-pane="register">
-          <div class="role-switch mb-3" role="group" aria-label="نوع حساب">
-            <button type="button" class="role-switch-btn active" data-role="Customer">
-              <i class="bi bi-person"></i> مشتری
-            </button>
-            <button type="button" class="role-switch-btn" data-role="Supplier">
-              <i class="bi bi-shop"></i> فروشنده
-            </button>
           </div>
 
-          <form id="register-form" novalidate>
-            <input type="hidden" id="register-role" name="role" value="Customer">
-            <div class="row g-2 mb-3">
-              <div class="col-6">
-                <label class="form-label" for="register-firstName">نام</label>
-                <input type="text" class="form-control" id="register-firstName" name="firstName" required>
-              </div>
-              <div class="col-6">
-                <label class="form-label" for="register-lastName">نام خانوادگی</label>
-                <input type="text" class="form-control" id="register-lastName" name="lastName" required>
-              </div>
+          <div class="login-field-group mb-3">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-lock-fill" aria-hidden="true"></i></span>
+              <input type="password" id="login-password" name="password"
+                     autocomplete="current-password" placeholder="رمز عبور" required>
+              <button type="button" class="login-field__eye" id="toggle-login-password"
+                      aria-label="نمایش رمز عبور" aria-pressed="false">
+                <i class="bi bi-eye-fill" id="toggle-login-password-icon" aria-hidden="true"></i>
+              </button>
             </div>
-            <div class="mb-3">
-              <label class="form-label" for="register-mobile">موبایل</label>
-              <input type="tel" class="form-control" id="register-mobile" name="mobile"
-                     placeholder="09121234567" dir="ltr" autocomplete="tel" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label" for="register-password">رمز عبور</label>
-              <input type="password" class="form-control" id="register-password" name="password"
-                     autocomplete="new-password" minlength="6" required>
-              <div class="form-text">حداقل ۶ کاراکتر</div>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">ثبت‌نام</button>
-          </form>
+          </div>
+
+          <input type="hidden" id="login-role" name="role" value="Customer">
+
+          <button type="submit" class="login-btn" id="login-submit">
+            <span class="submit-text">ورود</span>
+            <span class="submit-loading d-none">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              در حال ورود...
+            </span>
+          </button>
+
+          <p class="auth-supplier-link">
+            فروشنده هستید؟
+            <button type="button" id="login-as-supplier">ورود با حساب فروشنده</button>
+          </p>
+        </form>
+      </div>
+
+      <!-- Register -->
+      <div id="auth-pane-register" class="auth-pane d-none" data-auth-pane="register">
+        <div class="role-switch" role="group" aria-label="نوع حساب">
+          <button type="button" class="role-switch-btn active" data-role="Customer">
+            <i class="bi bi-person"></i> مشتری
+          </button>
+          <button type="button" class="role-switch-btn" data-role="Supplier">
+            <i class="bi bi-shop"></i> فروشنده
+          </button>
         </div>
 
-        <a href="index.html" class="btn btn-outline-secondary w-100 mt-3">بازگشت به فروشگاه</a>
-      </div>
-    </div>
-  </main>
-  <div id="store-footer"></div>
+        <form id="register-form" novalidate>
+          <input type="hidden" id="register-role" name="role" value="Customer">
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+          <div class="auth-name-row mb-3">
+            <div class="login-field-group mb-0">
+              <div class="login-field">
+                <span class="login-field__icon"><i class="bi bi-person-fill" aria-hidden="true"></i></span>
+                <input type="text" id="register-firstName" name="firstName" placeholder="نام" required>
+              </div>
+            </div>
+            <div class="login-field-group mb-0">
+              <div class="login-field">
+                <span class="login-field__icon"><i class="bi bi-person-badge-fill" aria-hidden="true"></i></span>
+                <input type="text" id="register-lastName" name="lastName" placeholder="نام خانوادگی" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="login-field-group mb-3">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-phone-fill" aria-hidden="true"></i></span>
+              <input type="tel" id="register-mobile" name="mobile"
+                     placeholder="شماره موبایل" dir="ltr" autocomplete="tel" inputmode="numeric" required>
+            </div>
+          </div>
+
+          <div class="login-field-group mb-3">
+            <div class="login-field">
+              <span class="login-field__icon"><i class="bi bi-lock-fill" aria-hidden="true"></i></span>
+              <input type="password" id="register-password" name="password"
+                     autocomplete="new-password" placeholder="رمز عبور (حداقل ۶ کاراکتر)" minlength="6" required>
+              <button type="button" class="login-field__eye" id="toggle-register-password"
+                      aria-label="نمایش رمز عبور" aria-pressed="false">
+                <i class="bi bi-eye-fill" id="toggle-register-password-icon" aria-hidden="true"></i>
+              </button>
+            </div>
+            <p class="auth-field-hint">حداقل ۶ کاراکتر</p>
+          </div>
+
+          <button type="submit" class="login-btn" id="register-submit">
+            <span class="submit-text">ثبت‌نام</span>
+            <span class="submit-loading d-none">
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              در حال ثبت‌نام...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <div class="demo-hint">
+        <strong>حساب‌های دمو:</strong>
+        مشتری <code>09121000001</code> / <code>Customer123!</code>
+        — فروشنده <code>09122000001</code> / <code>Supplier123!</code>
+      </div>
+
+      <a href="index.html" class="auth-back">بازگشت به فروشگاه</a>
+      <div class="login-academy">Tahlildadeh Academy</div>
+    </div>
+  </div>
+
+  <script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
   <script src="js/config.js"></script>
   <script src="../shared/vendor/axios.min.js"></script>
   <script src="../shared/js/http-client.js"></script>
   <script src="../shared/js/auth-api.js"></script>
+  <script src="../shared/js/panel-session.js"></script>
   <script src="js/api-client.js"></script>
-  <script src="js/store-core.js"></script>
-  <script src="js/layout.js"></script>
   <script src="js/auth-page.js"></script>
 </body>
 </html>

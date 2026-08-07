@@ -4,11 +4,27 @@
   const createPaymentReference = () =>
     `PAY-${Date.now()}-${Math.random().toString(36).slice(2, 10).toUpperCase()}`;
 
-  document.addEventListener('DOMContentLoaded', () => {
+  const saveCustomerSession = (result, firstName, lastName) => {
+    if (!SimpleShopPanelSession?.savePanelSession) return;
+    SimpleShopPanelSession.savePanelSession('Customer', {
+      token: result?.token,
+      username: result?.username || result?.mobile,
+      mobile: result?.mobile,
+      userId: result?.userId,
+      role: result?.role || 'Customer',
+      fullName: result?.fullName || `${firstName} ${lastName}`.trim()
+    }, false);
+  };
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    await Store.catalog?.ready;
+
     const { formatPrice, escapeHtml, showToast } = Store.ui;
     const summary = document.getElementById('checkout-summary');
     const form = document.getElementById('checkout-form');
     const payBtn = document.getElementById('btn-pay');
+
+    Store.card.purgeInvalidCardItems?.();
     const entity = Store.card.getCardEntity();
     const cardItems = entity.cardItems;
 
@@ -20,6 +36,7 @@
     const orderLines = Store.card.toOrderItems();
     if (!orderLines.length) {
       showToast('اقلام کارت با کاتالوگ فروشگاه هم‌خوان نیستند. لطفاً دوباره به کارت اضافه کنید.');
+      setTimeout(() => { window.location.href = 'card.html'; }, 900);
       return;
     }
 
@@ -101,6 +118,7 @@
             items: orderLines
           });
           if (result?.token) Store.api.setToken(result.token);
+          saveCustomerSession(result, firstName, lastName);
           orderId = result?.order?.id ?? result?.order?.Id;
         }
 

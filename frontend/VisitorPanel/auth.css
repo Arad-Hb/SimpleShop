@@ -1,0 +1,134 @@
+/**
+ * auth.css — Visitor auth tabs/role switch on top of Admin login.css
+ */
+body.login-page .auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  margin: 0 0 1.15rem;
+  background: rgba(232, 242, 250, 0.85);
+  border-radius: 999px;
+  border: 1px solid rgba(43, 155, 255, 0.16);
+}
+
+body.login-page .auth-tab {
+  border: 0;
+  background: transparent;
+  color: #5f6a80;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.84rem;
+  padding: 0.58rem 0.65rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+body.login-page .auth-tab.active {
+  background: #fff;
+  color: var(--login-navy);
+  box-shadow: 0 4px 12px rgba(12, 20, 48, 0.1);
+}
+
+body.login-page .role-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem;
+  padding: 0.28rem;
+  margin-bottom: 0.85rem;
+  background: rgba(232, 242, 250, 0.85);
+  border-radius: 12px;
+  border: 1px solid rgba(43, 155, 255, 0.16);
+}
+
+body.login-page .role-switch-btn {
+  border: 0;
+  background: transparent;
+  color: #5f6a80;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 0.52rem 0.45rem;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+body.login-page .role-switch-btn.active {
+  background: #fff;
+  color: var(--login-navy);
+  box-shadow: 0 3px 10px rgba(12, 20, 48, 0.08);
+}
+
+body.login-page .auth-name-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+}
+
+body.login-page .auth-supplier-link {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #3a455c;
+}
+
+body.login-page .auth-supplier-link button {
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  font-style: italic;
+  color: var(--login-logo-blue);
+  cursor: pointer;
+}
+
+body.login-page .auth-supplier-link button:hover {
+  color: #1a86e8;
+  text-decoration: underline;
+}
+
+body.login-page .auth-back {
+  display: block;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--login-logo-blue) !important;
+  text-decoration: none;
+}
+
+body.login-page .auth-back:hover {
+  color: #1a86e8 !important;
+  text-decoration: underline;
+}
+
+body.login-page .auth-field-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.76rem;
+  color: #5f6a80;
+}
+
+body.login-page #auth-error,
+body.login-page #auth-hint {
+  margin: 0 0 1rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  padding: 0.7rem 0.85rem;
+}
+
+@media (max-width: 420px) {
+  body.login-page .auth-name-row {
+    grid-template-columns: 1fr;
+  }
+}

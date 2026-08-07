@@ -343,6 +343,10 @@
       Store.layout?.initMegaMenuHover?.();
     }
 
+    if (source === 'api' && CATEGORIES.length) {
+      Store.layout?.refreshMegaSubPanels?.(CATEGORIES);
+    }
+
     document.querySelectorAll('[data-category-link]').forEach((el) => {
       const catId = el.dataset.categoryLink;
       if (catId) el.setAttribute('href', categoryHref(catId));
@@ -625,6 +629,25 @@
 
   const clearCard = () => saveCardEntity(emptyCardEntity());
 
+  const purgeInvalidCardItems = () => {
+    const entity = getCardEntity();
+    const cardItems = entity.cardItems.filter((row) => {
+      const pid = String(row.productId);
+      const product = getProduct(pid);
+      if (!product) return false;
+      if (source === 'api') {
+        const n = parseInt(pid, 10);
+        return Number.isFinite(n) && n > 0;
+      }
+      return true;
+    });
+    if (cardItems.length !== entity.cardItems.length) {
+      saveCardEntity({ ...entity, cardItems });
+      updateCardUI();
+    }
+    return cardItems;
+  };
+
   /** Map virtual card → API order lines */
   const toOrderItems = () =>
     getCardEntity().cardItems
@@ -754,6 +777,7 @@
     removeFromCart: removeFromCard,
     clearCard,
     clearCart: clearCard,
+    purgeInvalidCardItems,
     cardCount,
     cartCount: cardCount,
     cardTotal,

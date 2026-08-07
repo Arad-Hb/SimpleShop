@@ -251,7 +251,7 @@
               { href: '#', label: 'پرسش‌های متداول' },
               { href: '#', label: 'بازگشت کالا' },
               { href: '#', label: 'شرایط استفاده' },
-              { href: 'auth.html?tab=login', label: 'پیگیری سفارش' },
+              { href: '../CustomerPanel/orders.html', label: 'پیگیری سفارش' },
               { href: 'auth.html', label: 'پشتیبانی' }
             ])}
             ${renderFooterContactColumn()}
@@ -306,6 +306,42 @@
   }
 
   // ─── Interactions (bound once after mount) ───────────────────────
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function refreshMegaSubPanels(categories) {
+    const container = document.querySelector('.mega-cols');
+    if (!container || !Array.isArray(categories) || !categories.length) return;
+
+    container.querySelectorAll('.mega-col.links').forEach((el) => el.remove());
+
+    const promoCol = container.querySelector('.mega-col.promo');
+    if (!promoCol) return;
+
+    const panels = categories.slice(0, 8).map((c, i) => {
+      const id = escapeHtml(String(c.id));
+      const name = escapeHtml(c.name || 'دسته');
+      const hidden = i === 0 ? '' : ' d-none';
+      return `
+        <div class="mega-col links${hidden}" id="mega-panel-${id}">
+          <h6>${name}</h6>
+          <a href="${categoryLink(c.id)}">همه ${name}</a>
+          <a href="search.html">جستجو در فروشگاه</a>
+        </div>`;
+    }).join('');
+
+    promoCol.insertAdjacentHTML('beforebegin', panels);
+
+    const catCol = container.querySelector('.mega-col.categories');
+    if (catCol) delete catCol.dataset.megaBound;
+    initMegaMenuHover();
+  }
 
   function initMegaMenuHover() {
     const catCol = document.querySelector('.mega-col.categories');
@@ -370,6 +406,7 @@
     mount: mountLayout,
     applyBranding,
     initMegaMenuHover,
+    refreshMegaSubPanels,
     initSearchForms
   };
 })(window.SimpleStore = window.SimpleStore || {});

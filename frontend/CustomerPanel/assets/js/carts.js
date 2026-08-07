@@ -63,7 +63,7 @@
             <div class="cart-card__foot">
               <div class="cart-card__total">${items.length ? formatPrice(total) : '۰ تومان'}</div>
               <div class="d-flex gap-2">
-                ${items.length ? `<a class="btn btn-sm btn-primary" href="../VisitorPanel/cart.html">ادامه خرید</a>` : ''}
+                ${items.length ? `<a class="btn btn-sm btn-primary" href="../VisitorPanel/card.html">ادامه خرید</a>` : ''}
                 <button type="button" class="btn btn-sm btn-outline-secondary" data-delete-cart>حذف سبد</button>
               </div>
             </div>
