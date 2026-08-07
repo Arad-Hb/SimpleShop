@@ -73,7 +73,8 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<SimpleShopDbContext>();
     await context.Database.MigrateAsync();
     await IdentitySeeder.SeedAsync(scope.ServiceProvider);
-    await DbSeeder.SeedAsync(context, app.Environment.WebRootPath);
+    var forceCatalogReset = app.Configuration.GetValue<bool>("CatalogSeed:ForceReset");
+    await DbSeeder.SeedAsync(context, forceCatalogReset);
     await IdentityUserSeeder.SeedAsync(scope.ServiceProvider, context);
 }
 

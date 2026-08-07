@@ -12,208 +12,11 @@
 
   const CAT_STRIP_TONES = ['purple', 'charcoal', 'pink', 'tan', 'gold', 'teal', 'orange', 'black'];
 
-  const DEMO_CATEGORIES = [
-    { id: 'digital', name: 'کالای دیجیتال', icon: 'bi-phone' },
-    { id: 'home', name: 'خانه و آشپزخانه', icon: 'bi-house-heart' },
-    { id: 'fashion', name: 'مد و پوشاک', icon: 'bi-handbag' },
-    { id: 'beauty', name: 'زیبایی و سلامت', icon: 'bi-balloon-heart' },
-    { id: 'sport', name: 'ورزش و سفر', icon: 'bi-bicycle' },
-    { id: 'gaming', name: 'گیمینگ', icon: 'bi-controller' }
-  ];
-
-  let CATEGORIES = DEMO_CATEGORIES.slice();
+  let CATEGORIES = [];
   let CATEGORY_TREE = [];
-  let source = 'demo';
+  let source = 'offline';
 
-  const DEMO_PRODUCTS = [
-    {
-      id: 'p1',
-      title: 'گوشی هوشمند Galaxy A55',
-      price: 18500000,
-      old: 21900000,
-      discount: 15,
-      icon: 'bi-phone',
-      rating: 4.7,
-      reviews: 1284,
-      category: 'digital',
-      brand: 'Samsung',
-      stock: 24,
-      amazing: true,
-      tag: 'amazing',
-      description: 'گوشی هوشمند با نمایشگر سوپر امولد، دوربین چندگانه و باتری بادوام. مناسب استفاده روزمره و عکاسی.'
-    },
-    {
-      id: 'p2',
-      title: 'هدفون بی‌سیم Noise Cancel',
-      price: 4250000,
-      old: 5100000,
-      discount: 17,
-      icon: 'bi-headphones',
-      rating: 4.5,
-      reviews: 642,
-      category: 'digital',
-      brand: 'Sony',
-      stock: 18,
-      amazing: true,
-      tag: 'amazing',
-      description: 'هدفون با حذف نویز فعال، مکالمه واضح و شارژ سریع. مناسب سفر و کار روزانه.'
-    },
-    {
-      id: 'p3',
-      title: 'ساعت هوشمند Pro Series',
-      price: 6900000,
-      old: 8200000,
-      discount: 16,
-      icon: 'bi-watch',
-      rating: 4.6,
-      reviews: 890,
-      category: 'digital',
-      brand: 'Xiaomi',
-      stock: 30,
-      tag: 'special',
-      description: 'پایش سلامت، GPS و مقاومت در برابر آب. همراه با بندهای قابل تعویض.'
-    },
-    {
-      id: 'p4',
-      title: 'لپ‌تاپ ۱۳ اینچ سبک',
-      price: 42900000,
-      old: 47500000,
-      discount: 10,
-      icon: 'bi-laptop',
-      rating: 4.8,
-      reviews: 312,
-      category: 'digital',
-      brand: 'ASUS',
-      stock: 9,
-      tag: 'special',
-      description: 'لپ‌تاپ فوق سبک برای کار و تحصیل، پردازنده قدرتمند و باتری طولانی‌مدت.'
-    },
-    {
-      id: 'p5',
-      title: 'قهوه‌ساز اتوماتیک',
-      price: 9800000,
-      old: 11500000,
-      discount: 15,
-      icon: 'bi-cup-hot',
-      rating: 4.4,
-      reviews: 221,
-      category: 'home',
-      brand: 'Delonghi',
-      stock: 14,
-      amazing: true,
-      tag: 'amazing',
-      description: 'آسیاب داخلی، کف‌شیر شیر و برنامه‌های متنوع برای اسپرسو و کاپوچینو.'
-    },
-    {
-      id: 'p6',
-      title: 'کفش ورزشی رانینگ',
-      price: 3200000,
-      old: 4100000,
-      discount: 22,
-      icon: 'bi-lightning',
-      rating: 4.3,
-      reviews: 540,
-      category: 'sport',
-      brand: 'Adidas',
-      stock: 40,
-      tag: 'sale',
-      description: 'کفش سبک با کفی نرم برای دویدن روزمره و تمرینات هوازی.'
-    },
-    {
-      id: 'p7',
-      title: 'عطر مردانه ۱۰۰ میل',
-      price: 2750000,
-      old: 3400000,
-      discount: 19,
-      icon: 'bi-droplet',
-      rating: 4.6,
-      reviews: 760,
-      category: 'beauty',
-      brand: 'Dior',
-      stock: 22,
-      tag: 'special',
-      description: 'رایحه گرم و ماندگار، مناسب استفاده روزانه و مهمانی.'
-    },
-    {
-      id: 'p8',
-      title: 'کنسول بازی نسل جدید',
-      price: 28900000,
-      old: 31500000,
-      discount: 8,
-      icon: 'bi-controller',
-      rating: 4.9,
-      reviews: 1502,
-      category: 'gaming',
-      brand: 'Sony',
-      stock: 7,
-      amazing: true,
-      tag: 'amazing',
-      description: 'کنسول قدرتمند با گرافیک نسل جدید و پشتیبانی از بازی‌های 4K.'
-    },
-    {
-      id: 'p9',
-      title: 'جارو رباتیک هوشمند',
-      price: 15400000,
-      old: 17900000,
-      discount: 14,
-      icon: 'bi-robot',
-      rating: 4.5,
-      reviews: 433,
-      category: 'home',
-      brand: 'Xiaomi',
-      stock: 11,
-      tag: 'sale',
-      description: 'نقشه‌برداری هوشمند، کنترل از اپلیکیشن و قدرت مکش بالا.'
-    },
-    {
-      id: 'p10',
-      title: 'دوربین اکشن ۴K',
-      price: 7800000,
-      old: 9200000,
-      discount: 15,
-      icon: 'bi-camera',
-      rating: 4.4,
-      reviews: 198,
-      category: 'digital',
-      brand: 'GoPro',
-      stock: 16,
-      tag: 'special',
-      description: 'ضدآب، لرزشگیر پیشرفته و کیفیت تصویر 4K برای ماجراجویی.'
-    },
-    {
-      id: 'p11',
-      title: 'مانتو بهاره زنانه',
-      price: 2100000,
-      old: 2800000,
-      discount: 25,
-      icon: 'bi-handbag',
-      rating: 4.2,
-      reviews: 97,
-      category: 'fashion',
-      brand: 'Local',
-      stock: 35,
-      tag: 'sale',
-      description: 'پارچه سبک و خنک، مناسب فصل بهار و تابستان.'
-    },
-    {
-      id: 'p12',
-      title: 'کرم مرطوب‌کننده پوست',
-      price: 890000,
-      old: 1200000,
-      discount: 26,
-      icon: 'bi-heart-pulse',
-      rating: 4.7,
-      reviews: 1104,
-      category: 'beauty',
-      brand: 'CeraVe',
-      stock: 50,
-      amazing: true,
-      tag: 'amazing',
-      description: 'آبرسان روزانه مناسب پوست خشک و حساس با ترکیبات ترمیم‌کننده.'
-    }
-  ];
-
-  let PRODUCTS = DEMO_PRODUCTS.slice();
+  let PRODUCTS = [];
 
   const TAG_LABELS = {
     amazing: 'پیشنهاد شگفت‌انگیز',
@@ -346,25 +149,103 @@
       children: []
     }));
 
+
+  const loadFromOffline = async () => {
+    const loader = globalThis.SimpleShopOfflineData;
+    if (!loader) return false;
+    try {
+      const [catData, prodData] = await Promise.all([
+        loader.loadCategories(),
+        loader.loadProducts()
+      ]);
+      const prodItems = (prodData.items || []).filter((p) => p.isActive !== false);
+      if (!prodItems.length) return false;
+
+      PRODUCTS = prodItems.map((dto, i) => mapApiProduct(dto, i));
+
+      const tree = catData.tree || [];
+      if (tree.length) {
+        CATEGORY_TREE = tree
+          .map((node, i) => normalizeTreeNode(node, i))
+          .filter(Boolean);
+        CATEGORIES = CATEGORY_TREE.slice(0, 8).map(({ id, name, icon }, i) => ({
+          id,
+          name,
+          icon: icon || ICONS[i % ICONS.length]
+        }));
+      } else {
+        const flat = (catData.items || []).filter((c) => c.isActive !== false);
+        CATEGORY_TREE = buildTreeFromFlat(flat);
+        CATEGORIES = CATEGORY_TREE.slice(0, 8).map(({ id, name, icon }, i) => ({
+          id,
+          name,
+          icon: icon || ICONS[i % ICONS.length]
+        }));
+      }
+
+      source = 'offline';
+      refreshCategoryNav();
+      document.dispatchEvent(new CustomEvent('catalog:ready', { detail: { source } }));
+      return true;
+    } catch (err) {
+      console.warn('[VisitorPanel] Offline JSON unavailable.', err);
+      return false;
+    }
+  };
+
+  const fetchAllProductsFromApi = async () => {
+    const pageSize = 50;
+    let page = 1;
+    let all = [];
+    let total = Infinity;
+
+    while (all.length < total && page <= 20) {
+      const paged = await Store.api.getProducts({ page, pageSize, sortBy: 'name', sortDir: 'asc' });
+      const items = paged?.items || paged?.Items || [];
+      const search = paged?.searchModel || paged?.SearchModel || {};
+      total = Number(search.recordCount ?? search.RecordCount ?? items.length) || items.length;
+      all = all.concat(items);
+      if (!items.length || items.length < pageSize) break;
+      page += 1;
+    }
+
+    return all;
+  };
+
+  const applyCategoryTree = (tree) => {
+    if (!Array.isArray(tree) || !tree.length) return;
+    CATEGORY_TREE = tree
+      .map((node, i) => normalizeTreeNode(node, i))
+      .filter(Boolean);
+    CATEGORIES = CATEGORY_TREE.slice(0, 8).map(({ id, name, icon }, i) => ({
+      id,
+      name,
+      icon: icon || ICONS[i % ICONS.length]
+    }));
+    refreshCategoryNav();
+  };
+
   const loadFromApi = async () => {
     if (!Store.config?.USE_API || !Store.api) return false;
-    const [paged, tree] = await Promise.all([
-      Store.api.getProducts({ page: 1, pageSize: 48, sortBy: 'name', sortDir: 'asc' }),
-      Store.api.getCategoriesTree()
-    ]);
-    const items = paged?.items || paged?.Items || [];
-    if (!Array.isArray(items) || !items.length) return false;
 
-    PRODUCTS = items.map((dto, i) => mapApiProduct(dto, i));
-    if (Array.isArray(tree) && tree.length) {
-      CATEGORY_TREE = tree
-        .map((node, i) => normalizeTreeNode(node, i))
-        .filter(Boolean);
-      CATEGORIES = CATEGORY_TREE.map(({ id, name, icon }) => ({ id, name, icon }));
+    let productDtos = [];
+    try {
+      productDtos = await fetchAllProductsFromApi();
+    } catch (err) {
+      console.warn('[VisitorPanel] Product API failed.', err);
+      return false;
     }
+    if (!productDtos.length) return false;
+
+    PRODUCTS = productDtos.map((dto, i) => mapApiProduct(dto, i));
     source = 'api';
     refreshCategoryNav();
     document.dispatchEvent(new CustomEvent('catalog:ready', { detail: { source } }));
+
+    Store.api.getCategoriesTree()
+      .then((tree) => applyCategoryTree(tree))
+      .catch((err) => console.warn('[VisitorPanel] Category tree API failed.', err));
+
     return true;
   };
 
@@ -405,12 +286,18 @@
         if (ok) return { source };
       }
     } catch (err) {
-      console.warn('[VisitorPanel] API unavailable, using demo catalog.', err);
+      console.warn('[VisitorPanel] API unavailable, trying offline JSON.', err);
     }
-    PRODUCTS = DEMO_PRODUCTS.slice();
-    CATEGORIES = DEMO_CATEGORIES.slice();
-    CATEGORY_TREE = buildTreeFromFlat(DEMO_CATEGORIES);
-    source = 'demo';
+    try {
+      const ok = await loadFromOffline();
+      if (ok) return { source };
+    } catch (err) {
+      console.warn('[VisitorPanel] Offline JSON unavailable.', err);
+    }
+    PRODUCTS = [];
+    CATEGORIES = [];
+    CATEGORY_TREE = [];
+    source = 'empty';
     refreshCategoryNav();
     document.dispatchEvent(new CustomEvent('catalog:ready', { detail: { source } }));
     return { source };
@@ -796,6 +683,7 @@
     TAG_LABELS,
     ready,
     loadFromApi,
+    loadFromOffline,
     mapApiProduct,
     refreshCategoryNav,
     categoryHref,

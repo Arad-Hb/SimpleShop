@@ -7,7 +7,7 @@
 
   Store.config = {
     API_BASE_URL: 'http://localhost:5102',
-    /** Use live API when reachable; fall back to local demo catalog otherwise */
+    /** Use live API when reachable; fall back to shared JSON files when offline */
     USE_API: true,
     REQUEST_TIMEOUT_MS: 8000
   };

@@ -1,111 +1,98 @@
 /**
- * seed-data.js — داده‌های نمونه تأمین‌کننده
+ * seed-data.js — load supplier profile/products from JSON when API is offline
  */
 (function (ShopSupplier) {
   'use strict';
 
-  const seedDemoData = () => {
+  const OFFLINE_SEED_VERSION = 'legacy-catalog-v1';
+
+  const hasRole = (user, role) =>
+    (user.roles || []).some((r) => String(r).toLowerCase() === String(role).toLowerCase());
+
+  const seedFromOfflineJson = async () => {
+    const loader = window.SimpleShopOfflineData;
+    if (!loader) return null;
+
     const data = ShopSupplier.storage.getData();
-    if (data.seeded) return;
+    if (data.offlineSeedVersion === OFFLINE_SEED_VERSION && data.seeded) {
+      return data;
+    }
 
-    const now = new Date().toISOString();
-    const brandA = { id: 'brand_samsung', name: 'Samsung', description: 'کالای دیجیتال سامسونگ', createdAt: now };
-    const brandB = { id: 'brand_lg', name: 'LG', description: 'لوازم خانگی ال‌جی', createdAt: now };
-    const brandC = { id: 'brand_xiaomi', name: 'Xiaomi', description: 'گجت و موبایل', createdAt: now };
+    const [users, productsPayload] = await Promise.all([
+      loader.loadUsers(),
+      loader.loadProducts()
+    ]);
 
-    const products = [
-      {
-        id: 'prod_a55',
-        name: 'گوشی Galaxy A55',
-        brandId: brandA.id,
-        brandName: brandA.name,
-        sku: 'SM-A55-128',
-        price: 18500000,
-        stock: 24,
+    const suppliers = (users.items || []).filter((u) => hasRole(u, 'Supplier'));
+    const supplier = suppliers[0];
+    if (!supplier) return null;
+
+    const supplierId = supplier.id;
+    const supplierProducts = (productsPayload.items || [])
+      .filter((p) => String(p.supplierId) === String(supplierId) || suppliers.length === 1)
+      .slice(0, 50);
+
+    const brandNames = [...new Set(supplierProducts.map((p) => p.brandName).filter(Boolean))];
+    const brands = brandNames.map((name, i) => ({
+      id: `brand_${i + 1}`,
+      name,
+      description: name,
+      createdAt: new Date().toISOString()
+    }));
+    const brandByName = new Map(brands.map((b) => [b.name, b]));
+
+    const products = supplierProducts.map((p) => {
+      const brand = brandByName.get(p.brandName);
+      return {
+        id: String(p.id),
+        name: p.name || 'محصول',
+        brandId: brand?.id || null,
+        brandName: p.brandName || brand?.name || '',
+        sku: p.sku || `SKU-${p.id}`,
+        price: Number(p.price) || 0,
+        stock: Number(p.stock) || 0,
         lowStockThreshold: 5,
-        isActive: true,
-        description: 'گوشی هوشمند با حافظه ۱۲۸ گیگ',
-        createdAt: now,
-        updatedAt: now
-      },
-      {
-        id: 'prod_buds',
-        name: 'هدفون Galaxy Buds',
-        brandId: brandA.id,
-        brandName: brandA.name,
-        sku: 'BUDS-3',
-        price: 5200000,
-        stock: 4,
-        lowStockThreshold: 5,
-        isActive: true,
-        description: 'هدفون بی‌سیم',
-        createdAt: now,
-        updatedAt: now
-      },
-      {
-        id: 'prod_tv',
-        name: 'تلویزیون ۵۵ اینچ LG',
-        brandId: brandB.id,
-        brandName: brandB.name,
-        sku: 'LG-55-4K',
-        price: 32900000,
-        stock: 8,
-        lowStockThreshold: 3,
-        isActive: true,
-        description: 'تلویزیون هوشمند 4K',
-        createdAt: now,
-        updatedAt: now
-      },
-      {
-        id: 'prod_mi',
-        name: 'ساعت هوشمند Xiaomi',
-        brandId: brandC.id,
-        brandName: brandC.name,
-        sku: 'MI-WATCH-S',
-        price: 6900000,
-        stock: 0,
-        lowStockThreshold: 5,
-        isActive: true,
-        description: 'ساعت هوشمند',
-        createdAt: now,
-        updatedAt: now
-      },
-      {
-        id: 'prod_washer',
-        name: 'ماشین لباسشویی LG',
-        brandId: brandB.id,
-        brandName: brandB.name,
-        sku: 'LG-WASH-8',
-        price: 27800000,
-        stock: 6,
-        lowStockThreshold: 2,
-        isActive: false,
-        description: '۸ کیلویی اینورتر',
-        createdAt: now,
-        updatedAt: now
-      }
-    ];
+        isActive: p.isActive !== false,
+        description: p.description || '',
+        createdAt: p.createdAt || new Date().toISOString(),
+        updatedAt: p.createdAt || new Date().toISOString()
+      };
+    });
 
     ShopSupplier.storage.saveData({
       seeded: true,
+      offlineSeedVersion: OFFLINE_SEED_VERSION,
       profile: {
-        id: 'sup_demo_1',
-        companyName: 'تأمین‌کننده آریا تجارت',
-        contactPerson: 'رضا محمدی',
-        username: 'supplier',
-        email: 'supplier@simpleshop.ir',
-        phone: '021-91001234',
-        mobile: '09121234567',
-        address: 'تهران، خیابان ولیعصر، پلاک ۲۰۰',
-        description: 'تأمین کالای دیجیتال و لوازم خانگی اصل با گارانتی معتبر.',
-        website: 'https://example.com',
-        createdAt: now,
-        updatedAt: now
+        id: supplier.id,
+        companyName: `${supplier.firstName || ''} ${supplier.lastName || ''}`.trim() || 'تأمین‌کننده',
+        contactPerson: `${supplier.firstName || ''} ${supplier.lastName || ''}`.trim(),
+        username: supplier.userName || supplier.phoneNumber || '',
+        email: supplier.email || '',
+        phone: supplier.phoneNumber || '',
+        mobile: supplier.phoneNumber || '',
+        address: supplier.address || '',
+        description: '',
+        website: '',
+        createdAt: supplier.registerDate || new Date().toISOString(),
+        updatedAt: supplier.registerDate || new Date().toISOString()
       },
-      brands: [brandA, brandB, brandC],
+      brands,
       products
     });
+
+    return ShopSupplier.storage.getData();
   };
 
-  ShopSupplier.seed = { seedDemoData };
+  const seedIfApiOffline = async () => {
+    if (await window.SimpleShopOfflineData?.isApiOnline?.(ShopSupplier.config?.API_BASE_URL)) {
+      return null;
+    }
+    try {
+      return await seedFromOfflineJson();
+    } catch {
+      return null;
+    }
+  };
+
+  ShopSupplier.seed = { seedFromOfflineJson, seedIfApiOffline };
 })(window.ShopSupplier = window.ShopSupplier || {});

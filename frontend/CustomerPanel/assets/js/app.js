@@ -4,12 +4,12 @@
 (function (ShopCustomer) {
   'use strict';
 
-  const initApp = () => {
+  const initApp = async () => {
     const page = document.body.dataset.page;
     const isAuthPage = page === 'login' || page === 'register';
 
     if (!isAuthPage) {
-      ShopCustomer.seed.seedDemoData();
+      await ShopCustomer.seed?.seedIfApiOffline?.();
     }
 
     if (page && !isAuthPage) {

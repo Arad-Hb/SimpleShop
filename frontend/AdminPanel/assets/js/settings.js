@@ -280,8 +280,8 @@
 
     $('btn-reset-demo')?.addEventListener('click', () => {
       ShopAdmin.ui.showConfirmModal(
-        'بازنشانی داده‌های دمو',
-        'همه داده‌های LocalStorage پاک و دوباره ساخته می‌شوند. این کار قابل بازگشت نیست.',
+        'بازنشانی داده‌های محلی',
+        'همه داده‌های LocalStorage پاک می‌شوند. پس از بارگذاری مجدد، داده از API یا فایل‌های JSON آفلاین بارگذاری می‌شود.',
         () => {
           localStorage.removeItem(STORAGE_KEY);
           window.location.reload();

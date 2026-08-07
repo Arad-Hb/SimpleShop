@@ -1,0 +1,1561 @@
+{
+  "version": "legacy-catalog-v1",
+  "exportedAt": "2026-08-07T18:14:25.431058Z",
+  "count": 104,
+  "items": [
+    {
+      "id": "0dc8d1b9-6d89-4a1b-a457-47e62477b47a",
+      "userName": "Supplier09122000001",
+      "email": "supplier01@simpleshop.local",
+      "phoneNumber": "09122000001",
+      "firstName": "\u0631\u0636\u0627",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 1",
+      "postalCode": "10019567890",
+      "registerDate": "2026-07-07T18:13:38.6852106",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "1a376bbe-2120-4414-85be-893207eceea9",
+      "userName": "Customer09121000001",
+      "email": "customer01@simpleshop.local",
+      "phoneNumber": "09121000001",
+      "firstName": "\u0631\u0636\u0627",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 2\u060C \u067E\u0644\u0627\u06A9 1",
+      "postalCode": "11001912345",
+      "registerDate": "2026-07-07T18:13:38.8975817",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "7fc958a6-3654-4790-bb0e-441ef68c69f4",
+      "userName": "Supplier09122000002",
+      "email": "supplier02@simpleshop.local",
+      "phoneNumber": "09122000002",
+      "firstName": "\u0645\u062D\u0645\u062F",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 2",
+      "postalCode": "10002567890",
+      "registerDate": "2026-07-07T18:17:55.8093809",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "f36ef394-d14d-4331-99fa-f71ce737d348",
+      "userName": "Supplier09122000003",
+      "email": "supplier03@simpleshop.local",
+      "phoneNumber": "09122000003",
+      "firstName": "\u062D\u0633\u06CC\u0646",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 3",
+      "postalCode": "10003567890",
+      "registerDate": "2026-07-07T18:17:56.3594483",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "1ba48337-6a3c-4256-b737-03d13f026e56",
+      "userName": "Supplier09122000004",
+      "email": "supplier04@simpleshop.local",
+      "phoneNumber": "09122000004",
+      "firstName": "\u0645\u0647\u062F\u06CC",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 4",
+      "postalCode": "10004567890",
+      "registerDate": "2026-07-07T18:17:56.5946419",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "366ea00c-b86a-4182-ac7e-0244a1f03e29",
+      "userName": "Supplier09122000005",
+      "email": "supplier05@simpleshop.local",
+      "phoneNumber": "09122000005",
+      "firstName": "\u0627\u0645\u06CC\u0631",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 5",
+      "postalCode": "10005567890",
+      "registerDate": "2026-07-07T18:17:56.8038954",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "2490192f-ac1c-42a0-ba1c-295b5188d449",
+      "userName": "Supplier09122000006",
+      "email": "supplier06@simpleshop.local",
+      "phoneNumber": "09122000006",
+      "firstName": "\u0633\u0627\u0631\u0627",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 6",
+      "postalCode": "10006567890",
+      "registerDate": "2026-07-07T18:17:57.0415225",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "3f0b917d-9957-4393-805c-98912a602653",
+      "userName": "Supplier09122000007",
+      "email": "supplier07@simpleshop.local",
+      "phoneNumber": "09122000007",
+      "firstName": "\u0645\u0631\u06CC\u0645",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 7",
+      "postalCode": "10007567890",
+      "registerDate": "2026-07-07T18:17:57.1757641",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "052f3794-012b-4d4a-b1a8-4540b19e56a2",
+      "userName": "Supplier09122000008",
+      "email": "supplier08@simpleshop.local",
+      "phoneNumber": "09122000008",
+      "firstName": "\u0632\u0647\u0631\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 8",
+      "postalCode": "10008567890",
+      "registerDate": "2026-07-07T18:17:57.3951674",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "33fe5890-591e-4581-b405-ad6fbd191b42",
+      "userName": "Supplier09122000009",
+      "email": "supplier09@simpleshop.local",
+      "phoneNumber": "09122000009",
+      "firstName": "\u0641\u0627\u0637\u0645\u0647",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 9",
+      "postalCode": "10009567890",
+      "registerDate": "2026-07-07T18:17:57.5886108",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "f6db0620-a830-4f06-8fec-b4551f8b7529",
+      "userName": "Supplier09122000010",
+      "email": "supplier10@simpleshop.local",
+      "phoneNumber": "09122000010",
+      "firstName": "\u0646\u06CC\u0645\u0627",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 10",
+      "postalCode": "10010567890",
+      "registerDate": "2026-07-07T18:17:57.811193",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "29bbf8c2-402d-454f-acdb-d786f5621fa6",
+      "userName": "Supplier09122000011",
+      "email": "supplier11@simpleshop.local",
+      "phoneNumber": "09122000011",
+      "firstName": "\u0622\u0631\u0634",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 11",
+      "postalCode": "10011567890",
+      "registerDate": "2026-07-07T18:17:58.0357937",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "a1998c83-5667-480d-ab52-5f1018a5e66e",
+      "userName": "Supplier09122000012",
+      "email": "supplier12@simpleshop.local",
+      "phoneNumber": "09122000012",
+      "firstName": "\u067E\u0631\u06CC\u0633\u0627",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 12",
+      "postalCode": "10012567890",
+      "registerDate": "2026-07-07T18:17:58.2258009",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "1dbde7f1-ee1a-4855-ba08-798ad4c14174",
+      "userName": "Supplier09122000013",
+      "email": "supplier13@simpleshop.local",
+      "phoneNumber": "09122000013",
+      "firstName": "\u0646\u0627\u0632\u0646\u06CC\u0646",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 13",
+      "postalCode": "10013567890",
+      "registerDate": "2026-07-07T18:17:58.4309552",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "94ee06ce-337d-4c5d-97fa-52c09a21ab62",
+      "userName": "Supplier09122000014",
+      "email": "supplier14@simpleshop.local",
+      "phoneNumber": "09122000014",
+      "firstName": "\u06A9\u0627\u0645\u0631\u0627\u0646",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 14",
+      "postalCode": "10014567890",
+      "registerDate": "2026-07-07T18:17:58.6213156",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "7d07dde6-5062-4e9b-87d8-772ff9bedadf",
+      "userName": "Supplier09122000015",
+      "email": "supplier15@simpleshop.local",
+      "phoneNumber": "09122000015",
+      "firstName": "\u0627\u0644\u0647\u0627\u0645",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 \u062A\u0623\u0645\u06CC\u0646\u200C\u06A9\u0646\u0646\u062F\u06AF\u0627\u0646\u060C \u067E\u0644\u0627\u06A9 15",
+      "postalCode": "10015567890",
+      "registerDate": "2026-07-07T18:17:58.8113881",
+      "isActive": true,
+      "roles": [
+        "Supplier"
+      ]
+    },
+    {
+      "id": "331e3405-917f-48fe-8e85-ad8cddb6f66a",
+      "userName": "Customer09121000003",
+      "email": "customer02@simpleshop.local",
+      "phoneNumber": "09121000003",
+      "firstName": "\u0645\u062D\u0645\u062F",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 3\u060C \u067E\u0644\u0627\u06A9 2",
+      "postalCode": "12000212345",
+      "registerDate": "2026-07-07T18:17:58.9689573",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "409bf8c4-7072-4f0a-8563-8d43f890434c",
+      "userName": "Customer09121000004",
+      "email": "customer03@simpleshop.local",
+      "phoneNumber": "09121000004",
+      "firstName": "\u062D\u0633\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 4\u060C \u067E\u0644\u0627\u06A9 3",
+      "postalCode": "13000312345",
+      "registerDate": "2026-07-07T18:17:59.130206",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "f7baad2c-42f0-42b6-86e4-408dd5f0f341",
+      "userName": "Customer09121000005",
+      "email": "customer04@simpleshop.local",
+      "phoneNumber": "09121000005",
+      "firstName": "\u0645\u0647\u062F\u06CC",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 5\u060C \u067E\u0644\u0627\u06A9 4",
+      "postalCode": "14000412345",
+      "registerDate": "2026-07-07T18:17:59.3150055",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "cb0ee21b-fdec-4c05-8f9e-24b9b70f8682",
+      "userName": "Customer09121000006",
+      "email": "customer05@simpleshop.local",
+      "phoneNumber": "09121000006",
+      "firstName": "\u0627\u0645\u06CC\u0631",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 6\u060C \u067E\u0644\u0627\u06A9 5",
+      "postalCode": "15000512345",
+      "registerDate": "2026-07-07T18:17:59.5031884",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "2c4bee6b-9677-40c5-b616-5bd97c33a930",
+      "userName": "Customer09121000007",
+      "email": "customer06@simpleshop.local",
+      "phoneNumber": "09121000007",
+      "firstName": "\u0633\u0627\u0631\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 7\u060C \u067E\u0644\u0627\u06A9 6",
+      "postalCode": "16000612345",
+      "registerDate": "2026-07-07T18:17:59.6712495",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "cb3c877f-05d6-431a-ac76-0f419de442c7",
+      "userName": "Customer09121000008",
+      "email": "customer07@simpleshop.local",
+      "phoneNumber": "09121000008",
+      "firstName": "\u0645\u0631\u06CC\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 8\u060C \u067E\u0644\u0627\u06A9 7",
+      "postalCode": "17000712345",
+      "registerDate": "2026-07-07T18:17:59.8652512",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "549fa61c-126a-4d6e-9450-2655e59ab6d1",
+      "userName": "Customer09121000009",
+      "email": "customer08@simpleshop.local",
+      "phoneNumber": "09121000009",
+      "firstName": "\u0632\u0647\u0631\u0627",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 9\u060C \u067E\u0644\u0627\u06A9 8",
+      "postalCode": "18000812345",
+      "registerDate": "2026-07-07T18:18:00.0087869",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "b7f4abf4-d20f-48d7-b6af-61fd4f45d0a7",
+      "userName": "Customer09121000010",
+      "email": "customer09@simpleshop.local",
+      "phoneNumber": "09121000010",
+      "firstName": "\u0641\u0627\u0637\u0645\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 10\u060C \u067E\u0644\u0627\u06A9 9",
+      "postalCode": "10000912345",
+      "registerDate": "2026-07-07T18:18:00.1388215",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "2ec2c64e-988b-4101-9841-82c9907cf848",
+      "userName": "Customer09121000011",
+      "email": "customer10@simpleshop.local",
+      "phoneNumber": "09121000011",
+      "firstName": "\u0646\u06CC\u0645\u0627",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 11\u060C \u067E\u0644\u0627\u06A9 10",
+      "postalCode": "11001012345",
+      "registerDate": "2026-07-07T18:18:00.3452157",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "9976e11d-70a0-4546-a758-ceae40fdf6d7",
+      "userName": "Customer09121000012",
+      "email": "customer11@simpleshop.local",
+      "phoneNumber": "09121000012",
+      "firstName": "\u0622\u0631\u0634",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 12\u060C \u067E\u0644\u0627\u06A9 11",
+      "postalCode": "12001112345",
+      "registerDate": "2026-07-07T18:18:00.4691047",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "805d7464-4b53-4d55-bb08-de23f580700f",
+      "userName": "Customer09121000013",
+      "email": "customer12@simpleshop.local",
+      "phoneNumber": "09121000013",
+      "firstName": "\u067E\u0631\u06CC\u0633\u0627",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 13\u060C \u067E\u0644\u0627\u06A9 12",
+      "postalCode": "13001212345",
+      "registerDate": "2026-07-07T18:18:00.6152311",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "4f550162-4741-4dd6-a0c7-cc92349e30f9",
+      "userName": "Customer09121000014",
+      "email": "customer13@simpleshop.local",
+      "phoneNumber": "09121000014",
+      "firstName": "\u0646\u0627\u0632\u0646\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 14\u060C \u067E\u0644\u0627\u06A9 13",
+      "postalCode": "14001312345",
+      "registerDate": "2026-07-07T18:18:00.760109",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "b071d53a-e464-4b59-8f45-797f807911aa",
+      "userName": "Customer09121000015",
+      "email": "customer14@simpleshop.local",
+      "phoneNumber": "09121000015",
+      "firstName": "\u06A9\u0627\u0645\u0631\u0627\u0646",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 15\u060C \u067E\u0644\u0627\u06A9 14",
+      "postalCode": "15001412345",
+      "registerDate": "2026-07-07T18:18:00.8989135",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "0e2663b6-f410-44b1-9c80-464e67b31374",
+      "userName": "Customer09121000016",
+      "email": "customer15@simpleshop.local",
+      "phoneNumber": "09121000016",
+      "firstName": "\u0627\u0644\u0647\u0627\u0645",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 16\u060C \u067E\u0644\u0627\u06A9 15",
+      "postalCode": "16001512345",
+      "registerDate": "2026-07-07T18:18:01.0148759",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "49597a0a-2028-4ab6-a93d-e28a8bfeb060",
+      "userName": "Customer09121000017",
+      "email": "customer16@simpleshop.local",
+      "phoneNumber": "09121000017",
+      "firstName": "\u0634\u06CC\u062F\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 17\u060C \u067E\u0644\u0627\u06A9 16",
+      "postalCode": "17001612345",
+      "registerDate": "2026-07-07T18:18:01.1248274",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "cb8c22e6-f379-4ad0-9fc9-d749985ec318",
+      "userName": "Customer09121000018",
+      "email": "customer17@simpleshop.local",
+      "phoneNumber": "09121000018",
+      "firstName": "\u0628\u0647\u0631\u0627\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 18\u060C \u067E\u0644\u0627\u06A9 17",
+      "postalCode": "18001712345",
+      "registerDate": "2026-07-07T18:18:01.2424699",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "63737122-32e2-4bb0-83ff-8cf74355abda",
+      "userName": "Customer09121000019",
+      "email": "customer18@simpleshop.local",
+      "phoneNumber": "09121000019",
+      "firstName": "\u06A9\u06CC\u0627\u0646",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 19\u060C \u067E\u0644\u0627\u06A9 18",
+      "postalCode": "10001812345",
+      "registerDate": "2026-07-07T18:18:01.3975183",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "72c62fac-9327-41c7-af12-b0a7983f26f2",
+      "userName": "Customer09121000020",
+      "email": "customer19@simpleshop.local",
+      "phoneNumber": "09121000020",
+      "firstName": "\u0647\u0627\u0646\u06CC\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 20\u060C \u067E\u0644\u0627\u06A9 19",
+      "postalCode": "11001912345",
+      "registerDate": "2026-07-07T18:18:01.5453376",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "4b2215c6-c428-4f14-9109-0f2083351b7b",
+      "userName": "Customer09121000021",
+      "email": "customer20@simpleshop.local",
+      "phoneNumber": "09121000021",
+      "firstName": "\u0639\u0644\u06CC",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 21\u060C \u067E\u0644\u0627\u06A9 20",
+      "postalCode": "12002012345",
+      "registerDate": "2026-07-07T18:18:01.6762647",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "5a43adf7-78e3-4a9c-8f7b-83e2ddd1743e",
+      "userName": "Customer09121000022",
+      "email": "customer21@simpleshop.local",
+      "phoneNumber": "09121000022",
+      "firstName": "\u0631\u0636\u0627",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 22\u060C \u067E\u0644\u0627\u06A9 21",
+      "postalCode": "13002112345",
+      "registerDate": "2026-07-07T18:18:01.8283674",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "ef7cac9c-a152-46ec-887c-e5c3d5765b6a",
+      "userName": "Customer09121000023",
+      "email": "customer22@simpleshop.local",
+      "phoneNumber": "09121000023",
+      "firstName": "\u0645\u062D\u0645\u062F",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 23\u060C \u067E\u0644\u0627\u06A9 22",
+      "postalCode": "14002212345",
+      "registerDate": "2026-07-07T18:18:01.960548",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "6d82fc3d-fc68-43eb-8de9-20b05fe65516",
+      "userName": "Customer09121000024",
+      "email": "customer23@simpleshop.local",
+      "phoneNumber": "09121000024",
+      "firstName": "\u062D\u0633\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 24\u060C \u067E\u0644\u0627\u06A9 23",
+      "postalCode": "15002312345",
+      "registerDate": "2026-07-07T18:18:02.0658816",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "d2b52f10-8d93-4038-8acb-56cb615cb74d",
+      "userName": "Customer09121000025",
+      "email": "customer24@simpleshop.local",
+      "phoneNumber": "09121000025",
+      "firstName": "\u0645\u0647\u062F\u06CC",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 25\u060C \u067E\u0644\u0627\u06A9 24",
+      "postalCode": "16002412345",
+      "registerDate": "2026-07-07T18:18:02.2279262",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "6f3aea41-1573-4950-b0b1-fb9a146caddd",
+      "userName": "Customer09121000026",
+      "email": "customer25@simpleshop.local",
+      "phoneNumber": "09121000026",
+      "firstName": "\u0627\u0645\u06CC\u0631",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 26\u060C \u067E\u0644\u0627\u06A9 25",
+      "postalCode": "17002512345",
+      "registerDate": "2026-07-07T18:18:02.4160688",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "469f2082-26a4-4a0c-bfc9-b3a05a92ec6f",
+      "userName": "Customer09121000027",
+      "email": "customer26@simpleshop.local",
+      "phoneNumber": "09121000027",
+      "firstName": "\u0633\u0627\u0631\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 27\u060C \u067E\u0644\u0627\u06A9 26",
+      "postalCode": "18002612345",
+      "registerDate": "2026-07-07T18:18:02.5636037",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "3250abbe-43bf-4345-9621-12d112dcdee7",
+      "userName": "Customer09121000028",
+      "email": "customer27@simpleshop.local",
+      "phoneNumber": "09121000028",
+      "firstName": "\u0645\u0631\u06CC\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 28\u060C \u067E\u0644\u0627\u06A9 27",
+      "postalCode": "10002712345",
+      "registerDate": "2026-07-07T18:18:02.740352",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "14004a42-9fc1-4817-989d-c97f01df7cab",
+      "userName": "Customer09121000029",
+      "email": "customer28@simpleshop.local",
+      "phoneNumber": "09121000029",
+      "firstName": "\u0632\u0647\u0631\u0627",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 29\u060C \u067E\u0644\u0627\u06A9 28",
+      "postalCode": "11002812345",
+      "registerDate": "2026-07-07T18:18:03.0090328",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "993d397a-8740-4c0b-87ec-363124235aa1",
+      "userName": "Customer09121000030",
+      "email": "customer29@simpleshop.local",
+      "phoneNumber": "09121000030",
+      "firstName": "\u0641\u0627\u0637\u0645\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 30\u060C \u067E\u0644\u0627\u06A9 29",
+      "postalCode": "12002912345",
+      "registerDate": "2026-07-07T18:18:03.3034674",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "eb667ce9-338e-42f6-879e-a7b8bac7079f",
+      "userName": "Customer09121000031",
+      "email": "customer30@simpleshop.local",
+      "phoneNumber": "09121000031",
+      "firstName": "\u0646\u06CC\u0645\u0627",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 31\u060C \u067E\u0644\u0627\u06A9 30",
+      "postalCode": "13003012345",
+      "registerDate": "2026-07-07T18:18:03.4548477",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "c36af2f7-e05e-4684-91df-c4a6e638f46c",
+      "userName": "Customer09121000032",
+      "email": "customer31@simpleshop.local",
+      "phoneNumber": "09121000032",
+      "firstName": "\u0622\u0631\u0634",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 32\u060C \u067E\u0644\u0627\u06A9 31",
+      "postalCode": "14003112345",
+      "registerDate": "2026-07-07T18:18:03.7153161",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "26c8aaf1-9b42-4e0a-a9ab-83ab35a3e389",
+      "userName": "Customer09121000033",
+      "email": "customer32@simpleshop.local",
+      "phoneNumber": "09121000033",
+      "firstName": "\u067E\u0631\u06CC\u0633\u0627",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 33\u060C \u067E\u0644\u0627\u06A9 32",
+      "postalCode": "15003212345",
+      "registerDate": "2026-07-07T18:18:03.9910688",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "399d868b-6cf6-47c5-9f57-d1bc81f3c714",
+      "userName": "Customer09121000034",
+      "email": "customer33@simpleshop.local",
+      "phoneNumber": "09121000034",
+      "firstName": "\u0646\u0627\u0632\u0646\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 34\u060C \u067E\u0644\u0627\u06A9 33",
+      "postalCode": "16003312345",
+      "registerDate": "2026-07-07T18:18:04.2422019",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "a4e90613-dc0e-48b6-9139-161af09ab1b0",
+      "userName": "Customer09121000035",
+      "email": "customer34@simpleshop.local",
+      "phoneNumber": "09121000035",
+      "firstName": "\u06A9\u0627\u0645\u0631\u0627\u0646",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 35\u060C \u067E\u0644\u0627\u06A9 34",
+      "postalCode": "17003412345",
+      "registerDate": "2026-07-07T18:18:04.4656574",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "17a1dc51-d801-46c3-9ab7-87906a9f6748",
+      "userName": "Customer09121000036",
+      "email": "customer35@simpleshop.local",
+      "phoneNumber": "09121000036",
+      "firstName": "\u0627\u0644\u0647\u0627\u0645",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 36\u060C \u067E\u0644\u0627\u06A9 35",
+      "postalCode": "18003512345",
+      "registerDate": "2026-07-07T18:18:04.6654488",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "b99a0885-b933-49a4-837d-55d5feaa5e2e",
+      "userName": "Customer09121000037",
+      "email": "customer36@simpleshop.local",
+      "phoneNumber": "09121000037",
+      "firstName": "\u0634\u06CC\u062F\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 37\u060C \u067E\u0644\u0627\u06A9 36",
+      "postalCode": "10003612345",
+      "registerDate": "2026-07-07T18:18:04.8446289",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "52a6c30a-b5ec-4be1-aa2a-0da84da1f7a0",
+      "userName": "Customer09121000038",
+      "email": "customer37@simpleshop.local",
+      "phoneNumber": "09121000038",
+      "firstName": "\u0628\u0647\u0631\u0627\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 38\u060C \u067E\u0644\u0627\u06A9 37",
+      "postalCode": "11003712345",
+      "registerDate": "2026-07-07T18:18:05.1316463",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "da8e8fe7-f365-41fb-ba77-71d483501d83",
+      "userName": "Customer09121000039",
+      "email": "customer38@simpleshop.local",
+      "phoneNumber": "09121000039",
+      "firstName": "\u06A9\u06CC\u0627\u0646",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 39\u060C \u067E\u0644\u0627\u06A9 38",
+      "postalCode": "12003812345",
+      "registerDate": "2026-07-07T18:18:05.4106152",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "0bfa0584-9625-485b-a5a8-393fd1e8acc7",
+      "userName": "Customer09121000040",
+      "email": "customer39@simpleshop.local",
+      "phoneNumber": "09121000040",
+      "firstName": "\u0647\u0627\u0646\u06CC\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 40\u060C \u067E\u0644\u0627\u06A9 39",
+      "postalCode": "13003912345",
+      "registerDate": "2026-07-07T18:18:05.6900316",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "3b00cb6e-7ead-4dbe-89e2-eda14a6bc5fb",
+      "userName": "Customer09121000041",
+      "email": "customer40@simpleshop.local",
+      "phoneNumber": "09121000041",
+      "firstName": "\u0639\u0644\u06CC",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 1\u060C \u067E\u0644\u0627\u06A9 40",
+      "postalCode": "14004012345",
+      "registerDate": "2026-07-07T18:18:05.8653478",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "3b654d5b-aca5-470c-aa28-5f60055a26db",
+      "userName": "Customer09121000042",
+      "email": "customer41@simpleshop.local",
+      "phoneNumber": "09121000042",
+      "firstName": "\u0631\u0636\u0627",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 2\u060C \u067E\u0644\u0627\u06A9 41",
+      "postalCode": "15004112345",
+      "registerDate": "2026-07-07T18:18:06.0483794",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "15aa9a5a-bac4-480a-a973-57dedb1fc743",
+      "userName": "Customer09121000043",
+      "email": "customer42@simpleshop.local",
+      "phoneNumber": "09121000043",
+      "firstName": "\u0645\u062D\u0645\u062F",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 3\u060C \u067E\u0644\u0627\u06A9 42",
+      "postalCode": "16004212345",
+      "registerDate": "2026-07-07T18:18:06.3453242",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "0a811868-4230-448e-b806-b5f7b9b9349f",
+      "userName": "Customer09121000044",
+      "email": "customer43@simpleshop.local",
+      "phoneNumber": "09121000044",
+      "firstName": "\u062D\u0633\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 4\u060C \u067E\u0644\u0627\u06A9 43",
+      "postalCode": "17004312345",
+      "registerDate": "2026-07-07T18:18:06.6306746",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "946afd49-52c1-4ae2-9165-c505b364d8e1",
+      "userName": "Customer09121000045",
+      "email": "customer44@simpleshop.local",
+      "phoneNumber": "09121000045",
+      "firstName": "\u0645\u0647\u062F\u06CC",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 5\u060C \u067E\u0644\u0627\u06A9 44",
+      "postalCode": "18004412345",
+      "registerDate": "2026-07-07T18:18:06.8548114",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "071939b2-3449-4ff6-b3fc-1b02d8c627a2",
+      "userName": "Customer09121000046",
+      "email": "customer45@simpleshop.local",
+      "phoneNumber": "09121000046",
+      "firstName": "\u0627\u0645\u06CC\u0631",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 6\u060C \u067E\u0644\u0627\u06A9 45",
+      "postalCode": "10004512345",
+      "registerDate": "2026-07-07T18:18:06.9987095",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "65a2f01b-d7e6-4f88-91fd-1ce034c0c276",
+      "userName": "Customer09121000047",
+      "email": "customer46@simpleshop.local",
+      "phoneNumber": "09121000047",
+      "firstName": "\u0633\u0627\u0631\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 7\u060C \u067E\u0644\u0627\u06A9 46",
+      "postalCode": "11004612345",
+      "registerDate": "2026-07-07T18:18:07.108484",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "e67714ba-e9f1-4710-b32a-c864e823f50e",
+      "userName": "Customer09121000048",
+      "email": "customer47@simpleshop.local",
+      "phoneNumber": "09121000048",
+      "firstName": "\u0645\u0631\u06CC\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 8\u060C \u067E\u0644\u0627\u06A9 47",
+      "postalCode": "12004712345",
+      "registerDate": "2026-07-07T18:18:07.2139898",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "b53b6a15-8908-40d4-9ad1-0f7ce6580f2d",
+      "userName": "Customer09121000049",
+      "email": "customer48@simpleshop.local",
+      "phoneNumber": "09121000049",
+      "firstName": "\u0632\u0647\u0631\u0627",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 9\u060C \u067E\u0644\u0627\u06A9 48",
+      "postalCode": "13004812345",
+      "registerDate": "2026-07-07T18:18:07.3131497",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "4ef6fa0e-de10-453a-8525-860d5b9bf0b6",
+      "userName": "Customer09121000050",
+      "email": "customer49@simpleshop.local",
+      "phoneNumber": "09121000050",
+      "firstName": "\u0641\u0627\u0637\u0645\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 10\u060C \u067E\u0644\u0627\u06A9 49",
+      "postalCode": "14004912345",
+      "registerDate": "2026-07-07T18:18:07.4406942",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "d73a9a82-a68c-410a-a8d3-3ad20d352cc6",
+      "userName": "Customer09121000051",
+      "email": "customer50@simpleshop.local",
+      "phoneNumber": "09121000051",
+      "firstName": "\u0646\u06CC\u0645\u0627",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 11\u060C \u067E\u0644\u0627\u06A9 50",
+      "postalCode": "15005012345",
+      "registerDate": "2026-07-07T18:18:07.5697364",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "d2284f58-9f79-4966-9f42-e44aa4b8fecb",
+      "userName": "Customer09121000052",
+      "email": "customer51@simpleshop.local",
+      "phoneNumber": "09121000052",
+      "firstName": "\u0622\u0631\u0634",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 12\u060C \u067E\u0644\u0627\u06A9 51",
+      "postalCode": "16005112345",
+      "registerDate": "2026-07-07T18:18:07.6937104",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "3f32cc85-37ce-40b5-8a0c-2048f43e9680",
+      "userName": "Customer09121000053",
+      "email": "customer52@simpleshop.local",
+      "phoneNumber": "09121000053",
+      "firstName": "\u067E\u0631\u06CC\u0633\u0627",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 13\u060C \u067E\u0644\u0627\u06A9 52",
+      "postalCode": "17005212345",
+      "registerDate": "2026-07-07T18:18:07.8059903",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "08eef6e9-40a5-4870-a4de-63496b61614f",
+      "userName": "Customer09121000054",
+      "email": "customer53@simpleshop.local",
+      "phoneNumber": "09121000054",
+      "firstName": "\u0646\u0627\u0632\u0646\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 14\u060C \u067E\u0644\u0627\u06A9 53",
+      "postalCode": "18005312345",
+      "registerDate": "2026-07-07T18:18:07.9604581",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "3734db6f-ff57-4fda-bac4-1f490c01cc43",
+      "userName": "Customer09121000055",
+      "email": "customer54@simpleshop.local",
+      "phoneNumber": "09121000055",
+      "firstName": "\u06A9\u0627\u0645\u0631\u0627\u0646",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 15\u060C \u067E\u0644\u0627\u06A9 54",
+      "postalCode": "10005412345",
+      "registerDate": "2026-07-07T18:18:08.1611915",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "9eb01fcf-864f-466e-9485-104b7dc80d8c",
+      "userName": "Customer09121000056",
+      "email": "customer55@simpleshop.local",
+      "phoneNumber": "09121000056",
+      "firstName": "\u0627\u0644\u0647\u0627\u0645",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 16\u060C \u067E\u0644\u0627\u06A9 55",
+      "postalCode": "11005512345",
+      "registerDate": "2026-07-07T18:18:08.2901027",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "f0fa23e2-4254-414f-b6b0-f5b5fece9803",
+      "userName": "Customer09121000057",
+      "email": "customer56@simpleshop.local",
+      "phoneNumber": "09121000057",
+      "firstName": "\u0634\u06CC\u062F\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 17\u060C \u067E\u0644\u0627\u06A9 56",
+      "postalCode": "12005612345",
+      "registerDate": "2026-07-07T18:18:08.4522258",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "b8c5f664-9558-48e6-b90c-6e0f737eddf4",
+      "userName": "Customer09121000058",
+      "email": "customer57@simpleshop.local",
+      "phoneNumber": "09121000058",
+      "firstName": "\u0628\u0647\u0631\u0627\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 18\u060C \u067E\u0644\u0627\u06A9 57",
+      "postalCode": "13005712345",
+      "registerDate": "2026-07-07T18:18:08.5273916",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "da5beca0-3923-48ec-82bd-004feb438182",
+      "userName": "Customer09121000059",
+      "email": "customer58@simpleshop.local",
+      "phoneNumber": "09121000059",
+      "firstName": "\u06A9\u06CC\u0627\u0646",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 19\u060C \u067E\u0644\u0627\u06A9 58",
+      "postalCode": "14005812345",
+      "registerDate": "2026-07-07T18:18:08.6717381",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "522dd044-ea87-4ac8-bd60-9a23ff819753",
+      "userName": "Customer09121000060",
+      "email": "customer59@simpleshop.local",
+      "phoneNumber": "09121000060",
+      "firstName": "\u0647\u0627\u0646\u06CC\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 20\u060C \u067E\u0644\u0627\u06A9 59",
+      "postalCode": "15005912345",
+      "registerDate": "2026-07-07T18:18:08.7784822",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "e43b9662-c86c-4f4c-a002-40b938bd2fcd",
+      "userName": "Customer09121000061",
+      "email": "customer60@simpleshop.local",
+      "phoneNumber": "09121000061",
+      "firstName": "\u0639\u0644\u06CC",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 21\u060C \u067E\u0644\u0627\u06A9 60",
+      "postalCode": "16006012345",
+      "registerDate": "2026-07-07T18:18:08.9206886",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "1d0097f2-bb03-40a5-abba-9d65205c0471",
+      "userName": "Customer09121000062",
+      "email": "customer61@simpleshop.local",
+      "phoneNumber": "09121000062",
+      "firstName": "\u0631\u0636\u0627",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 22\u060C \u067E\u0644\u0627\u06A9 61",
+      "postalCode": "17006112345",
+      "registerDate": "2026-07-07T18:18:09.0042807",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "6e7e5040-10a7-4bb5-9c1b-075ffad250ff",
+      "userName": "Customer09121000063",
+      "email": "customer62@simpleshop.local",
+      "phoneNumber": "09121000063",
+      "firstName": "\u0645\u062D\u0645\u062F",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 23\u060C \u067E\u0644\u0627\u06A9 62",
+      "postalCode": "18006212345",
+      "registerDate": "2026-07-07T18:18:09.1075504",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "5f8f1074-242d-4560-8e19-715d09480a62",
+      "userName": "Customer09121000064",
+      "email": "customer63@simpleshop.local",
+      "phoneNumber": "09121000064",
+      "firstName": "\u062D\u0633\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 24\u060C \u067E\u0644\u0627\u06A9 63",
+      "postalCode": "10006312345",
+      "registerDate": "2026-07-07T18:18:09.2411904",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "e129333d-5b66-4c4b-8a5d-70fa4d8ceacc",
+      "userName": "Customer09121000065",
+      "email": "customer64@simpleshop.local",
+      "phoneNumber": "09121000065",
+      "firstName": "\u0645\u0647\u062F\u06CC",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 25\u060C \u067E\u0644\u0627\u06A9 64",
+      "postalCode": "11006412345",
+      "registerDate": "2026-07-07T18:18:09.3735361",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "1d13663d-3a66-4d89-9bfe-7b46868f5f08",
+      "userName": "Customer09121000066",
+      "email": "customer65@simpleshop.local",
+      "phoneNumber": "09121000066",
+      "firstName": "\u0627\u0645\u06CC\u0631",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 26\u060C \u067E\u0644\u0627\u06A9 65",
+      "postalCode": "12006512345",
+      "registerDate": "2026-07-07T18:18:09.4745287",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "4f583ff4-2354-48de-ad6e-7d00c025cac2",
+      "userName": "Customer09121000067",
+      "email": "customer66@simpleshop.local",
+      "phoneNumber": "09121000067",
+      "firstName": "\u0633\u0627\u0631\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 27\u060C \u067E\u0644\u0627\u06A9 66",
+      "postalCode": "13006612345",
+      "registerDate": "2026-07-07T18:18:09.6273469",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "8cb29329-7e7b-40e0-a8e9-07f4b7f302f4",
+      "userName": "Customer09121000068",
+      "email": "customer67@simpleshop.local",
+      "phoneNumber": "09121000068",
+      "firstName": "\u0645\u0631\u06CC\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 28\u060C \u067E\u0644\u0627\u06A9 67",
+      "postalCode": "14006712345",
+      "registerDate": "2026-07-07T18:18:09.7514994",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "d0dd0e35-c702-421e-b83e-e675fc0833c5",
+      "userName": "Customer09121000069",
+      "email": "customer68@simpleshop.local",
+      "phoneNumber": "09121000069",
+      "firstName": "\u0632\u0647\u0631\u0627",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 29\u060C \u067E\u0644\u0627\u06A9 68",
+      "postalCode": "15006812345",
+      "registerDate": "2026-07-07T18:18:09.8875441",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "d459c9e8-632a-4f2e-926b-57daa10e97a6",
+      "userName": "Customer09121000070",
+      "email": "customer69@simpleshop.local",
+      "phoneNumber": "09121000070",
+      "firstName": "\u0641\u0627\u0637\u0645\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 30\u060C \u067E\u0644\u0627\u06A9 69",
+      "postalCode": "16006912345",
+      "registerDate": "2026-07-07T18:18:10.0056519",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "00190532-df68-456b-9577-6cf7c1e83071",
+      "userName": "Customer09121000071",
+      "email": "customer70@simpleshop.local",
+      "phoneNumber": "09121000071",
+      "firstName": "\u0646\u06CC\u0645\u0627",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 31\u060C \u067E\u0644\u0627\u06A9 70",
+      "postalCode": "17007012345",
+      "registerDate": "2026-07-07T18:18:10.137049",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "fcd6b177-e499-4371-848f-c0fc64c8082d",
+      "userName": "Customer09121000072",
+      "email": "customer71@simpleshop.local",
+      "phoneNumber": "09121000072",
+      "firstName": "\u0622\u0631\u0634",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 32\u060C \u067E\u0644\u0627\u06A9 71",
+      "postalCode": "18007112345",
+      "registerDate": "2026-07-07T18:18:10.2747232",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "aafe7bd7-25f8-4957-a84e-cb9727ed9bcd",
+      "userName": "Customer09121000073",
+      "email": "customer72@simpleshop.local",
+      "phoneNumber": "09121000073",
+      "firstName": "\u067E\u0631\u06CC\u0633\u0627",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 33\u060C \u067E\u0644\u0627\u06A9 72",
+      "postalCode": "10007212345",
+      "registerDate": "2026-07-07T18:18:10.3952552",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "61ae1a2a-d7dc-42ba-a6c3-e1207991b78f",
+      "userName": "Customer09121000074",
+      "email": "customer73@simpleshop.local",
+      "phoneNumber": "09121000074",
+      "firstName": "\u0646\u0627\u0632\u0646\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 34\u060C \u067E\u0644\u0627\u06A9 73",
+      "postalCode": "11007312345",
+      "registerDate": "2026-07-07T18:18:10.5172919",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "f5be67fd-80e3-4e1a-87ea-1d0fabbe9730",
+      "userName": "Customer09121000075",
+      "email": "customer74@simpleshop.local",
+      "phoneNumber": "09121000075",
+      "firstName": "\u06A9\u0627\u0645\u0631\u0627\u0646",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 35\u060C \u067E\u0644\u0627\u06A9 74",
+      "postalCode": "12007412345",
+      "registerDate": "2026-07-07T18:18:10.7143006",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "6f5912ed-eb18-4e01-917f-abe2043c77be",
+      "userName": "Customer09121000076",
+      "email": "customer75@simpleshop.local",
+      "phoneNumber": "09121000076",
+      "firstName": "\u0627\u0644\u0647\u0627\u0645",
+      "lastName": "\u0645\u0648\u0633\u0648\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 36\u060C \u067E\u0644\u0627\u06A9 75",
+      "postalCode": "13007512345",
+      "registerDate": "2026-07-07T18:18:10.853532",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "3f3e1c48-4cf9-4952-abaf-3b1ba69a98a6",
+      "userName": "Customer09121000077",
+      "email": "customer76@simpleshop.local",
+      "phoneNumber": "09121000077",
+      "firstName": "\u0634\u06CC\u062F\u0627",
+      "lastName": "\u06A9\u0627\u0638\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 37\u060C \u067E\u0644\u0627\u06A9 76",
+      "postalCode": "14007612345",
+      "registerDate": "2026-07-07T18:18:11.0200288",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "11b578e4-e136-4488-a01c-feaebb37b3ec",
+      "userName": "Customer09121000078",
+      "email": "customer77@simpleshop.local",
+      "phoneNumber": "09121000078",
+      "firstName": "\u0628\u0647\u0631\u0627\u0645",
+      "lastName": "\u0627\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 38\u060C \u067E\u0644\u0627\u06A9 77",
+      "postalCode": "15007712345",
+      "registerDate": "2026-07-07T18:18:11.2071671",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "9d56a670-0eb6-4b47-8a1e-0b2d23d408cc",
+      "userName": "Customer09121000079",
+      "email": "customer78@simpleshop.local",
+      "phoneNumber": "09121000079",
+      "firstName": "\u06A9\u06CC\u0627\u0646",
+      "lastName": "\u06A9\u0631\u06CC\u0645\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 39\u060C \u067E\u0644\u0627\u06A9 78",
+      "postalCode": "16007812345",
+      "registerDate": "2026-07-07T18:18:11.3615546",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "10c22639-9570-4c79-bd58-ff3df97a7d1b",
+      "userName": "Customer09121000080",
+      "email": "customer79@simpleshop.local",
+      "phoneNumber": "09121000080",
+      "firstName": "\u0647\u0627\u0646\u06CC\u0647",
+      "lastName": "\u0646\u0648\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 40\u060C \u067E\u0644\u0627\u06A9 79",
+      "postalCode": "17007912345",
+      "registerDate": "2026-07-07T18:18:11.4902411",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "51363de0-ba93-42cb-878a-0dee565f1da5",
+      "userName": "Customer09121000081",
+      "email": "customer80@simpleshop.local",
+      "phoneNumber": "09121000081",
+      "firstName": "\u0639\u0644\u06CC",
+      "lastName": "\u0645\u062D\u0645\u062F\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 1\u060C \u067E\u0644\u0627\u06A9 80",
+      "postalCode": "18008012345",
+      "registerDate": "2026-07-07T18:18:11.659882",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "e0e10885-a026-4da1-a1e9-6462e440fdca",
+      "userName": "Customer09121000082",
+      "email": "customer81@simpleshop.local",
+      "phoneNumber": "09121000082",
+      "firstName": "\u0631\u0636\u0627",
+      "lastName": "\u0631\u0636\u0627\u06CC\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 2\u060C \u067E\u0644\u0627\u06A9 81",
+      "postalCode": "10008112345",
+      "registerDate": "2026-07-07T18:18:11.8063758",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "c487a718-01a0-40f6-b7f2-030834450648",
+      "userName": "Customer09121000083",
+      "email": "customer82@simpleshop.local",
+      "phoneNumber": "09121000083",
+      "firstName": "\u0645\u062D\u0645\u062F",
+      "lastName": "\u062C\u0639\u0641\u0631\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 3\u060C \u067E\u0644\u0627\u06A9 82",
+      "postalCode": "11008212345",
+      "registerDate": "2026-07-07T18:18:11.9493795",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "305d45b9-5c88-49d4-83b6-6974a7387499",
+      "userName": "Customer09121000084",
+      "email": "customer83@simpleshop.local",
+      "phoneNumber": "09121000084",
+      "firstName": "\u062D\u0633\u06CC\u0646",
+      "lastName": "\u0635\u0627\u062F\u0642\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 4\u060C \u067E\u0644\u0627\u06A9 83",
+      "postalCode": "12008312345",
+      "registerDate": "2026-07-07T18:18:12.0467055",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "a71c5934-8642-4fc3-b533-32516c6e271e",
+      "userName": "Customer09121000085",
+      "email": "customer84@simpleshop.local",
+      "phoneNumber": "09121000085",
+      "firstName": "\u0645\u0647\u062F\u06CC",
+      "lastName": "\u062D\u0633\u06CC\u0646\u06CC",
+      "address": "\u062A\u0647\u0631\u0627\u0646\u060C \u0645\u062D\u0644\u0647 \u0646\u0645\u0648\u0646\u0647\u060C \u062E\u06CC\u0627\u0628\u0627\u0646 5\u060C \u067E\u0644\u0627\u06A9 84",
+      "postalCode": "13008412345",
+      "registerDate": "2026-07-07T18:18:12.1897575",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "bd0bf52a-e4d6-404a-96c5-9e7e19935c8a",
+      "userName": "admin",
+      "email": "admin@simpleshop.local",
+      "firstName": "\u0645\u062F\u06CC\u0631",
+      "lastName": "\u0641\u0631\u0648\u0634\u06AF\u0627\u0647",
+      "registerDate": "2026-08-06T18:02:01.7767941",
+      "isActive": true,
+      "roles": [
+        "Admin"
+      ]
+    },
+    {
+      "id": "7c4fa2b2-b0b7-42de-81bf-7e648536d65a",
+      "userName": "Customer09129990002",
+      "email": "Customer09129990002@simpleshop.local",
+      "phoneNumber": "09129990002",
+      "firstName": "Guest",
+      "lastName": "Test",
+      "address": "Tehran test",
+      "registerDate": "2026-08-06T19:02:10.7827773",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "76209fe3-d657-4093-97e3-62145d2c93c9",
+      "userName": "Customer09129998877",
+      "email": "Customer09129998877@simpleshop.local",
+      "phoneNumber": "09129998877",
+      "firstName": "Ali",
+      "lastName": "Guest",
+      "address": "Tehran",
+      "registerDate": "2026-08-06T19:19:09.1878182",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "9f70b590-c47e-4020-8e04-b00200a0fb46",
+      "userName": "Customer09128887766",
+      "email": "Customer09128887766@simpleshop.local",
+      "phoneNumber": "09128887766",
+      "firstName": "Sara",
+      "lastName": "New",
+      "address": "Isfahan, Test Ave 12",
+      "postalCode": "8175678901",
+      "registerDate": "2026-08-06T19:20:02.5959163",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    },
+    {
+      "id": "ff58462f-da2a-4c39-9bce-3239335ea2e0",
+      "userName": "Customer09125554433",
+      "email": "Customer09125554433@simpleshop.local",
+      "phoneNumber": "09125554433",
+      "firstName": "Guest2",
+      "lastName": "User",
+      "address": "Tehran",
+      "registerDate": "2026-08-06T21:24:40.5539367",
+      "isActive": true,
+      "roles": [
+        "Customer"
+      ]
+    }
+  ]
+}

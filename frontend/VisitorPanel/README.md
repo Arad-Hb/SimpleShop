@@ -16,7 +16,7 @@ Customer storefront for SimpleShop.
 
 `js/config.js` → `API_BASE_URL`  
 `js/api-client.js` → fetch helpers  
-`js/store-core.js` → loads `/api/products` + `/api/categories` when API is up, otherwise uses demo catalog.
+`js/store-core.js` → loads `/api/products` + `/api/categories` when API is up, otherwise loads shared JSON from `../shared/files/`.
 
 ## Auth handoff
 

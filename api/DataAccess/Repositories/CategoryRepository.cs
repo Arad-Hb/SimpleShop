@@ -273,21 +273,67 @@ public class CategoryRepository(SimpleShopDbContext db) : ICategoryRepository
 
     public async Task<List<CategoryListItem>> GetAll()
     {
-        var categories = await db.Categories.AsNoTracking()
-            .Include(c => c.ImageFile)
-            .Include(c => c.OgImage)
-            .Include(c => c.Products)
-            .Include(c => c.Children)
-            .Include(c => c.Parent)
-            .ToListAsync();
-
-        return categories
-            .Select(c => ToListItem(c, c.Children.Count, c.Parent?.Name))
+        var rows = await db.Categories.AsNoTracking()
+            .Select(c => new
+            {
+                c.Id,
+                c.Name,
+                c.Description,
+                c.Slug,
+                c.MetaTitle,
+                c.MetaDescription,
+                c.IsActive,
+                c.ParentId,
+                c.SortOrder,
+                c.Depth,
+                c.CreatedAt
+            })
             .OrderBy(c => c.Depth)
             .ThenBy(c => c.ParentId)
             .ThenBy(c => c.SortOrder)
             .ThenBy(c => c.Name)
-            .ToList();
+            .ToListAsync();
+
+        var nameById = rows.ToDictionary(r => r.Id, r => r.Name);
+
+        var categories = rows.Select(r => new CategoryListItem
+        {
+            Id = r.Id,
+            Name = r.Name,
+            Description = r.Description,
+            Slug = r.Slug,
+            MetaTitle = r.MetaTitle,
+            MetaDescription = r.MetaDescription,
+            IsActive = r.IsActive,
+            ParentId = r.ParentId,
+            ParentName = r.ParentId is int pid && nameById.TryGetValue(pid, out var parentName) ? parentName : null,
+            SortOrder = r.SortOrder,
+            Depth = r.Depth,
+            CreatedAt = r.CreatedAt,
+            ProductCount = 0,
+            ChildCount = 0
+        }).ToList();
+
+        var productCounts = await db.Products.AsNoTracking()
+            .GroupBy(p => p.CategoryId)
+            .Select(g => new { CategoryId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.CategoryId, x => x.Count);
+
+        var childCounts = await db.Categories.AsNoTracking()
+            .Where(c => c.ParentId != null)
+            .GroupBy(c => c.ParentId!.Value)
+            .Select(g => new { ParentId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.ParentId, x => x.Count);
+
+        foreach (var category in categories)
+        {
+            if (productCounts.TryGetValue(category.Id, out var productCount))
+                category.ProductCount = productCount;
+            if (childCounts.TryGetValue(category.Id, out var childCount))
+                category.ChildCount = childCount;
+        }
+
+        return categories;
     }
 
     public async Task<List<CategoryTreeNode>> GetTree()

@@ -4,8 +4,14 @@
 (function (ShopSupplier) {
   'use strict';
 
-  const initApp = () => {
-    ShopSupplier.seed.seedDemoData();
+  const initApp = async () => {
+    let syncResult = { ok: false, message: 'sync disabled' };
+    if (typeof ShopSupplier.sync?.syncProductsFromApi === 'function') {
+      syncResult = await ShopSupplier.sync.syncProductsFromApi();
+    }
+    if (!syncResult.ok && syncResult.message === 'API offline') {
+      await ShopSupplier.seed?.seedIfApiOffline?.();
+    }
 
     const activePage = document.body.dataset.page;
     if (activePage) ShopSupplier.ui.initSidebar(activePage);

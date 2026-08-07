@@ -46,15 +46,8 @@
     ]
   };
 
-  // Demo categories shown until store-core.js refreshes nav from API
-  const DEMO_CATEGORIES = [
-    { id: 'digital', name: 'کالای دیجیتال', icon: 'bi-phone' },
-    { id: 'home', name: 'خانه و آشپزخانه', icon: 'bi-house' },
-    { id: 'fashion', name: 'مد و پوشاک', icon: 'bi-handbag' },
-    { id: 'beauty', name: 'زیبایی و سلامت', icon: 'bi-flower1' },
-    { id: 'sport', name: 'ورزش و سفر', icon: 'bi-trophy' },
-    { id: 'gaming', name: 'گیمینگ', icon: 'bi-controller' }
-  ];
+  // Empty until store-core.js loads catalog from API or offline JSON
+  const EMPTY_CATEGORY_TREE = [];
 
   const categoryLink = (id) => `category.html?id=${encodeURIComponent(id)}`;
 
@@ -120,7 +113,7 @@
   }
 
   function renderMegaCategoryList(tree) {
-    const roots = tree?.length ? tree : DEMO_CATEGORIES;
+    const roots = tree?.length ? tree : EMPTY_CATEGORY_TREE;
     return roots.map((c, i) => `
       <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryLink(c.id)}" data-panel="${escapeHtml(String(c.id))}">
         <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i>
@@ -184,8 +177,8 @@
   }
 
   function renderMegaNav() {
-    const demoTree = DEMO_CATEGORIES.map((c) => ({ ...c, children: [] }));
-    const subPanels = demoTree.map((node, i) => renderMegaSubPanelFromNode(node, i === 0)).join('');
+    const initialTree = EMPTY_CATEGORY_TREE;
+    const subPanels = initialTree.map((node, i) => renderMegaSubPanelFromNode(node, i === 0)).join('');
 
     return `
       <nav class="mega-nav">
@@ -198,7 +191,7 @@
               </button>
               <div class="mega-panel" id="mega-panel-desktop" aria-hidden="true">
                 <div class="mega-cols">
-                  <div class="mega-col categories">${renderMegaCategoryList(demoTree)}</div>
+                  <div class="mega-col categories">${renderMegaCategoryList(initialTree)}</div>
                   <div class="mega-col-content">
                     ${subPanels}
                   </div>
@@ -350,7 +343,7 @@
   let mobileNavStack = [];
 
   function refreshMegaMenu(tree) {
-    const roots = Array.isArray(tree) && tree.length ? tree : DEMO_CATEGORIES.map((c) => ({ ...c, children: [] }));
+    const roots = Array.isArray(tree) && tree.length ? tree : EMPTY_CATEGORY_TREE;
     mobileCategoryTree = roots;
 
     const container = document.querySelector('.mega-cols');
@@ -842,7 +835,7 @@
     syncCardBadge();
     const tree = Store.catalog?.CATEGORY_TREE?.length
       ? Store.catalog.CATEGORY_TREE
-      : DEMO_CATEGORIES.map((c) => ({ ...c, children: [] }));
+      : EMPTY_CATEGORY_TREE;
     initMobileCategoryMenu(tree);
   }
 

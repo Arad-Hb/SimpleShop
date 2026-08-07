@@ -117,7 +117,17 @@
     const syncResult = await ShopSupplier.sync.syncProductsFromApi();
     apiProducts = ShopSupplier.sync.getProducts();
 
-    if (!syncResult.ok) {
+    if (!syncResult.ok || !apiProducts.length) {
+      const stored = ShopSupplier.storage.getProducts();
+      if (stored.length) {
+        apiProducts = stored;
+        if (!syncResult.ok) {
+          ShopSupplier.ui.showToast('info', 'API در دسترس نیست — نمایش محصولات آفلاین.');
+        }
+      } else if (!syncResult.ok) {
+        ShopSupplier.ui.showToast('warning', syncResult.message || 'همگام‌سازی API ناموفق بود.');
+      }
+    } else if (!syncResult.ok) {
       ShopSupplier.ui.showToast('warning', syncResult.message || 'همگام‌سازی API ناموفق بود.');
     }
 

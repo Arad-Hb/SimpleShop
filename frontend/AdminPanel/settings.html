@@ -351,14 +351,14 @@
                     <span class="settings-card__logo settings-card__logo--danger"><i class="bi bi-exclamation-triangle"></i></span>
                     <div>
                       <h3 class="settings-card__title">منطقه خطر</h3>
-                      <p class="settings-card__subtitle">بازنشانی داده‌های دمو LocalStorage</p>
+                      <p class="settings-card__subtitle">بازنشانی داده‌های محلی LocalStorage</p>
                     </div>
                   </div>
                 </div>
                 <div class="settings-card__body">
-                  <p class="small text-muted mb-3">بازنشانی داده‌های دمو تمام اطلاعات LocalStorage را پاک کرده و داده‌های نمونه را مجدداً بارگذاری می‌کند.</p>
+                  <p class="small text-muted mb-3">بازنشانی تمام اطلاعات LocalStorage را پاک می‌کند. پس از بارگذاری مجدد، داده از API یا فایل‌های JSON آفلاین بارگذاری می‌شود.</p>
                   <button type="button" class="btn btn-outline-danger" id="btn-reset-demo">
-                    <i class="bi bi-arrow-counterclockwise"></i> بازنشانی داده‌های دمو
+                    <i class="bi bi-arrow-counterclockwise"></i> بازنشانی داده‌های محلی
                   </button>
                 </div>
               </article>
@@ -390,6 +390,8 @@
 <script src="../shared/vendor/axios.min.js"></script>
 <script src="../shared/js/http-client.js"></script>
 <script src="assets/js/api-client.js"></script>
+<script src="../shared/js/offline-data.js"></script>
+
 <script src="assets/js/seed-data.js"></script>
 <script src="assets/js/sync.js"></script>
 <script src="assets/js/app.js"></script>

@@ -8,28 +8,24 @@
   const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
 
   const initApp = async () => {
-    // داده‌های نمونه (فقط بار اول — قبل از initStorage)
-    ShopAdmin.seed.seedDemoData();
-    // ارتقای سفارش‌های نمونه برای گزارش‌های چندماهه
-    if (typeof ShopAdmin.seed.ensureRichOrders === 'function') {
-      ShopAdmin.seed.ensureRichOrders();
-    }
-
-    // مقداردهی ذخیره‌سازی
     ShopAdmin.storage.initStorage();
 
-    // همگام‌سازی محصولات/دسته‌ها/تصاویر از دیتابیس API
+    let syncResult = { ok: false, message: 'sync disabled' };
     if (typeof ShopAdmin.sync?.syncCatalogFromApi === 'function') {
-      const result = await ShopAdmin.sync.syncCatalogFromApi();
-      if (result.ok && result.message !== 'cached' && ShopAdmin.ui?.showToast) {
+      syncResult = await ShopAdmin.sync.syncCatalogFromApi();
+      if (syncResult.ok && syncResult.message !== 'cached' && ShopAdmin.ui?.showToast) {
         ShopAdmin.ui.showToast(
           'success',
-          `همگام با دیتابیس: ${result.products.toLocaleString('fa-IR')} محصول`
+          `همگام با دیتابیس: ${syncResult.products.toLocaleString('fa-IR')} محصول`
         );
-      } else if (!result.ok && result.message === 'API offline' && ShopAdmin.ui?.showToast) {
-        ShopAdmin.ui.showToast('warning', 'API در دسترس نیست — داده‌های محلی نمایش داده می‌شود');
+      } else if (!syncResult.ok && syncResult.message === 'API offline' && ShopAdmin.ui?.showToast) {
+        ShopAdmin.ui.showToast('warning', 'API در دسترس نیست — داده‌های آفلاین JSON بارگذاری می‌شود');
       }
-      document.dispatchEvent(new CustomEvent('admin:catalog-synced', { detail: result }));
+      document.dispatchEvent(new CustomEvent('admin:catalog-synced', { detail: syncResult }));
+    }
+
+    if (!syncResult.ok) {
+      await ShopAdmin.seed?.seedIfApiOffline?.(syncResult);
     }
 
     // سایدبار — اگر data-page روی body تعریف شده باشد
