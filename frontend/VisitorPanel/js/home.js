@@ -99,9 +99,27 @@
     }
   };
 
+  const initDealTimer = () => {
+    const timer = document.getElementById('deal-timer');
+    if (!timer) return;
+    let total = 12 * 3600 + 45 * 60 + 33;
+    const tick = () => {
+      if (total <= 0) total = 12 * 3600;
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      const pad = (n) => String(n).padStart(2, '0');
+      timer.innerHTML = `<span>${pad(h)}</span>:<span>${pad(m)}</span>:<span>${pad(s)}</span>`;
+      total -= 1;
+    };
+    tick();
+    setInterval(tick, 1000);
+  };
+
   document.addEventListener('DOMContentLoaded', async () => {
     await Store.catalog.ready;
     await loadBanners();
+    initDealTimer();
 
     const { productCard, bindAddButtons } = Store.ui;
     const { PRODUCTS, getAmazing, source } = Store.catalog;

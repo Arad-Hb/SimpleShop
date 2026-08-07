@@ -340,6 +340,7 @@
         <a class="mega-cat${i === 0 ? ' active' : ''}" href="${categoryHref(c.id)}" data-panel="${escapeHtml(String(c.id))}">
           <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i> ${escapeHtml(c.name)}
         </a>`).join('');
+      Store.layout?.initMegaMenuHover?.();
     }
 
     document.querySelectorAll('[data-category-link]').forEach((el) => {
@@ -350,6 +351,14 @@
     document.querySelectorAll('.mega-nav-list a[href*="cat="]').forEach((el) => {
       el.setAttribute('href', 'category.html');
     });
+
+    const catStrip = document.querySelector('.cat-strip');
+    if (catStrip && CATEGORIES.length) {
+      catStrip.innerHTML = CATEGORIES.slice(0, 8).map((c) => `
+        <a href="${categoryHref(c.id)}" class="cat-chip">
+          <i class="bi ${escapeHtml(c.icon || 'bi-grid')}"></i><span>${escapeHtml(c.name)}</span>
+        </a>`).join('');
+    }
   };
 
   const ready = (async () => {
@@ -709,189 +718,9 @@
     el._t = setTimeout(() => el.classList.remove('show'), 2200);
   };
 
-  const initMegaMenu = () => {
-    document.querySelectorAll('.mega-cat').forEach((btn) => {
-      btn.addEventListener('mouseenter', () => {
-        document.querySelectorAll('.mega-cat').forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        const id = btn.dataset.panel;
-        document.querySelectorAll('.mega-col.links').forEach((col) => {
-          col.classList.toggle('d-none', col.id !== `mega-panel-${id}`);
-        });
-      });
-    });
-  };
-
-  const initSearchForms = () => {
-    document.querySelectorAll('[data-store-search]').forEach((form) => {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const q = form.querySelector('input[type="search"], input[name="q"]')?.value || '';
-        window.location.href = `search.html?q=${encodeURIComponent(q.trim())}`;
-      });
-    });
-  };
-
-  const initDealTimer = () => {
-    const timer = document.getElementById('deal-timer');
-    if (!timer) return;
-    let total = 12 * 3600 + 45 * 60 + 33;
-    const tick = () => {
-      if (total <= 0) total = 12 * 3600;
-      const h = Math.floor(total / 3600);
-      const m = Math.floor((total % 3600) / 60);
-      const s = total % 60;
-      const pad = (n) => String(n).padStart(2, '0');
-      timer.innerHTML = `<span>${pad(h)}</span>:<span>${pad(m)}</span>:<span>${pad(s)}</span>`;
-      total -= 1;
-    };
-    tick();
-    setInterval(tick, 1000);
-  };
-
-  const headerHTML = () => `
-  <div class="preview-banner">فروشگاه آزمایشی SimpleShop — کارت خرید و صفحات محصول فعال است</div>
-  <div class="top-bar">
-    <div class="container-xxl d-flex align-items-center justify-content-between flex-wrap gap-2">
-      <div class="d-flex align-items-center gap-3 flex-wrap top-bar-links">
-        <a href="index.html"><i class="bi bi-geo-alt"></i> ارسال به تهران</a>
-        <a href="login.html"><i class="bi bi-headset"></i> پشتیبانی</a>
-      </div>
-      <div class="d-flex align-items-center gap-3 flex-wrap top-bar-links">
-        <a href="login.html"><i class="bi bi-box-arrow-in-left"></i> ورود / ثبت‌نام</a>
-        <a href="card.html"><i class="bi bi-truck"></i> کارت و سفارش</a>
-      </div>
-    </div>
-  </div>
-  <header class="main-header">
-    <div class="container-xxl">
-      <div class="header-row">
-        <a href="index.html" class="brand">
-          <span class="brand-mark"><i class="bi bi-bag-heart-fill"></i></span>
-          <span class="brand-text"><strong>SimpleShop</strong><small>فروشگاه اینترنتی</small></span>
-        </a>
-        <form class="search-box" data-store-search role="search">
-          <i class="bi bi-search"></i>
-          <input type="search" name="q" placeholder="جستجو در محصولات، برندها و دسته‌ها..." aria-label="جستجو">
-          <button type="submit" class="btn-search">جستجو</button>
-        </form>
-        <div class="header-actions">
-          <a href="amazing.html" class="action-btn action-amazing" title="شگفت‌انگیزها">
-            <i class="bi bi-lightning-charge-fill"></i>
-          </a>
-          <a href="card.html" class="action-btn cart-btn" title="کارت خرید">
-            <i class="bi bi-credit-card-2-front"></i>
-            <span class="cart-badge" data-card-count data-cart-count>0</span>
-            <span class="cart-meta d-none d-lg-inline">
-              <small>کارت خرید</small>
-              <strong data-card-total data-cart-total>۰ ت</strong>
-            </span>
-          </a>
-        </div>
-      </div>
-    </div>
-  </header>
-  <nav class="mega-nav">
-    <div class="container-xxl">
-      <ul class="mega-nav-list">
-        <li class="mega-item">
-          <a href="category.html" class="mega-trigger"><i class="bi bi-grid"></i> دسته‌بندی کالاها <i class="bi bi-chevron-down"></i></a>
-          <div class="mega-panel">
-            <div class="mega-cols">
-              <div class="mega-col categories">
-                <a class="mega-cat active" href="category.html?id=digital" data-panel="digital"><i class="bi bi-phone"></i> کالای دیجیتال</a>
-                <a class="mega-cat" href="category.html?id=home" data-panel="home"><i class="bi bi-house"></i> خانه و آشپزخانه</a>
-                <a class="mega-cat" href="category.html?id=fashion" data-panel="fashion"><i class="bi bi-handbag"></i> مد و پوشاک</a>
-                <a class="mega-cat" href="category.html?id=beauty" data-panel="beauty"><i class="bi bi-flower1"></i> زیبایی و سلامت</a>
-                <a class="mega-cat" href="category.html?id=sport" data-panel="sport"><i class="bi bi-trophy"></i> ورزش و سفر</a>
-                <a class="mega-cat" href="category.html?id=gaming" data-panel="gaming"><i class="bi bi-controller"></i> گیمینگ</a>
-              </div>
-              <div class="mega-col links" id="mega-panel-digital">
-                <h6>میانبرها</h6>
-                <a href="category.html?id=digital">همه کالای دیجیتال</a>
-                <a href="amazing.html" class="text-amazing-link">پیشنهادهای شگفت‌انگیز</a>
-                <a href="search.html?q=Samsung">برند Samsung</a>
-                <a href="search.html?q=Sony">برند Sony</a>
-              </div>
-              <div class="mega-col promo">
-                <div class="mega-promo-card">
-                  <span class="offer-tag tag-amazing">پیشنهاد شگفت‌انگیز</span>
-                  <strong>تا ۴۰٪ تخفیف منتخب‌ها</strong>
-                  <a href="amazing.html">مشاهده همه</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li><a href="amazing.html" class="nav-amazing"><i class="bi bi-lightning-charge-fill"></i> شگفت‌انگیزها</a></li>
-        <li><a href="category.html">همه محصولات</a></li>
-        <li><a href="category.html?id=digital">پرفروش‌ها</a></li>
-        <li><a href="search.html?q=%D9%81%D8%B1%D9%88%D8%B4">تخفیف‌ها</a></li>
-        <li class="ms-auto d-none d-xl-block"><a href="checkout.html" class="mega-highlight"><i class="bi bi-bag-check"></i> تکمیل خرید</a></li>
-      </ul>
-    </div>
-  </nav>`;
-
-  const footerHTML = () => `
-  <footer class="site-footer">
-    <div class="container-xxl">
-      <div class="footer-top">
-        <div class="footer-brand">
-          <div class="brand">
-            <span class="brand-mark"><i class="bi bi-bag-heart-fill"></i></span>
-            <span class="brand-text"><strong>SimpleShop</strong><small>خرید مطمئن، ارسال سریع</small></span>
-          </div>
-          <p>فروشگاه اینترنتی SimpleShop — پیش‌نمایش کامل فروشگاهی با کارت خرید و صفحه محصول.</p>
-          <div class="socials">
-            <a href="#" aria-label="اینستاگرام"><i class="bi bi-instagram"></i></a>
-            <a href="#" aria-label="تلگرام"><i class="bi bi-telegram"></i></a>
-            <a href="#" aria-label="یوتیوب"><i class="bi bi-youtube"></i></a>
-          </div>
-        </div>
-        <div>
-          <h5>فروشگاه</h5>
-          <a href="index.html">صفحه اصلی</a>
-          <a href="category.html">محصولات</a>
-          <a href="amazing.html">شگفت‌انگیزها</a>
-          <a href="card.html">کارت خرید</a>
-        </div>
-        <div>
-          <h5>حساب کاربری</h5>
-          <a href="login.html">ورود / ثبت‌نام</a>
-          <a href="checkout.html">تسویه حساب</a>
-        </div>
-        <div>
-          <h5>راهنما</h5>
-          <a href="category.html">دسته‌بندی‌ها</a>
-          <a href="search.html">جستجو</a>
-        </div>
-        <div class="footer-contact">
-          <h5>ارتباط با ما</h5>
-          <p><i class="bi bi-telephone"></i> ۰۲۱-۹۱۰۰۰۰۰۰</p>
-          <p><i class="bi bi-envelope"></i> support@simpleshop.ir</p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span>© ۱۴۰۴ SimpleShop</span>
-        <span class="preview-note">Visitor UI preview</span>
-      </div>
-    </div>
-  </footer>`;
-
-  const mountShell = () => {
-    const top = document.querySelector('[data-shell-top]');
-    const bottom = document.querySelector('[data-shell-bottom]');
-    if (top) top.innerHTML = headerHTML();
-    if (bottom) bottom.innerHTML = footerHTML();
-  };
-
   const boot = () => {
-    mountShell();
     notifyIfStoredCardExpired();
     updateCardUI();
-    initMegaMenu();
-    initSearchForms();
-    initDealTimer();
     bindAddButtons();
   };
 
@@ -944,7 +773,6 @@
     productCard,
     tagHtml,
     bindAddButtons,
-    showToast,
-    mountShell
+    showToast
   };
 })(window.SimpleStore = window.SimpleStore || {});
