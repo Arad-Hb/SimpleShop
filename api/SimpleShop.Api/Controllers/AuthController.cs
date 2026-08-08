@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using DataAccess.Services;
 using DomainModel.Models;
 using DomainModel.ViewModels.User;
@@ -46,6 +47,48 @@ public class AuthController(IUserRepository users, JwtTokenService jwt) : Contro
 
         var taken = await users.IsMobileTakenForRoleAsync(mobile, role);
         return Ok(new { mobile = IdentityUserNames.NormalizeMobile(mobile), role, available = !taken });
+    }
+
+    [HttpGet("me")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> GetProfile()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var profile = await users.GetProfileAsync(userId);
+        return profile == null ? NotFound() : Ok(profile);
+    }
+
+    [HttpPut("me")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> UpdateProfile([FromBody] ProfileUpdateModel model)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var op = await users.UpdateProfileAsync(userId, model);
+        if (!op.Success)
+            return BadRequest(new { message = op.Message });
+
+        return Ok(await users.GetProfileAsync(userId));
+    }
+
+    [HttpPost("change-password")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var op = await users.ChangePasswordAsync(userId, model);
+        if (!op.Success)
+            return BadRequest(new { message = op.Message });
+
+        return Ok(new { message = op.Message });
     }
 
     private object ToAuthResponse(LoginResultModel result) => new

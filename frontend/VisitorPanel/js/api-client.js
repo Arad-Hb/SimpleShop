@@ -72,6 +72,8 @@
     }
   };
 
+  const getSettings = () => request('/api/settings');
+
   Store.api = {
     request,
     getProducts,
@@ -85,6 +87,7 @@
     guestCheckout,
     completeCheckout,
     ping,
+    getSettings,
     getToken,
     setToken
   };

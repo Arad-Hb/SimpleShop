@@ -101,6 +101,7 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
             Status = NormalizeStatus(order.Status),
             TotalAmount = order.TotalAmount,
             ShippingAddress = order.ShippingAddress,
+            PaymentStatus = NormalizeStatus(order.PaymentStatus),
             Items = order.OrderItems.Select(oi => new OrderItemLine
             {
                 ProductId = oi.ProductId,
@@ -221,6 +222,33 @@ public class OrderRepository(SimpleShopDbContext db) : IOrderRepository
             order.Status = NormalizeStatus(status);
             await db.SaveChangesAsync();
             return op.ToSuccess("وضعیت سفارش به‌روزرسانی شد", id);
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed(ex.Message);
+        }
+    }
+
+    private static readonly HashSet<string> ValidPaymentStatuses = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "unpaid", "paid", "refunded"
+    };
+
+    public async Task<OperationResult> UpdatePaymentStatus(int id, string paymentStatus)
+    {
+        var op = new OperationResult("Update Order Payment Status");
+        try
+        {
+            var normalized = NormalizeStatus(paymentStatus);
+            if (!ValidPaymentStatuses.Contains(normalized))
+                return op.ToFailed("وضعیت پرداخت نامعتبر است");
+
+            var order = await db.Orders.FirstOrDefaultAsync(o => o.Id == id);
+            if (order == null) return op.ToFailed("سفارش پیدا نشد");
+
+            order.PaymentStatus = normalized;
+            await db.SaveChangesAsync();
+            return op.ToSuccess("وضعیت پرداخت به‌روزرسانی شد", id);
         }
         catch (Exception ex)
         {

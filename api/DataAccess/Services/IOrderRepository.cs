@@ -10,6 +10,7 @@ public interface IOrderRepository
 {
     Task<OrderDetailsModel?> GetDetails(int id);
     Task<OperationResult> UpdateStatus(int id, string status);
+    Task<OperationResult> UpdatePaymentStatus(int id, string paymentStatus);
     Task<OperationResult> CreateFromItems(OrderCreateModel model);
     Task<SalesReportPayload> GetSalesReportData();
 }

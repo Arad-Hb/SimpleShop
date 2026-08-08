@@ -9,6 +9,7 @@ public class OrderDetailsModel
     public string Status { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public string? ShippingAddress { get; set; }
+    public string PaymentStatus { get; set; } = string.Empty;
     public List<OrderItemLine> Items { get; set; } = new();
 }
 

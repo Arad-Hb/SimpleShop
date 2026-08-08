@@ -11,6 +11,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         builder.Property(x => x.LastName).HasMaxLength(100);
         builder.Property(x => x.Address).HasMaxLength(500);
         builder.Property(x => x.PostalCode).HasMaxLength(20);
+        builder.Property(x => x.NationalId).HasMaxLength(10);
 
         builder.HasMany(x => x.ApplicationUserRoles)
             .WithOne(x => x.ApplicationUser)

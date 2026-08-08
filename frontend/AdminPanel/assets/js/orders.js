@@ -360,8 +360,8 @@
     if (statusSelect) statusSelect.value = order.status;
     if (paymentSelect) {
       paymentSelect.value = order.paymentStatus;
-      paymentSelect.disabled = true;
-      paymentSelect.title = 'وضعیت پرداخت از API قابل ویرایش نیست.';
+      paymentSelect.disabled = false;
+      paymentSelect.removeAttribute('title');
     }
     if (adminNote) {
       adminNote.value = order.adminNote || '';
@@ -382,7 +382,11 @@
     if (!currentOrder) return;
 
     const newStatus = normalizeStatus(document.getElementById('order-status').value);
-    if (newStatus === currentOrder.status) {
+    const newPayment = normalizeStatus(document.getElementById('payment-status').value);
+    const statusChanged = newStatus !== currentOrder.status;
+    const paymentChanged = newPayment !== currentOrder.paymentStatus;
+
+    if (!statusChanged && !paymentChanged) {
       ShopAdmin.ui.showToast('info', 'تغییری اعمال نشد.');
       return;
     }
@@ -391,20 +395,29 @@
     const allowedForward = forward.includes(newStatus);
     let confirmMsg = null;
 
-    if (!allowedForward && isBackwardTransition(currentOrder.status, newStatus)) {
-      confirmMsg = `شما در حال بازگرداندن وضعیت از «${getStatusLabel(currentOrder.status)}» به «${getStatusLabel(newStatus)}» هستید. ادامه می‌دهید؟`;
-    } else if (currentOrder.status === 'delivered' && newStatus !== 'delivered') {
-      confirmMsg = 'این سفارش تحویل شده است. تغییر وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
-    } else if (currentOrder.status === 'cancelled' && newStatus !== 'cancelled') {
-      confirmMsg = 'این سفارش لغو شده است. بازگردانی وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
+    if (statusChanged) {
+      if (!allowedForward && isBackwardTransition(currentOrder.status, newStatus)) {
+        confirmMsg = `شما در حال بازگرداندن وضعیت از «${getStatusLabel(currentOrder.status)}» به «${getStatusLabel(newStatus)}» هستید. ادامه می‌دهید؟`;
+      } else if (currentOrder.status === 'delivered' && newStatus !== 'delivered') {
+        confirmMsg = 'این سفارش تحویل شده است. تغییر وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
+      } else if (currentOrder.status === 'cancelled' && newStatus !== 'cancelled') {
+        confirmMsg = 'این سفارش لغو شده است. بازگردانی وضعیت نیاز به تأیید دارد. ادامه می‌دهید؟';
+      }
     }
 
     const doSave = async () => {
       try {
         await ShopAdmin.api.ensureApiAuth();
-        const dto = await ShopAdmin.api.updateOrderStatus(currentOrder.id, toApiStatus(newStatus));
+        let dto = null;
+        if (statusChanged) {
+          dto = await ShopAdmin.api.updateOrderStatus(currentOrder.id, toApiStatus(newStatus));
+        }
+        if (paymentChanged) {
+          dto = await ShopAdmin.api.updateOrderPayment(currentOrder.id, newPayment);
+        }
+        if (!dto) dto = await ShopAdmin.api.getOrder(currentOrder.id);
         currentOrder = mapDetails(dto);
-        ShopAdmin.ui.showToast('success', 'وضعیت سفارش بروزرسانی شد.');
+        ShopAdmin.ui.showToast('success', 'سفارش بروزرسانی شد.');
         renderOrderDetail(currentOrder);
       } catch (err) {
         ShopAdmin.ui.showToast('error', apiError(err));

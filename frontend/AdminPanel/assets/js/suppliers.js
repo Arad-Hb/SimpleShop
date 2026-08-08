@@ -23,7 +23,7 @@
     name: pick(dto, 'name', 'Name') || '',
     contactPerson: pick(dto, 'contactPerson', 'ContactPerson') || '',
     phone: pick(dto, 'phone', 'Phone') || '',
-    mobile: pick(dto, 'mobile', 'Mobile') || '',
+    mobile: pick(dto, 'mobile', 'Mobile') || pick(dto, 'phone', 'Phone') || '',
     email: pick(dto, 'email', 'Email') || '',
     address: pick(dto, 'address', 'Address') || '',
     description: pick(dto, 'description', 'Description') || '',
@@ -38,9 +38,10 @@
   const toApiPayload = (form) => ({
     name: form.name,
     contactPerson: form.contactPerson || null,
-    phone: form.phone || null,
+    phone: form.phone || form.mobile || null,
     email: form.email || null,
-    address: form.address || null
+    address: form.address || null,
+    isActive: form.isActive !== false
   });
 
   // ─── List Page ───────────────────────────────────────────────
@@ -298,8 +299,26 @@
       }
     };
 
-    const handleToggle = (id) => {
-      ShopAdmin.ui.showToast('info', 'تغییر isActive در API پشتیبانی نمی‌شود؛ همه به‌عنوان فعال نمایش داده می‌شوند.');
+    const handleToggle = async (id) => {
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+        const dto = await ShopAdmin.api.getSupplier(id);
+        const item = mapEditModel(dto);
+        const payload = toApiPayload({
+          name: item.name,
+          contactPerson: item.contactPerson,
+          phone: item.phone,
+          mobile: item.mobile,
+          email: item.email,
+          address: item.address,
+          isActive: !item.isActive
+        });
+        await ShopAdmin.api.updateSupplier(id, payload);
+        ShopAdmin.ui.showToast('success', payload.isActive ? 'تأمین‌کننده فعال شد.' : 'تأمین‌کننده غیرفعال شد.');
+        renderTable();
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
+      }
     };
 
     const handleDelete = (id) => {
@@ -491,8 +510,10 @@
         name: nameInput.value.trim(),
         contactPerson: contactInput.value.trim(),
         phone: phoneInput.value.trim(),
+        mobile: document.getElementById('supplier-mobile')?.value.trim() || '',
         email: emailInput.value.trim(),
-        address: addressInput.value.trim()
+        address: addressInput.value.trim(),
+        isActive: document.getElementById('supplier-is-active')?.checked !== false
       });
 
       isSubmitting = true;

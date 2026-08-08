@@ -32,6 +32,7 @@ builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IBannerRepository, BannerRepository>();
+builder.Services.AddScoped<IShopSettingsRepository, ShopSettingsRepository>();
 builder.Services.AddSingleton(sp =>
     new MediaStorageService(sp.GetRequiredService<IWebHostEnvironment>().WebRootPath));
 builder.Services.AddSingleton<JwtTokenService>();
@@ -83,7 +84,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseCors();
 app.UseAuthentication();

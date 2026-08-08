@@ -61,7 +61,7 @@
     mobile: dto.mobile || '',
     email: dto.email || '',
     address: dto.address || '',
-    isActive: true,
+    isActive: dto.isActive !== false,
     createdAt: new Date().toISOString(),
     source: 'api'
   });

@@ -9,6 +9,60 @@
   const { getData, saveData, imageStore, syncPublicBranding, STORAGE_KEY } = ShopAdmin.storage;
   const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
 
+  const mapSettingsFromApi = (data = {}) => ({
+    shopName: data.shopName || '',
+    shopDescription: data.shopDescription || '',
+    contactPhone: data.contactPhone || '',
+    contactEmail: data.contactEmail || '',
+    address: data.address || '',
+    currency: data.currency || 'تومان',
+    lowStockThreshold: data.lowStockThreshold ?? 10,
+    shopVisibility: data.shopVisibility || 'public',
+    instagram: data.instagram || '',
+    telegram: data.telegram || '',
+    whatsapp: data.whatsapp || '',
+    instagramEnabled: !!data.instagramEnabled,
+    telegramEnabled: !!data.telegramEnabled,
+    whatsappEnabled: !!data.whatsappEnabled,
+    defaultSeoTitle: data.defaultSeoTitle || '',
+    defaultSeoDescription: data.defaultSeoDescription || '',
+    updatedAt: data.updatedAt || null
+  });
+
+  const mapSettingsToApi = (settings = {}) => ({
+    shopName: settings.shopName || DEFAULT_SHOP_NAME,
+    shopDescription: settings.shopDescription || null,
+    contactPhone: settings.contactPhone || null,
+    contactEmail: settings.contactEmail || null,
+    address: settings.address || null,
+    currency: settings.currency || 'تومان',
+    lowStockThreshold: Number(settings.lowStockThreshold ?? 10),
+    shopVisibility: settings.shopVisibility === 'private' ? 'private' : 'public',
+    instagram: settings.instagram || null,
+    telegram: settings.telegram || null,
+    whatsapp: settings.whatsapp || null,
+    instagramEnabled: !!settings.instagramEnabled,
+    telegramEnabled: !!settings.telegramEnabled,
+    whatsappEnabled: !!settings.whatsappEnabled,
+    defaultSeoTitle: settings.defaultSeoTitle || null,
+    defaultSeoDescription: settings.defaultSeoDescription || null
+  });
+
+  const loadLocalImageSettings = () => {
+    const local = getData().settings || {};
+    return {
+      logoId: local.logoId || null,
+      faviconId: local.faviconId || null,
+      ogImageId: local.ogImageId || null
+    };
+  };
+
+  const saveLocalImageSettings = (imageSettings) => {
+    const data = getData();
+    data.settings = { ...(data.settings || {}), ...imageSettings };
+    saveData(data);
+  };
+
   /** @type {Record<string, string|null>} */
   let objectUrls = {};
   /** @type {Record<string, string|null>} */
@@ -244,7 +298,6 @@
         return;
       }
 
-      const data = getData();
       const prev = data.settings || {};
       const next = collectSettings(prev);
 
@@ -258,23 +311,40 @@
         }
       }
 
-      data.settings = next;
-      saveData(data);
+      saveLocalImageSettings({
+        logoId: next.logoId,
+        faviconId: next.faviconId,
+        ogImageId: next.ogImageId
+      });
       removedImages = { logoId: false, faviconId: false, ogImageId: false };
 
-      const shopNameEl = document.querySelector('[data-shop-name]');
-      if (shopNameEl) shopNameEl.textContent = next.shopName || DEFAULT_SHOP_NAME;
-
       try {
-        await syncPublicBranding(next);
-      } catch (_) { /* ignore branding sync errors */ }
+        const saved = await ShopAdmin.api.updateSettings(mapSettingsToApi(next));
+        const merged = {
+          ...mapSettingsFromApi(saved),
+          logoId: next.logoId,
+          faviconId: next.faviconId,
+          ogImageId: next.ogImageId
+        };
+        saveLocalImageSettings(merged);
 
-      ShopAdmin.ui.showToast('success', 'تنظیمات سازمان فروش ذخیره شد.');
+        const shopNameEl = document.querySelector('[data-shop-name]');
+        if (shopNameEl) shopNameEl.textContent = merged.shopName || DEFAULT_SHOP_NAME;
+
+        try {
+          await syncPublicBranding(merged);
+        } catch (_) { /* ignore branding sync errors */ }
+
+        ShopAdmin.ui.showToast('success', 'تنظیمات سازمان فروش ذخیره شد.');
+      } catch (err) {
+        const msg = err?.response?.data?.message || err?.message || 'ذخیره تنظیمات ناموفق بود.';
+        ShopAdmin.ui.showToast('error', msg);
+      }
     });
 
-    form?.addEventListener('reset', (e) => {
+    form?.addEventListener('reset', async (e) => {
       e.preventDefault();
-      fillForm(getData().settings || {});
+      await loadSettingsIntoForm();
       ShopAdmin.ui.showToast('info', 'فرم به آخرین مقادیر ذخیره‌شده برگشت.');
     });
 
@@ -290,6 +360,17 @@
     });
   };
 
+  const loadSettingsIntoForm = async () => {
+    try {
+      const apiSettings = mapSettingsFromApi(await ShopAdmin.api.getSettings());
+      const images = loadLocalImageSettings();
+      await fillForm({ ...apiSettings, ...images });
+    } catch {
+      await fillForm({ ...mapSettingsFromApi({}), ...loadLocalImageSettings() });
+      ShopAdmin.ui.showToast('warning', 'بارگذاری تنظیمات از API ناموفق — فرم با مقادیر پیش‌فرض نمایش داده شد.');
+    }
+  };
+
   const initSettings = async () => {
     if (!ShopAdmin.auth.requireAuth()) return;
 
@@ -299,7 +380,7 @@
     ]);
 
     bindEvents();
-    await fillForm(getData().settings || {});
+    await loadSettingsIntoForm();
     switchTopTab('organization');
     switchOrgPanel('general');
   };

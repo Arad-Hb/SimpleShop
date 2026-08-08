@@ -288,7 +288,7 @@
       </footer>`;
   }
 
-  // ─── Branding from Admin settings (localStorage) ───────────────────
+  // ─── Branding from Admin settings (API + localStorage fallback) ───
 
   function readBranding() {
     try {
@@ -298,21 +298,20 @@
     }
   }
 
-  function applyBranding() {
-    const branding = readBranding();
-    if (!branding) return;
-
+  function applyBrandingFromPayload(branding = {}) {
     const name = (branding.shopName || '').trim();
     const desc = (branding.shopDescription || '').trim();
     const logo = branding.logoDataUrl;
 
     if (name) {
+      SHOP.name = name;
       document.querySelectorAll('[data-brand-name]').forEach((el) => {
         el.textContent = name;
       });
     }
 
     if (desc) {
+      SHOP.description = desc;
       document.querySelectorAll('[data-brand-desc]').forEach((el) => {
         el.textContent = desc;
       });
@@ -327,6 +326,72 @@
         mark.innerHTML = `<img src="${SHOP.logoUrl}" alt="${name || SHOP.name}" class="brand-logo-img">`;
       }
     });
+  }
+
+  function applyBranding() {
+    applyBrandingFromPayload(readBranding() || {});
+  }
+
+  function cachePublicBranding(settings = {}) {
+    const cached = readBranding() || {};
+    localStorage.setItem(
+      SHOP.brandingKey,
+      JSON.stringify({
+        shopName: settings.shopName || cached.shopName || SHOP.name,
+        shopDescription: settings.shopDescription || cached.shopDescription || '',
+        logoDataUrl: cached.logoDataUrl || null,
+        updatedAt: Date.now()
+      })
+    );
+  }
+
+  function applyApiSettings(settings = {}) {
+    if (!settings || typeof settings !== 'object') return;
+
+    const name = (settings.shopName || '').trim();
+    const desc = (settings.shopDescription || '').trim();
+    if (name) SHOP.name = name;
+    if (desc) SHOP.description = desc;
+
+    if (settings.contactPhone) SHOP.contact.supportPhone = settings.contactPhone;
+    if (settings.contactEmail) SHOP.contact.email = settings.contactEmail;
+    if (settings.address) SHOP.contact.address = settings.address;
+
+    const social = [];
+    if (settings.instagramEnabled && settings.instagram) {
+      social.push({ href: settings.instagram, label: 'اینستاگرام', icon: 'bi-instagram' });
+    }
+    if (settings.telegramEnabled && settings.telegram) {
+      social.push({ href: settings.telegram, label: 'تلگرام', icon: 'bi-telegram' });
+    }
+    if (settings.whatsappEnabled && settings.whatsapp) {
+      social.push({ href: settings.whatsapp, label: 'واتساپ', icon: 'bi-whatsapp' });
+    }
+    if (social.length) SHOP.socialLinks = social;
+
+    cachePublicBranding({ shopName: name, shopDescription: desc });
+    applyBrandingFromPayload({
+      shopName: name,
+      shopDescription: desc,
+      logoDataUrl: readBranding()?.logoDataUrl || null
+    });
+
+    const contactCol = document.querySelector('.footer-contact');
+    if (contactCol) {
+      contactCol.outerHTML = renderFooterContactColumn();
+    }
+  }
+
+  async function loadBrandingFromApi() {
+    if (typeof Store.api?.getSettings !== 'function') {
+      applyBranding();
+      return;
+    }
+    try {
+      applyApiSettings(await Store.api.getSettings());
+    } catch {
+      applyBranding();
+    }
   }
 
   // ─── Interactions (bound once after mount) ───────────────────────
@@ -796,7 +861,7 @@
   function mountLayout() {
     mountHeader();
     mountFooter();
-    applyBranding();
+    loadBrandingFromApi();
     initMegaMenuHover();
     initMegaMenuToggle();
     initSearchForms();
@@ -813,6 +878,8 @@
   Store.layout = {
     mount: mountLayout,
     applyBranding,
+    loadBrandingFromApi,
+    applyApiSettings,
     initMegaMenuHover,
     initMegaMenuToggle,
     openMegaMenu,

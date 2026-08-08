@@ -15,7 +15,8 @@ public class SupplierRepository(SimpleShopDbContext db) : ISupplierRepository
         ContactPerson = s.ContactPerson,
         Phone = s.Phone,
         Email = s.Email,
-        Address = s.Address
+        Address = s.Address,
+        IsActive = s.IsActive
     };
 
     public async Task<OperationResult> Add(SupplierAddEditModel model)
@@ -29,7 +30,8 @@ public class SupplierRepository(SimpleShopDbContext db) : ISupplierRepository
                 ContactPerson = model.ContactPerson,
                 Phone = model.Phone,
                 Email = model.Email,
-                Address = model.Address
+                Address = model.Address,
+                IsActive = model.IsActive
             };
             db.Suppliers.Add(entity);
             await db.SaveChangesAsync();
@@ -53,6 +55,7 @@ public class SupplierRepository(SimpleShopDbContext db) : ISupplierRepository
             entity.Phone = model.Phone;
             entity.Email = model.Email;
             entity.Address = model.Address;
+            entity.IsActive = model.IsActive;
             await db.SaveChangesAsync();
             return op.ToSuccess("تأمین‌کننده ویرایش شد", entity.Id);
         }
@@ -110,6 +113,7 @@ public class SupplierRepository(SimpleShopDbContext db) : ISupplierRepository
                 Phone = s.Phone,
                 Email = s.Email,
                 Address = s.Address,
+                IsActive = s.IsActive,
                 ProductCount = s.Products.Count
             })
             .ToListAsync();

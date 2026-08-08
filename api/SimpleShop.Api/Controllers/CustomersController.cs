@@ -36,18 +36,11 @@ public class CustomersController(IUserRepository users) : ControllerBase
         if (!op.Success)
             return BadRequest(new { message = op.Message });
 
-        var search = await users.Search(new UserSearchModel
-        {
-            Role = Roles.Customer,
-            Search = model.Phone ?? model.Username,
-            PageSize = 1
-        });
-        var createdId = search.Items.FirstOrDefault()?.Id;
-        if (string.IsNullOrEmpty(createdId))
+        if (string.IsNullOrEmpty(op.RecordKey))
             return Ok(new { message = op.Message });
 
-        var created = await users.Get(createdId);
-        return CreatedAtAction(nameof(GetById), new { id = createdId }, created);
+        var created = await users.Get(op.RecordKey);
+        return CreatedAtAction(nameof(GetById), new { id = op.RecordKey }, created);
     }
 
     [HttpPut("{id}")]
@@ -75,6 +68,8 @@ public class CustomersController(IUserRepository users) : ControllerBase
             return NotFound();
 
         var op = await users.Delete(id);
-        return op.Success ? NoContent() : BadRequest(new { message = op.Message });
+        if (op.Success) return NoContent();
+        if (op.Message == "کاربر پیدا نشد") return NotFound(new { message = op.Message });
+        return BadRequest(new { message = op.Message });
     }
 }

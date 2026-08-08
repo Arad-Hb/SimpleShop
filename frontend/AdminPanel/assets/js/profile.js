@@ -1,49 +1,19 @@
 /**
- * profile.js — پروفایل مدیر (همان الگوی سازمان فروش)
+ * profile.js — پروفایل مدیر (متصل به API)
  */
 (function (ShopAdmin) {
   'use strict';
 
-  const { formatDateTime, generateId } = ShopAdmin.utils;
+  const { formatDateTime } = ShopAdmin.utils;
   const { validateRequired, validateEmail, validateMobile, validateForm } = ShopAdmin.validation;
-  const { imageStore, getData, saveData } = ShopAdmin.storage;
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
+
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
   let currentProfile = {};
-  let avatarUrl = null;
-  let pendingAvatarId = null;
-  let avatarRemoved = false;
 
   const $ = (id) => document.getElementById(id);
-
-  const setAvatarPreview = async (avatarId) => {
-    const preview = $('avatar-preview');
-    const placeholder = $('avatar-placeholder');
-    if (!preview || !placeholder) return;
-
-    if (avatarUrl) {
-      URL.revokeObjectURL(avatarUrl);
-      avatarUrl = null;
-    }
-
-    if (!avatarId) {
-      preview.hidden = true;
-      preview.removeAttribute('src');
-      placeholder.hidden = false;
-      return;
-    }
-
-    const blob = await imageStore.getImage(avatarId);
-    if (!blob) {
-      preview.hidden = true;
-      placeholder.hidden = false;
-      return;
-    }
-
-    avatarUrl = URL.createObjectURL(blob);
-    preview.src = avatarUrl;
-    preview.hidden = false;
-    placeholder.hidden = true;
-  };
 
   const switchTopTab = (tabId) => {
     document.querySelectorAll('[data-profile-tab]').forEach((btn) => {
@@ -78,61 +48,118 @@
     });
   };
 
+  const mapProfile = (dto) => {
+    const firstName = pick(dto, 'firstName', 'FirstName') || '';
+    const lastName = pick(dto, 'lastName', 'LastName') || '';
+    const fullName = `${firstName} ${lastName}`.trim()
+      || pick(dto, 'username', 'Username')
+      || '';
+    return {
+      firstName,
+      lastName,
+      fullName,
+      email: pick(dto, 'email', 'Email') || '',
+      mobile: pick(dto, 'phone', 'Phone') || pick(dto, 'username', 'Username') || '',
+      isActive: pick(dto, 'isActive', 'IsActive') !== false,
+      registerDate: pick(dto, 'registerDate', 'RegisterDate') || null
+    };
+  };
+
   const loadProfile = async () => {
-    currentProfile = { ...(getData().adminProfile || {}) };
-    pendingAvatarId = currentProfile.avatarId || null;
-    avatarRemoved = false;
+    await ShopAdmin.api.ensureApiAuth();
+    const dto = await ShopAdmin.api.getMyProfile();
+    currentProfile = mapProfile(dto);
 
     const session = ShopAdmin.auth.getSession();
 
-    if ($('fullName')) $('fullName').value = currentProfile.fullName || '';
-    if ($('email')) $('email').value = currentProfile.email || '';
-    if ($('mobile')) $('mobile').value = currentProfile.mobile || '';
+    if ($('fullName')) $('fullName').value = currentProfile.fullName;
+    if ($('email')) $('email').value = currentProfile.email;
+    if ($('mobile')) $('mobile').value = currentProfile.mobile;
     if ($('profileActiveToggle')) {
-      $('profileActiveToggle').checked = currentProfile.isActive !== false;
+      $('profileActiveToggle').checked = currentProfile.isActive;
     }
     if ($('lastLogin')) {
       $('lastLogin').value = session?.loggedInAt
         ? formatDateTime(session.loggedInAt)
-        : (currentProfile.lastLogin ? formatDateTime(currentProfile.lastLogin) : '—');
-    }
-    if ($('accountCreated')) {
-      $('accountCreated').value = currentProfile.createdAt
-        ? formatDateTime(currentProfile.createdAt)
         : '—';
     }
-
-    await setAvatarPreview(pendingAvatarId);
+    if ($('accountCreated')) {
+      $('accountCreated').value = currentProfile.registerDate
+        ? formatDateTime(currentProfile.registerDate)
+        : '—';
+    }
   };
 
   const saveProfile = async (formData) => {
-    const data = getData();
-    const prev = data.adminProfile || {};
-    const nextAvatarId = avatarRemoved ? null : (pendingAvatarId ?? prev.avatarId ?? null);
+    const parts = formData.fullName.trim().split(/\s+/).filter(Boolean);
+    const firstName = parts[0] || '';
+    const lastName = parts.slice(1).join(' ');
 
-    if (prev.avatarId && prev.avatarId !== nextAvatarId) {
-      await imageStore.deleteImage(prev.avatarId).catch(() => {});
-    }
-
-    data.adminProfile = {
-      ...prev,
-      fullName: formData.fullName,
+    const payload = {
+      firstName,
+      lastName,
       email: formData.email,
-      mobile: formData.mobile,
-      isActive: formData.isActive,
-      avatarId: nextAvatarId,
-      updatedAt: new Date().toISOString()
+      phone: formData.mobile
     };
-    saveData(data);
 
-    currentProfile = data.adminProfile;
-    pendingAvatarId = nextAvatarId;
-    avatarRemoved = false;
+    await ShopAdmin.api.updateMyProfile(payload);
+
+    currentProfile = {
+      ...currentProfile,
+      fullName: formData.fullName,
+      firstName,
+      lastName,
+      email: formData.email,
+      mobile: formData.mobile
+    };
+
+    ShopAdmin.auth.updateSession({
+      fullName: formData.fullName,
+      mobile: formData.mobile
+    });
 
     const adminNameEl = document.querySelector('[data-admin-name]');
-    if (adminNameEl) adminNameEl.textContent = data.adminProfile.fullName || 'مدیر';
+    if (adminNameEl) adminNameEl.textContent = formData.fullName || 'مدیر';
 
     ShopAdmin.ui.showToast('success', 'پروفایل با موفقیت ذخیره شد.');
+  };
+
+  const changePassword = async () => {
+    const currentPassword = $('currentPassword')?.value || '';
+    const newPassword = $('newPassword')?.value || '';
+    const confirmPassword = $('confirmPassword')?.value || '';
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      ShopAdmin.ui.showToast('error', 'همه فیلدهای رمز عبور الزامی است.');
+      switchTopTab('security');
+      switchSecurityPanel('password');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      ShopAdmin.ui.showToast('error', 'رمز عبور جدید باید حداقل ۶ کاراکتر باشد.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      ShopAdmin.ui.showToast('error', 'رمز عبور جدید و تکرار آن یکسان نیست.');
+      return;
+    }
+
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      await ShopAdmin.api.changePassword({
+        currentPassword,
+        newPassword,
+        confirmPassword
+      });
+      $('currentPassword').value = '';
+      $('newPassword').value = '';
+      $('confirmPassword').value = '';
+      ShopAdmin.ui.showToast('success', 'رمز عبور با موفقیت تغییر کرد.');
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
+    }
   };
 
   const bindNavigation = () => {
@@ -175,52 +202,28 @@
         return;
       }
 
-      await saveProfile({
-        fullName: form.fullName.value.trim(),
-        email: form.email.value.trim(),
-        mobile: form.mobile.value.trim(),
-        isActive: !!$('profileActiveToggle')?.checked
-      });
+      try {
+        await saveProfile({
+          fullName: form.fullName.value.trim(),
+          email: form.email.value.trim(),
+          mobile: form.mobile.value.trim()
+        });
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
+      }
     });
 
     form?.addEventListener('reset', (e) => {
       e.preventDefault();
-      loadProfile();
-      ShopAdmin.ui.showToast('info', 'فرم به آخرین مقادیر ذخیره‌شده برگشت.');
+      loadProfile().then(() => {
+        ShopAdmin.ui.showToast('info', 'فرم به آخرین مقادیر ذخیره‌شده برگشت.');
+      }).catch((err) => {
+        ShopAdmin.ui.showToast('error', apiError(err));
+      });
     });
 
-    $('avatar-upload')?.addEventListener('change', async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const err = ShopAdmin.validation.validateImageFile(file);
-      if (err) {
-        ShopAdmin.ui.showToast('error', err);
-        e.target.value = '';
-        return;
-      }
-
-      const savedId = getData().adminProfile?.avatarId || null;
-      const oldPending = pendingAvatarId;
-      const newId = generateId('avatar');
-      await imageStore.saveImage(newId, file);
-
-      if (oldPending && oldPending !== savedId && oldPending !== newId) {
-        await imageStore.deleteImage(oldPending).catch(() => {});
-      }
-
-      pendingAvatarId = newId;
-      avatarRemoved = false;
-      await setAvatarPreview(newId);
-      e.target.value = '';
-      ShopAdmin.ui.showToast('success', 'آواتار آماده ذخیره است.');
-    });
-
-    $('avatar-remove')?.addEventListener('click', async () => {
-      pendingAvatarId = null;
-      avatarRemoved = true;
-      await setAvatarPreview(null);
-      ShopAdmin.ui.showToast('info', 'آواتار پس از ذخیره حذف می‌شود.');
+    $('change-password-btn')?.addEventListener('click', () => {
+      changePassword();
     });
   };
 
@@ -233,7 +236,11 @@
     ]);
 
     bindEvents();
-    await loadProfile();
+    try {
+      await loadProfile();
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
+    }
     switchTopTab('profile');
     switchProfilePanel('personal');
     switchSecurityPanel('account');

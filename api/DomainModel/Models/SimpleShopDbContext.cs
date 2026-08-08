@@ -16,6 +16,7 @@ public class SimpleShopDbContext : IdentityDbContext<ApplicationUser, Applicatio
     public DbSet<FileManager> FileManagers => Set<FileManager>();
     public DbSet<Banner> Banners => Set<Banner>();
     public DbSet<ProductImage> ProductImages => Set<ProductImage>();
+    public DbSet<ShopSettings> ShopSettings => Set<ShopSettings>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -32,5 +33,6 @@ public class SimpleShopDbContext : IdentityDbContext<ApplicationUser, Applicatio
         modelBuilder.ApplyConfiguration(new FileManagerConfiguration());
         modelBuilder.ApplyConfiguration(new BannerConfiguration());
         modelBuilder.ApplyConfiguration(new ProductImageConfiguration());
+        modelBuilder.ApplyConfiguration(new ShopSettingsConfiguration());
     }
 }

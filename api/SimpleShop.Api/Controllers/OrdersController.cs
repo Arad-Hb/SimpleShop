@@ -153,6 +153,15 @@ public class OrdersController(IOrderRepository orders, IUserRepository users, Jw
         return Ok(await orders.GetDetails(id));
     }
 
+    [HttpPut("{id:int}/payment")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> UpdatePaymentStatus(int id, [FromBody] PaymentStatusUpdate body)
+    {
+        var op = await orders.UpdatePaymentStatus(id, body.PaymentStatus);
+        if (!op.Success) return BadRequest(new { message = op.Message });
+        return Ok(await orders.GetDetails(id));
+    }
+
     [HttpDelete("{id:int}")]
     [Authorize(Roles = Roles.Admin)]
     public async Task<IActionResult> Delete(int id)
@@ -164,5 +173,10 @@ public class OrdersController(IOrderRepository orders, IUserRepository users, Jw
     public class StatusUpdate
     {
         public string Status { get; set; } = string.Empty;
+    }
+
+    public class PaymentStatusUpdate
+    {
+        public string PaymentStatus { get; set; } = string.Empty;
     }
 }

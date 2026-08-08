@@ -6,6 +6,8 @@
   'use strict';
 
   const { escapeHtml, formatPrice, formatDate, getStatusBadge, debounce } = ShopAdmin.utils;
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
   let rawData = {
     orders: [],
@@ -986,27 +988,31 @@
     };
   };
 
+  const emptyReportDataset = () => ({
+    orders: [],
+    orderItems: [],
+    products: [],
+    categories: [],
+    customers: [],
+    reviews: []
+  });
+
   const loadReportData = async () => {
-    const local = normalizeLocalDataset(ShopAdmin.storage.getData());
-    rawData = local;
+    rawData = emptyReportDataset();
 
     try {
-      if (!ShopAdmin.api?.getSalesReport) return { source: 'local' };
+      if (!ShopAdmin.api?.getSalesReport) {
+        ShopAdmin.ui.showToast('warning', 'گزارش فروش از API در دسترس نیست.');
+        return { source: 'api', orders: 0 };
+      }
       await ShopAdmin.api.ensureApiAuth();
       const payload = await ShopAdmin.api.getSalesReport();
-      const mapped = mapApiPayload(payload, local);
-      if ((mapped.orders?.length || 0) > 0) {
-        rawData = mapped;
-        // Keep local catalog if API customers empty somehow
-        if (!rawData.customers.length) rawData.customers = local.customers;
-        if (!rawData.products.length) rawData.products = local.products;
-        if (!rawData.categories.length) rawData.categories = local.categories;
-        return { source: 'api', orders: mapped.orders.length };
-      }
-    } catch {
-      // fall back to local seed data
+      rawData = mapApiPayload(payload, emptyReportDataset());
+      return { source: 'api', orders: rawData.orders?.length || 0 };
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
+      return { source: 'api', orders: 0 };
     }
-    return { source: 'local', orders: local.orders.length };
   };
 
   const exportCsv = () => {
@@ -1186,10 +1192,10 @@
     applyAndRender();
     setLoading(false);
 
-    if (result.source === 'api') {
+    if (result.source === 'api' && result.orders > 0) {
       ShopAdmin.ui.showToast('success', `گزارش از API: ${Number(result.orders || 0).toLocaleString('fa-IR')} سفارش`);
     } else if (!(result.orders > 0)) {
-      ShopAdmin.ui.showToast('warning', 'سفارشی یافت نشد. API را اجرا کنید یا داده‌های محلی را بررسی کنید.');
+      ShopAdmin.ui.showToast('warning', 'سفارشی یافت نشد. API را اجرا کنید.');
     }
   };
 

@@ -47,10 +47,6 @@
     }
   });
 
-  const categoryRepo = ShopAdmin.storage.createRepository('categories');
-  const supplierRepo = ShopAdmin.storage.createRepository('suppliers');
-
-  let apiProducts = [];
   let categoriesLoaded = [];
   let suppliersLoaded = [];
 
@@ -82,15 +78,13 @@
 
   const getCategoryMap = () => {
     const map = new Map();
-    (categoriesLoaded.length ? categoriesLoaded : categoryRepo.getAll())
-      .forEach((c) => map.set(c.id, c.name));
+    categoriesLoaded.forEach((c) => map.set(c.id, c.name));
     return map;
   };
 
   const getSupplierMap = () => {
     const map = new Map();
-    (suppliersLoaded.length ? suppliersLoaded : supplierRepo.getAll())
-      .forEach((s) => map.set(s.id, s.name));
+    suppliersLoaded.forEach((s) => map.set(s.id, s.name));
     return map;
   };
 
@@ -167,8 +161,8 @@
     catSel.innerHTML = '<option value="">همه</option>';
     supSel.innerHTML = '<option value="">همه</option>';
 
-    const categories = categoriesLoaded.length ? categoriesLoaded : categoryRepo.getAll();
-    const suppliers = suppliersLoaded.length ? suppliersLoaded : supplierRepo.getAll();
+    const categories = categoriesLoaded;
+    const suppliers = suppliersLoaded;
 
     categories
       .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))

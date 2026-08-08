@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Repositories;
 
 public class UserRepository(
+    SimpleShopDbContext db,
     UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager) : IUserRepository
 {
@@ -22,6 +23,9 @@ public class UserRepository(
         Phone = u.PhoneNumber,
         Address = u.Address,
         PostalCode = u.PostalCode,
+        NationalId = u.NationalId,
+        IsActive = u.IsActive,
+        RegisterDate = u.RegisterDate,
         Password = null
     };
 
@@ -35,6 +39,65 @@ public class UserRepository(
         FullName = user.DisplayName,
         Role = role
     };
+
+    private static UserListItem MapListItem(ApplicationUser u, string role) => new()
+    {
+        Id = u.Id,
+        Username = IdentityUserNames.ToDisplayMobile(u),
+        Email = u.Email ?? string.Empty,
+        FirstName = u.FirstName ?? string.Empty,
+        LastName = u.LastName ?? string.Empty,
+        FullName = u.DisplayName,
+        Role = role,
+        Phone = u.PhoneNumber,
+        NationalId = u.NationalId,
+        IsActive = u.IsActive,
+        RegisterDate = u.RegisterDate,
+        OrderCount = u.Orders.Count,
+        HasOrders = u.Orders.Count > 0,
+        TotalPurchase = u.Orders
+            .Where(o => o.Status.Equals("delivered", StringComparison.OrdinalIgnoreCase))
+            .Sum(o => o.TotalAmount)
+    };
+
+    private IQueryable<ApplicationUser> BuildSearchQuery(UserSearchModel searchModel)
+    {
+        var query = db.Users.AsNoTracking().Include(u => u.Orders).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchModel.Search))
+        {
+            var term = searchModel.Search.Trim();
+            var normalizedTerm = IdentityUserNames.NormalizeMobile(term);
+            query = query.Where(u =>
+                (u.UserName != null && u.UserName.Contains(term)) ||
+                (u.Email != null && u.Email.Contains(term)) ||
+                (u.FirstName != null && u.FirstName.Contains(term)) ||
+                (u.LastName != null && u.LastName.Contains(term)) ||
+                (u.PhoneNumber != null && u.PhoneNumber.Contains(term)) ||
+                (u.NationalId != null && u.NationalId.Contains(term)) ||
+                (!string.IsNullOrEmpty(normalizedTerm) && u.PhoneNumber == normalizedTerm));
+        }
+
+        if (searchModel.IsActive is not null)
+            query = query.Where(u => u.IsActive == searchModel.IsActive);
+
+        if (searchModel.HasOrders == true)
+            query = query.Where(u => u.Orders.Any());
+        else if (searchModel.HasOrders == false)
+            query = query.Where(u => !u.Orders.Any());
+
+        if (!string.IsNullOrWhiteSpace(searchModel.Role))
+        {
+            var roleName = searchModel.Role.Trim();
+            query = from u in query
+                    join ur in db.UserRoles on u.Id equals ur.UserId
+                    join r in db.Roles on ur.RoleId equals r.Id
+                    where r.Name == roleName
+                    select u;
+        }
+
+        return query.Distinct().OrderBy(u => u.UserName);
+    }
 
     private async Task<string?> GetPrimaryRoleAsync(ApplicationUser user)
     {
@@ -154,9 +217,22 @@ public class UserRepository(
                 PostalCode = model.PostalCode
             });
 
-            return register.Success
-                ? op.ToSuccess(register.Message)
-                : op.ToFailed(register.Message);
+            if (!register.Success)
+                return op.ToFailed(register.Message);
+
+            if (!string.IsNullOrEmpty(register.UserId))
+            {
+                var created = await userManager.FindByIdAsync(register.UserId);
+                if (created != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(model.NationalId))
+                        created.NationalId = model.NationalId.Trim();
+                    created.IsActive = model.IsActive;
+                    await userManager.UpdateAsync(created);
+                }
+            }
+
+            return op.ToSuccess(register.Message, register.UserId!);
         }
         catch (Exception ex)
         {
@@ -177,6 +253,8 @@ public class UserRepository(
             user.LastName = model.LastName?.Trim();
             user.Address = model.Address;
             user.PostalCode = model.PostalCode;
+            user.NationalId = string.IsNullOrWhiteSpace(model.NationalId) ? null : model.NationalId.Trim();
+            user.IsActive = model.IsActive;
 
             var newMobile = IdentityUserNames.NormalizeMobile(model.Phone);
             if (!string.IsNullOrEmpty(newMobile))
@@ -207,6 +285,9 @@ public class UserRepository(
         var op = new OperationResult("Delete User");
         try
         {
+            if (await db.Orders.AnyAsync(o => o.UserId == id))
+                return op.ToFailed("این مشتری سفارش دارد و قابل حذف نیست.");
+
             var user = await userManager.FindByIdAsync(id);
             if (user == null) return op.ToFailed("کاربر پیدا نشد");
 
@@ -230,53 +311,39 @@ public class UserRepository(
         return ToViewModel(user, role);
     }
 
+    public async Task<UserListItem?> GetListItem(string id)
+    {
+        var user = await db.Users.AsNoTracking()
+            .Include(u => u.Orders)
+            .FirstOrDefaultAsync(u => u.Id == id);
+        if (user == null) return null;
+
+        var role = await GetPrimaryRoleAsync(user) ?? Roles.Customer;
+        return MapListItem(user, role);
+    }
+
     public async Task<UserListComplex> Search(UserSearchModel searchModel)
     {
+        searchModel.PageIndex = searchModel.PageIndex < 0 ? 0 : searchModel.PageIndex;
         if (searchModel.PageSize <= 0) searchModel.PageSize = 20;
-        searchModel.PageIndex = Math.Max(0, searchModel.PageIndex);
 
-        var query = userManager.Users.AsNoTracking().AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(searchModel.Search))
-        {
-            var term = searchModel.Search.Trim();
-            var normalizedTerm = IdentityUserNames.NormalizeMobile(term);
-            query = query.Where(u =>
-                (u.UserName != null && u.UserName.Contains(term)) ||
-                (u.Email != null && u.Email.Contains(term)) ||
-                (u.FirstName != null && u.FirstName.Contains(term)) ||
-                (u.LastName != null && u.LastName.Contains(term)) ||
-                (u.PhoneNumber != null && u.PhoneNumber.Contains(term)) ||
-                (!string.IsNullOrEmpty(normalizedTerm) && u.PhoneNumber == normalizedTerm));
-        }
-
+        var query = BuildSearchQuery(searchModel);
         var result = new UserListComplex { SearchModel = searchModel };
-        var users = await query.OrderBy(u => u.UserName).ToListAsync();
-        var filtered = new List<UserListItem>();
+        result.SearchModel.RecordCount = await query.CountAsync();
 
-        foreach (var user in users)
-        {
-            var roles = await userManager.GetRolesAsync(user);
-            var role = roles.FirstOrDefault() ?? Roles.Customer;
-            if (!string.IsNullOrWhiteSpace(searchModel.Role) && role != searchModel.Role)
-                continue;
-
-            filtered.Add(new UserListItem
-            {
-                Id = user.Id,
-                Username = IdentityUserNames.ToDisplayMobile(user),
-                Email = user.Email ?? string.Empty,
-                FullName = user.DisplayName,
-                Role = role,
-                Phone = user.PhoneNumber
-            });
-        }
-
-        result.SearchModel.RecordCount = filtered.Count;
-        result.Items = filtered
+        var users = await query
             .Skip(searchModel.PageIndex * searchModel.PageSize)
             .Take(searchModel.PageSize)
-            .ToList();
+            .ToListAsync();
+
+        var items = new List<UserListItem>();
+        foreach (var user in users)
+        {
+            var role = await GetPrimaryRoleAsync(user) ?? Roles.Customer;
+            items.Add(MapListItem(user, role));
+        }
+
+        result.Items = items;
         return result;
     }
 
@@ -444,6 +511,68 @@ public class UserRepository(
         var roles = await userManager.GetRolesAsync(user);
         if (!roles.Contains(Roles.Customer)) return null;
         return ToLoginSuccess(user, Roles.Customer);
+    }
+
+    public async Task<UserAddEditModel?> GetProfileAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null) return null;
+        var role = await GetPrimaryRoleAsync(user) ?? Roles.Admin;
+        return ToViewModel(user, role);
+    }
+
+    public async Task<OperationResult> UpdateProfileAsync(string userId, ProfileUpdateModel model)
+    {
+        var op = new OperationResult("Update Profile");
+        try
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null) return op.ToFailed("کاربر پیدا نشد");
+
+            user.Email = string.IsNullOrWhiteSpace(model.Email) ? user.Email : model.Email.Trim();
+            user.FirstName = model.FirstName?.Trim();
+            user.LastName = model.LastName?.Trim();
+
+            var newMobile = IdentityUserNames.NormalizeMobile(model.Phone);
+            if (!string.IsNullOrEmpty(newMobile) && !string.Equals(user.UserName, "admin", StringComparison.OrdinalIgnoreCase))
+                user.PhoneNumber = newMobile;
+
+            var updateResult = await userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+                return op.ToFailed(string.Join(" ", updateResult.Errors.Select(e => e.Description)));
+
+            return op.ToSuccess("پروفایل بروزرسانی شد");
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed(ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> ChangePasswordAsync(string userId, ChangePasswordModel model)
+    {
+        var op = new OperationResult("Change Password");
+        try
+        {
+            if (model.NewPassword != model.ConfirmPassword)
+                return op.ToFailed("رمز عبور جدید و تکرار آن یکسان نیست.");
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null) return op.ToFailed("کاربر پیدا نشد");
+
+            if (!await userManager.CheckPasswordAsync(user, model.CurrentPassword))
+                return op.ToFailed("رمز عبور فعلی اشتباه است.");
+
+            var result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (!result.Succeeded)
+                return op.ToFailed(string.Join(" ", result.Errors.Select(e => e.Description)));
+
+            return op.ToSuccess("رمز عبور با موفقیت تغییر کرد");
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed(ex.Message);
+        }
     }
 
     private async Task EnsureRoleExistsAsync(string roleName)

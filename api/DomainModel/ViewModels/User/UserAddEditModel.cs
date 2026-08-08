@@ -26,4 +26,7 @@ public class UserAddEditModel
     public string? Phone { get; set; }
     public string? Address { get; set; }
     public string? PostalCode { get; set; }
+    public string? NationalId { get; set; }
+    public bool IsActive { get; set; } = true;
+    public DateTime? RegisterDate { get; set; }
 }

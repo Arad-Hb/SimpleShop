@@ -258,7 +258,7 @@
         description: item.description || null,
         slug: item.slug || null,
         parentId: item.parentId,
-        sortOrder: 0,
+        sortOrder: item.sortOrder,
         isActive: !item.isActive,
         metaTitle: item.metaTitle || null,
         metaDescription: item.metaDescription || null,

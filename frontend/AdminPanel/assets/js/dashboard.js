@@ -84,7 +84,9 @@
 
   const getCustomerName = (customers, customerId) => {
     const c = customers.find((x) => x.id === customerId);
-    return c ? `${c.firstName} ${c.lastName}` : '—';
+    if (!c) return '—';
+    const full = `${c.firstName || ''} ${c.lastName || ''}`.trim();
+    return full || c.fullName || c.mobile || '—';
   };
 
   const getProductName = (products, productId) => {
@@ -107,7 +109,7 @@
 
     tbody.innerHTML = recent.map((order) => `
       <tr>
-        <td><a href="orders.html">${escapeHtml(order.orderNumber)}</a></td>
+        <td><a href="order-details.html?id=${encodeURIComponent(order.id)}">${escapeHtml(order.orderNumber)}</a></td>
         <td>${escapeHtml(getCustomerName(data.customers, order.customerId))}</td>
         <td>${escapeHtml(formatPrice(order.total))}</td>
         <td>${getStatusBadge(order.status)}</td>
@@ -158,7 +160,7 @@
       .slice(0, 5);
 
     if (!pending.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">نظر در انتظاری وجود ندارد.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">نظر در انتظاری وجود ندارد. (ماژول نظرات — داده محلی، بدون API)</td></tr>';
       return;
     }
 
@@ -283,23 +285,125 @@
       </ul>`;
   };
 
-  const initDashboard = () => {
+  const initDashboard = async () => {
     if (!ShopAdmin.auth.requireAuth()) return;
 
     ShopAdmin.ui.initBreadcrumb([
       { label: 'داشبورد', href: 'index.html' }
     ]);
 
-    const data = ShopAdmin.storage.getData();
-    const stats = computeStats(data);
+    const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
+    const normalizeStatus = (status) => String(status || 'pending').trim().toLowerCase();
+    const derivePaymentStatus = (status, existing) => {
+      if (existing) return String(existing).toLowerCase();
+      const s = normalizeStatus(status);
+      if (s === 'cancelled') return 'refunded';
+      if (s === 'pending') return 'unpaid';
+      return 'paid';
+    };
 
-    renderStats(stats);
-    renderRecentOrders(data);
-    renderLowStock(data);
-    renderPendingReviews(data);
-    renderMonthlySalesChart(data.orders);
-    renderOrderStatusDonut(data.orders);
+    const fetchAllProducts = async () => {
+      const pageSize = 50;
+      let page = 1;
+      let all = [];
+      let total = Infinity;
+      while (all.length < total && page <= 20) {
+        const data = await ShopAdmin.api.getProducts({ page, pageSize, sortBy: 'name', sortDir: 'asc' });
+        const items = data?.items || data?.Items || [];
+        const search = data?.searchModel || data?.SearchModel || {};
+        total = Number(search.recordCount ?? search.RecordCount ?? items.length) || items.length;
+        all = all.concat(items);
+        if (!items.length || items.length < pageSize) break;
+        page += 1;
+      }
+      return all;
+    };
+
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+
+      const [
+        productDtos,
+        categoryDtos,
+        supplierPage,
+        customerPage,
+        salesReport
+      ] = await Promise.all([
+        fetchAllProducts(),
+        ShopAdmin.api.getCategories(),
+        ShopAdmin.api.searchSuppliers({ pageIndex: 0, pageSize: 1 }),
+        ShopAdmin.api.searchCustomers({ pageIndex: 0, pageSize: 1 }),
+        ShopAdmin.api.getSalesReport()
+      ]);
+
+      const products = (productDtos || []).map((dto) => ({
+        id: pick(dto, 'id', 'Id'),
+        name: pick(dto, 'name', 'Name') || 'محصول',
+        stock: Number(pick(dto, 'stock', 'Stock')) || 0,
+        minimumStock: Number(pick(dto, 'minimumStock', 'MinimumStock')) || 5,
+        isActive: pick(dto, 'isActive', 'IsActive') !== false
+      }));
+
+      const categories = Array.isArray(categoryDtos) ? categoryDtos : [];
+      const suppliersCount = supplierPage?.searchModel?.recordCount
+        ?? supplierPage?.SearchModel?.RecordCount ?? 0;
+      const customersCount = customerPage?.searchModel?.recordCount
+        ?? customerPage?.SearchModel?.RecordCount ?? 0;
+
+      const reportOrders = (salesReport?.orders || salesReport?.Orders || []).map((o) => ({
+        id: pick(o, 'id', 'Id'),
+        orderNumber: pick(o, 'orderNumber', 'OrderNumber') || `ORD-${pick(o, 'id', 'Id')}`,
+        customerId: pick(o, 'customerId', 'CustomerId'),
+        total: Number(pick(o, 'total', 'Total') ?? pick(o, 'totalAmount', 'TotalAmount') ?? 0),
+        status: normalizeStatus(pick(o, 'status', 'Status')),
+        paymentStatus: derivePaymentStatus(
+          pick(o, 'status', 'Status'),
+          pick(o, 'paymentStatus', 'PaymentStatus')
+        ),
+        createdAt: pick(o, 'createdAt', 'CreatedAt') || pick(o, 'orderDate', 'OrderDate')
+      }));
+
+      const reportCustomers = (salesReport?.customers || salesReport?.Customers || []).map((c) => ({
+        id: pick(c, 'id', 'Id'),
+        firstName: pick(c, 'firstName', 'FirstName') || '',
+        lastName: pick(c, 'lastName', 'LastName') || '',
+        fullName: pick(c, 'fullName', 'FullName') || '',
+        mobile: pick(c, 'mobile', 'Mobile') || ''
+      }));
+
+      const localReviews = ShopAdmin.storage.getData().reviews || [];
+
+      const data = {
+        products,
+        categories,
+        suppliers: Array.from({ length: suppliersCount }),
+        customers: Array.from({ length: customersCount }),
+        orders: reportOrders,
+        reviews: localReviews
+      };
+
+      const stats = computeStats(data);
+      renderStats(stats);
+      renderRecentOrders({ ...data, customers: reportCustomers });
+      renderLowStock({ products });
+      renderPendingReviews(data);
+      renderMonthlySalesChart(reportOrders);
+      renderOrderStatusDonut(reportOrders);
+    } catch (err) {
+      const { parseError } = window.SimpleShopHttp || {};
+      const msg = parseError ? parseError(err) : (err?.message || 'خطا در بارگذاری داشبورد');
+      ShopAdmin.ui.showToast('error', msg);
+
+      const data = ShopAdmin.storage.getData();
+      const stats = computeStats(data);
+      renderStats(stats);
+      renderRecentOrders(data);
+      renderLowStock(data);
+      renderPendingReviews(data);
+      renderMonthlySalesChart(data.orders);
+      renderOrderStatusDonut(data.orders);
+    }
   };
 
-  document.addEventListener('DOMContentLoaded', initDashboard);
+  document.addEventListener('DOMContentLoaded', () => { void initDashboard(); });
 })(window.ShopAdmin = window.ShopAdmin || {});

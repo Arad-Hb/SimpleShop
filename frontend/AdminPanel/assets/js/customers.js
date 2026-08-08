@@ -4,39 +4,26 @@
 (function (ShopAdmin) {
   'use strict';
 
-  const { escapeHtml, formatPrice, parseQuery, debounce } = ShopAdmin.utils;
+  const { escapeHtml, formatPrice, formatDateTime, getStatusBadge, parseQuery, debounce } = ShopAdmin.utils;
   const { sortItems } = ShopAdmin.pagination;
   const { parseError } = window.SimpleShopHttp || {};
   const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
   const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
-  const splitFullName = (fullName) => {
-    const parts = (fullName || '').trim().split(/\s+/).filter(Boolean);
-    if (!parts.length) return { firstName: '', lastName: '' };
-    if (parts.length === 1) return { firstName: parts[0], lastName: '' };
-    return { firstName: parts[0], lastName: parts.slice(1).join(' ') };
-  };
-
-  const mapListItem = (dto) => {
-    const fullName = pick(dto, 'fullName', 'FullName') || '';
-    const { firstName, lastName } = splitFullName(fullName);
-    const phone = pick(dto, 'phone', 'Phone') || '';
-    const username = pick(dto, 'username', 'Username') || '';
-    return {
-      id: pick(dto, 'id', 'Id') || '',
-      firstName,
-      lastName,
-      username,
-      mobile: phone || username,
-      email: pick(dto, 'email', 'Email') || '',
-      nationalId: '',
-      isActive: true,
-      orderCount: 0,
-      totalPurchase: 0,
-      createdAt: null
-    };
-  };
+  const mapListItem = (dto) => ({
+    id: pick(dto, 'id', 'Id') || '',
+    firstName: pick(dto, 'firstName', 'FirstName') || '',
+    lastName: pick(dto, 'lastName', 'LastName') || '',
+    username: pick(dto, 'username', 'Username') || '',
+    mobile: pick(dto, 'phone', 'Phone') || pick(dto, 'username', 'Username') || '',
+    email: pick(dto, 'email', 'Email') || '',
+    nationalId: pick(dto, 'nationalId', 'NationalId') || '',
+    isActive: pick(dto, 'isActive', 'IsActive') !== false,
+    orderCount: Number(pick(dto, 'orderCount', 'OrderCount')) || 0,
+    totalPurchase: Number(pick(dto, 'totalPurchase', 'TotalPurchase')) || 0,
+    createdAt: pick(dto, 'registerDate', 'RegisterDate') || null
+  });
 
   const mapEditModel = (dto) => ({
     id: pick(dto, 'id', 'Id') || '',
@@ -47,7 +34,10 @@
     mobile: pick(dto, 'phone', 'Phone') || pick(dto, 'username', 'Username') || '',
     phone: pick(dto, 'phone', 'Phone') || '',
     address: pick(dto, 'address', 'Address') || '',
-    postalCode: pick(dto, 'postalCode', 'PostalCode') || ''
+    postalCode: pick(dto, 'postalCode', 'PostalCode') || '',
+    nationalId: pick(dto, 'nationalId', 'NationalId') || '',
+    isActive: pick(dto, 'isActive', 'IsActive') !== false,
+    registerDate: pick(dto, 'registerDate', 'RegisterDate') || null
   });
 
   const toApiPayload = (form, { includePassword = false } = {}) => {
@@ -60,34 +50,14 @@
       phone: mobile,
       address: form.address.value.trim() || null,
       postalCode: form.postalCode.value.trim() || null,
+      nationalId: form.nationalId?.value.trim() || null,
+      isActive: form.isActive ? form.isActive.checked : true,
       role: 'Customer'
     };
     if (includePassword) {
       payload.password = form.password?.value || '';
     }
     return payload;
-  };
-
-  const enrichWithOrderStats = (customers, orders) => {
-    const byUser = new Map();
-    (orders || []).forEach((o) => {
-      const userId = pick(o, 'userId', 'UserId');
-      if (!userId) return;
-      if (!byUser.has(userId)) byUser.set(userId, []);
-      byUser.get(userId).push(o);
-    });
-
-    return customers.map((c) => {
-      const userOrders = byUser.get(c.id) || [];
-      const totalPurchase = userOrders
-        .filter((o) => (pick(o, 'status', 'Status') || '') === 'delivered')
-        .reduce((sum, o) => sum + (Number(pick(o, 'totalAmount', 'TotalAmount')) || 0), 0);
-      return {
-        ...c,
-        orderCount: userOrders.length,
-        totalPurchase
-      };
-    });
   };
 
   const getCustomerName = (c) => `${c.firstName || ''} ${c.lastName || ''}`.trim() || c.username || '—';
@@ -98,7 +68,6 @@
     const state = {
       page: 1,
       pageSize: 10,
-      search: '',
       filters: {},
       items: [],
       totalItems: 0,
@@ -115,7 +84,7 @@
 
     const applyClientFilters = (items) => {
       let result = [...items];
-      const { name, mobile, email, active, hasOrders } = state.filters;
+      const { name, mobile, email, nationalId, sort } = state.filters;
 
       if (name) {
         const q = name.trim().toLowerCase();
@@ -132,13 +101,13 @@
         const q = email.trim().toLowerCase();
         result = result.filter((c) => (c.email || '').toLowerCase().includes(q));
       }
-      if (active === 'true') result = result.filter((c) => c.isActive);
-      if (active === 'false') result = result.filter((c) => !c.isActive);
-      if (hasOrders === 'yes') result = result.filter((c) => c.orderCount > 0);
-      if (hasOrders === 'no') result = result.filter((c) => c.orderCount === 0);
+      if (nationalId) {
+        const q = nationalId.trim();
+        result = result.filter((c) => (c.nationalId || '').includes(q));
+      }
 
-      if (state.filters.sort) {
-        const [field, dir] = state.filters.sort.split('-');
+      if (sort) {
+        const [field, dir] = sort.split('-');
         result = sortItems(result, field, dir);
       }
 
@@ -165,11 +134,11 @@
           <td dir="ltr">${escapeHtml(c.username || '—')}</td>
           <td dir="ltr">${escapeHtml(c.mobile || '—')}</td>
           <td dir="ltr">${escapeHtml(c.email || '—')}</td>
-          <td dir="ltr">—</td>
+          <td dir="ltr">${escapeHtml(c.nationalId || '—')}</td>
           <td>${(c.orderCount || 0).toLocaleString('fa-IR')}</td>
           <td>${escapeHtml(formatPrice(c.totalPurchase || 0))}</td>
-          <td><span class="badge bg-success">فعال</span></td>
-          <td class="text-muted small">—</td>
+          <td>${getStatusBadge(c.isActive ? 'active' : 'inactive')}</td>
+          <td class="text-muted small">${c.createdAt ? escapeHtml(formatDateTime(c.createdAt)) : '—'}</td>
           <td class="no-print">
             <div class="table-actions">
               <a href="customer-form.html?id=${encodeURIComponent(c.id)}" class="btn btn-outline-primary" title="ویرایش">
@@ -218,6 +187,21 @@
       });
     };
 
+    const buildSearchParams = () => {
+      const { name, mobile, email, nationalId, active, hasOrders } = state.filters;
+      const searchTerms = [name, mobile, email, nationalId].filter(Boolean).join(' ').trim();
+
+      let isActive;
+      if (active === 'true') isActive = true;
+      else if (active === 'false') isActive = false;
+
+      let hasOrdersParam;
+      if (hasOrders === 'yes') hasOrdersParam = true;
+      else if (hasOrders === 'no') hasOrdersParam = false;
+
+      return { search: searchTerms, isActive, hasOrders: hasOrdersParam };
+    };
+
     const loadList = async () => {
       if (!tbody) return;
       state.loading = true;
@@ -226,23 +210,15 @@
       try {
         await ShopAdmin.api.ensureApiAuth();
 
-        const searchTerms = [
-          state.filters.name,
-          state.filters.mobile,
-          state.filters.email
-        ].filter(Boolean).join(' ').trim();
-
-        const [customerData, orderData] = await Promise.all([
-          ShopAdmin.api.searchCustomers({
-            pageIndex: state.page - 1,
-            pageSize: state.pageSize,
-            search: searchTerms || state.search
-          }),
-          ShopAdmin.api.searchOrders({ pageIndex: 0, pageSize: 500 })
-        ]);
+        const searchParams = buildSearchParams();
+        const customerData = await ShopAdmin.api.searchCustomers({
+          pageIndex: state.page - 1,
+          pageSize: state.pageSize,
+          ...searchParams
+        });
 
         const rawItems = customerData?.items || customerData?.Items || [];
-        let items = enrichWithOrderStats(rawItems.map(mapListItem), orderData?.items || orderData?.Items || []);
+        let items = rawItems.map(mapListItem);
         items = applyClientFilters(items);
 
         state.items = items;
@@ -284,7 +260,7 @@
         loadList();
       }, 400);
 
-      ['filter-name', 'filter-mobile', 'filter-email'].forEach((id) => {
+      ['filter-name', 'filter-mobile', 'filter-email', 'filter-nationalId'].forEach((id) => {
         document.getElementById(id)?.addEventListener('input', debouncedSearch);
       });
       ['filter-active', 'filter-orders', 'filter-sort'].forEach((id) => {
@@ -303,6 +279,8 @@
     const form = document.getElementById('customer-form');
     const passwordField = document.getElementById('password-field');
     const passwordInput = document.getElementById('password');
+    const isActiveField = document.getElementById('isActive-field');
+    const metaInfo = document.getElementById('meta-info');
 
     if (!form) return;
 
@@ -311,6 +289,7 @@
       document.getElementById('delete-btn')?.classList.remove('d-none');
       passwordField?.classList.add('d-none');
       passwordInput?.removeAttribute('required');
+      isActiveField?.classList.remove('d-none');
 
       try {
         await ShopAdmin.api.ensureApiAuth();
@@ -326,6 +305,14 @@
         document.getElementById('phone').value = customer.phone;
         document.getElementById('postalCode').value = customer.postalCode;
         document.getElementById('address').value = customer.address;
+        document.getElementById('nationalId').value = customer.nationalId;
+        document.getElementById('isActive').checked = customer.isActive;
+
+        if (customer.registerDate && metaInfo) {
+          document.getElementById('meta-created').textContent =
+            `تاریخ عضویت: ${formatDateTime(customer.registerDate)}`;
+          metaInfo.classList.remove('d-none');
+        }
 
         document.getElementById('form-heading').textContent = `ویرایش: ${getCustomerName(customer)}`;
         ShopAdmin.ui.initBreadcrumb([
@@ -341,6 +328,8 @@
     } else {
       passwordField?.classList.remove('d-none');
       passwordInput?.setAttribute('required', 'required');
+      isActiveField?.classList.add('d-none');
+      metaInfo?.classList.add('d-none');
       ShopAdmin.ui.initBreadcrumb([
         { label: 'داشبورد', href: 'index.html' },
         { label: 'مشتریان', href: 'customers.html' },
@@ -363,7 +352,11 @@
           (v) => ShopAdmin.validation.validateRequired(v, 'موبایل'),
           (v) => ShopAdmin.validation.validateMobile(v)
         ]},
-        { name: 'phone', label: 'تلفن', rules: [(v) => ShopAdmin.validation.validatePhone(v)] }
+        { name: 'phone', label: 'تلفن', rules: [(v) => ShopAdmin.validation.validatePhone(v)] },
+        { name: 'nationalId', label: 'کد ملی', rules: [(v) => {
+          if (!v || !v.trim()) return null;
+          return ShopAdmin.validation.validateNationalId(v);
+        }]}
       ];
 
       if (!editId) {

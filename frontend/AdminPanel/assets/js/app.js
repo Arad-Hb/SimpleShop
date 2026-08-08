@@ -10,24 +10,6 @@
   const initApp = async () => {
     ShopAdmin.storage.initStorage();
 
-    let syncResult = { ok: false, message: 'sync disabled' };
-    if (typeof ShopAdmin.sync?.syncCatalogFromApi === 'function') {
-      syncResult = await ShopAdmin.sync.syncCatalogFromApi();
-      if (syncResult.ok && syncResult.message !== 'cached' && ShopAdmin.ui?.showToast) {
-        ShopAdmin.ui.showToast(
-          'success',
-          `همگام با دیتابیس: ${syncResult.products.toLocaleString('fa-IR')} محصول`
-        );
-      } else if (!syncResult.ok && syncResult.message === 'API offline' && ShopAdmin.ui?.showToast) {
-        ShopAdmin.ui.showToast('warning', 'API در دسترس نیست — داده‌های آفلاین JSON بارگذاری می‌شود');
-      }
-      document.dispatchEvent(new CustomEvent('admin:catalog-synced', { detail: syncResult }));
-    }
-
-    if (!syncResult.ok) {
-      await ShopAdmin.seed?.seedIfApiOffline?.(syncResult);
-    }
-
     // سایدبار — اگر data-page روی body تعریف شده باشد
     const activePage = document.body.dataset.page;
     if (activePage) {
@@ -48,8 +30,13 @@
     // نمایش نام فروشگاه در هدر
     const shopNameEl = document.querySelector('[data-shop-name]');
     if (shopNameEl) {
-      const settings = ShopAdmin.storage.getData().settings;
-      shopNameEl.textContent = settings?.shopName || DEFAULT_SHOP_NAME;
+      try {
+        const settings = await ShopAdmin.api.getSettings();
+        shopNameEl.textContent = settings?.shopName || DEFAULT_SHOP_NAME;
+      } catch {
+        const settings = ShopAdmin.storage.getData().settings;
+        shopNameEl.textContent = settings?.shopName || DEFAULT_SHOP_NAME;
+      }
     }
 
     // نمایش نام مدیر
@@ -68,7 +55,6 @@
     runSelectEnhance();
     // Page scripts often populate options on the same tick — re-run once after
     setTimeout(runSelectEnhance, 0);
-    document.addEventListener('admin:catalog-synced', runSelectEnhance);
 
     // Style any static Bootstrap modals like dynamic ones
     if (typeof ShopAdmin.ui.enhanceAdminModal === 'function') {

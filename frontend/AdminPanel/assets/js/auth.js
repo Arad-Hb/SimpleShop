@@ -106,6 +106,13 @@
     return false;
   };
 
+  const updateSession = (updates = {}) => {
+    const session = getSession();
+    if (!session) return;
+    const next = { ...session, ...updates };
+    saveSession(next);
+  };
+
   ShopAdmin.auth = {
     ROLE,
     login,
@@ -113,6 +120,7 @@
     isAuthenticated,
     requireAuth,
     getSession,
-    getToken
+    getToken,
+    updateSession
   };
 })(window.ShopAdmin = window.ShopAdmin || {});

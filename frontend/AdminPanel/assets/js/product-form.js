@@ -17,9 +17,6 @@
 
   const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
-  const categoryRepo = ShopAdmin.storage.createRepository('categories');
-  const supplierRepo = ShopAdmin.storage.createRepository('suppliers');
-
   const form = document.getElementById('product-form');
 
   let editId = null;
@@ -98,15 +95,8 @@
         opt.textContent = `${pick(s, 'name', 'Name') || ''}${pick(s, 'isActive', 'IsActive') === false ? ' (غیرفعال)' : ''}`;
         supSel.appendChild(opt);
       });
-    } catch {
-      appendCategoryOptions(categoryRepo.getAll(), catSel, includeCategoryId);
-
-      supplierRepo.getAll().forEach((s) => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `${s.name}${s.isActive === false ? ' (غیرفعال)' : ''}`;
-        supSel.appendChild(opt);
-      });
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
     }
   };
 

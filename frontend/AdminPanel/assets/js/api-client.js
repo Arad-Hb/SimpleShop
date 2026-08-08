@@ -138,6 +138,9 @@
   const updateOrderStatus = (id, status) =>
     request(`/api/orders/${id}/status`, { method: 'PUT', body: { status } });
 
+  const updateOrderPayment = (id, paymentStatus) =>
+    request(`/api/orders/${id}/payment`, { method: 'PUT', body: { paymentStatus } });
+
   const searchSuppliers = async ({ pageIndex = 0, pageSize = 100, search = '' } = {}) => {
     const params = new URLSearchParams({
       pageIndex: String(pageIndex),
@@ -157,12 +160,22 @@
 
   const deleteSupplier = (id) => request(`/api/suppliers/${id}`, { method: 'DELETE' });
 
-  const searchCustomers = async ({ pageIndex = 0, pageSize = 20, search = '' } = {}) => {
+  const searchCustomers = async ({
+    pageIndex = 0,
+    pageSize = 20,
+    search = '',
+    isActive = undefined,
+    hasOrders = undefined
+  } = {}) => {
     const params = new URLSearchParams({
       pageIndex: String(pageIndex),
       pageSize: String(pageSize)
     });
     if (search) params.set('search', search);
+    if (isActive === true) params.set('isActive', 'true');
+    else if (isActive === false) params.set('isActive', 'false');
+    if (hasOrders === true) params.set('hasOrders', 'true');
+    else if (hasOrders === false) params.set('hasOrders', 'false');
     return request(`/api/customers?${params}`);
   };
 
@@ -175,6 +188,12 @@
 
   const deleteCustomer = (id) =>
     request(`/api/customers/${encodeURIComponent(id)}`, { method: 'DELETE' });
+
+  const getMyProfile = () => request('/api/auth/me');
+
+  const updateMyProfile = (body) => request('/api/auth/me', { method: 'PUT', body });
+
+  const changePassword = (body) => request('/api/auth/change-password', { method: 'POST', body });
 
   const ensureApiAuth = async () => {
     if (getToken()) return true;
@@ -194,6 +213,10 @@
   };
 
   const getSalesReport = () => request('/api/reports/sales');
+
+  const getSettings = () => request('/api/settings');
+
+  const updateSettings = (body) => request('/api/settings', { method: 'PUT', body });
 
   ShopAdmin.api = {
     request,
@@ -216,6 +239,7 @@
     searchOrders,
     getOrder,
     updateOrderStatus,
+    updateOrderPayment,
     searchSuppliers,
     getSuppliers,
     getSupplier,
@@ -227,7 +251,12 @@
     createCustomer,
     updateCustomer,
     deleteCustomer,
+    getMyProfile,
+    updateMyProfile,
+    changePassword,
     getSalesReport,
+    getSettings,
+    updateSettings,
     ensureApiAuth,
     ping,
     getToken,
