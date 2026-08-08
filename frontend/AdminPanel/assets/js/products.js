@@ -47,6 +47,7 @@
     }
   });
 
+  let apiProducts = [];
   let categoriesLoaded = [];
   let suppliersLoaded = [];
 

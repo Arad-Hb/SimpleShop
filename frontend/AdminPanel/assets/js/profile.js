@@ -37,6 +37,7 @@
       const match = panel.getAttribute('data-profile-content') === panelId;
       panel.hidden = !match;
       panel.classList.toggle('is-active', match);
+      panel.classList.toggle('d-none', !match);
     });
   };
 
@@ -48,6 +49,7 @@
       const match = panel.getAttribute('data-security-content') === panelId;
       panel.hidden = !match;
       panel.classList.toggle('is-active', match);
+      panel.classList.toggle('d-none', !match);
     });
   };
 
@@ -215,8 +217,49 @@
     });
   };
 
+  const handleAvatarFile = (file) => {
+    if (!file) return;
+    const err = validateImageFile(file);
+    if (err) {
+      ShopAdmin.ui.showToast('error', err);
+      return;
+    }
+    pendingAvatarFile = file;
+    avatarRemoved = false;
+    showAvatarPreview(URL.createObjectURL(file));
+  };
+
+  const initAvatarDropZone = () => {
+    const dropZone = $('avatar-drop-zone');
+    const fileInput = $('avatar-upload');
+    if (!dropZone || !fileInput) return;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput.click();
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      handleAvatarFile(e.target.files?.[0]);
+      e.target.value = '';
+    });
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drop-zone--active');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone--active'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drop-zone--active');
+      handleAvatarFile(e.dataTransfer?.files?.[0]);
+    });
+  };
+
   const bindEvents = () => {
     bindNavigation();
+    initAvatarDropZone();
 
     const form = $('profile-form');
     form?.addEventListener('submit', async (e) => {
@@ -257,21 +300,6 @@
 
     $('change-password-btn')?.addEventListener('click', () => {
       changePassword();
-    });
-
-    $('avatar-upload')?.addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const err = validateImageFile(file);
-      if (err) {
-        ShopAdmin.ui.showToast('error', err);
-        e.target.value = '';
-        return;
-      }
-      pendingAvatarFile = file;
-      avatarRemoved = false;
-      showAvatarPreview(URL.createObjectURL(file));
-      e.target.value = '';
     });
 
     $('avatar-remove')?.addEventListener('click', () => {

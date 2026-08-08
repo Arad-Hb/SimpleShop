@@ -27,6 +27,8 @@ public class ProductListItem
     public string? ImageUrl { get; set; }
     public string? ThumbnailUrl { get; set; }
     public string? OgImageUrl { get; set; }
+    public int? PrimaryImageId { get; set; }
+    public int? OgImageId { get; set; }
     public List<ProductImageItem> Gallery { get; set; } = new();
 }
 

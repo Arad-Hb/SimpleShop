@@ -74,6 +74,8 @@
 
   const getSettings = () => request('/api/settings');
 
+  const getMyProfile = () => request('/api/auth/me');
+
   Store.api = {
     request,
     getProducts,
@@ -88,6 +90,7 @@
     completeCheckout,
     ping,
     getSettings,
+    getMyProfile,
     getToken,
     setToken
   };

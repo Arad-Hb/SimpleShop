@@ -81,7 +81,9 @@ public class ProductRepository(SimpleShopDbContext db) : IProductRepository
             OgDescription = p.OgDescription,
             ImageUrl = p.PrimaryImage != null ? p.PrimaryImage.Url : null,
             ThumbnailUrl = p.PrimaryImage != null ? p.PrimaryImage.ThumbnailUrl : null,
-            OgImageUrl = p.OgImage != null ? p.OgImage.Url : (p.PrimaryImage != null ? p.PrimaryImage.Url : null)
+            OgImageUrl = p.OgImage != null ? p.OgImage.Url : (p.PrimaryImage != null ? p.PrimaryImage.Url : null),
+            PrimaryImageId = p.PrimaryImageId,
+            OgImageId = p.OgImageId
         });
 
     public async Task<OperationResult> Add(ProductAddEditModel model)

@@ -393,12 +393,13 @@
 
   const loadProduct = async (id) => {
     let product;
+    let dto;
     try {
       await ShopAdmin.api.ensureApiAuth();
-      const dto = await ShopAdmin.api.getProduct(id);
+      dto = await ShopAdmin.api.getProduct(id);
       product = mapApiToForm(dto);
-    } catch {
-      ShopAdmin.ui.showToast('error', 'محصول یافت نشد.');
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err) || 'محصول یافت نشد.');
       window.location.href = 'products.html';
       return;
     }
@@ -484,6 +485,7 @@
       const data = collectFormData();
       data.isActive = false;
       await ShopAdmin.api.ensureApiAuth();
+      await uploadPendingFiles();
       await ShopAdmin.api.updateProduct(editId, toApiPayload(data));
       isDirty = false;
       ShopAdmin.ui.showToast('success', 'محصول غیرفعال شد.');

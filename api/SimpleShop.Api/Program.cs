@@ -90,4 +90,30 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+if (app.Environment.IsDevelopment())
+{
+    app.Lifetime.ApplicationStarted.Register(() =>
+    {
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(800);
+            var indexPath = Path.GetFullPath(Path.Combine(
+                app.Environment.ContentRootPath, "..", "..", "frontend", "VisitorPanel", "index.html"));
+            if (!File.Exists(indexPath)) return;
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = indexPath,
+                    UseShellExecute = true
+                });
+            }
+            catch
+            {
+                // Browser launch is best-effort in local dev.
+            }
+        });
+    });
+}
+
 app.Run();

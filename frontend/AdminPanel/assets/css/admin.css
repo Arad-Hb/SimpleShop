@@ -3746,6 +3746,10 @@ body.sidebar-collapsed [data-sidebar-toggle] i {
   border-top: 1px solid var(--line);
 }
 
+.settings-page__actions[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 991.98px) {
   .settings-layout {
     grid-template-columns: 1fr;

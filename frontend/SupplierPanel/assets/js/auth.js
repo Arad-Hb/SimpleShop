@@ -83,6 +83,7 @@
   const logout = () => {
     sessionStorage.removeItem(SESSION_KEY);
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem('simpleShopVisitorToken');
   };
 
   const requireAuth = (loginPage = 'login.html') => {

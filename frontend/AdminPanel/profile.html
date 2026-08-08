@@ -65,7 +65,7 @@
                 </button>
                 <button type="button" class="settings-select-menu__item" data-profile-panel="avatar">
                   <span class="settings-select-menu__icon"><i class="bi bi-image"></i></span>
-                  <span class="settings-select-menu__text">تصویر پروفایل</span>
+                  <span class="settings-select-menu__text">راهنمای تصویر</span>
                   <i class="bi bi-chevron-left settings-select-menu__chevron" aria-hidden="true"></i>
                 </button>
               </aside>
@@ -94,6 +94,31 @@
                     </div>
 
                     <div class="settings-card__body">
+                      <div class="row g-3 mb-2">
+                        <div class="col-12">
+                          <label class="form-label">تصویر پروفایل</label>
+                          <div class="d-flex flex-wrap align-items-start gap-3">
+                            <div class="settings-media-preview settings-media-preview--avatar flex-shrink-0">
+                              <img src="" alt="پیش‌نمایش آواتار" id="avatar-preview" class="settings-media-preview__img" hidden>
+                              <div id="avatar-placeholder" class="settings-media-preview__empty">
+                                <i class="bi bi-person-circle"></i>
+                                <span>بدون تصویر</span>
+                              </div>
+                            </div>
+                            <div class="flex-grow-1" style="min-width:240px;max-width:420px">
+                              <div class="drop-zone mb-2" id="avatar-drop-zone" tabindex="0">
+                                <i class="bi bi-cloud-arrow-up display-6 d-block mb-2"></i>
+                                <p class="mb-1 small">تصویر را بکشید یا کلیک کنید</p>
+                                <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت</p>
+                                <input type="file" id="avatar-upload" class="visually-hidden" accept="image/jpeg,image/png,image/webp">
+                              </div>
+                              <button type="button" class="btn btn-outline-danger btn-sm" id="avatar-remove">
+                                <i class="bi bi-trash"></i> حذف آواتار
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                       <div class="row g-3">
                         <div class="col-md-6">
                           <label for="fullName" class="form-label">نام کامل <span class="text-danger">*</span></label>
@@ -117,12 +142,12 @@
 
                     <div class="settings-card__note">
                       <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
-                      <span>پس از ذخیره، نام مدیر در هدر پنل به‌روز می‌شود.</span>
+                      <span>پس از انتخاب تصویر، «ذخیره پروفایل» را بزنید. نام مدیر در هدر پنل به‌روز می‌شود.</span>
                     </div>
                   </article>
                 </section>
 
-                <!-- Avatar -->
+                <!-- Avatar (shortcut panel — same upload as personal section) -->
                 <section class="settings-panel d-none" data-profile-content="avatar" hidden aria-labelledby="profile-avatar-title">
                   <header class="settings-panel__header">
                     <h2 id="profile-avatar-title">تصویر پروفایل</h2>
@@ -130,34 +155,8 @@
                   </header>
 
                   <article class="settings-card">
-                    <div class="settings-card__top">
-                      <div class="settings-card__brand">
-                        <span class="settings-card__logo"><i class="bi bi-person-circle"></i></span>
-                        <div>
-                          <h3 class="settings-card__title">آواتار</h3>
-                          <p class="settings-card__subtitle">نمایش در هدر و صفحه پروفایل</p>
-                        </div>
-                      </div>
-                    </div>
                     <div class="settings-card__body settings-card__body--media">
-                      <div class="settings-media-preview settings-media-preview--avatar">
-                        <img src="" alt="پیش‌نمایش آواتار" id="avatar-preview" class="settings-media-preview__img" hidden>
-                        <div id="avatar-placeholder" class="settings-media-preview__empty">
-                          <i class="bi bi-person-circle"></i>
-                          <span>آواتاری انتخاب نشده</span>
-                        </div>
-                      </div>
-                      <div class="settings-media-actions">
-                        <input type="file" class="form-control" id="avatar-upload" accept="image/jpeg,image/png,image/webp">
-                        <button type="button" class="btn btn-outline-danger settings-card__action" id="avatar-remove">حذف آواتار</button>
-                      </div>
-                    </div>
-                    <div class="settings-card__status">
-                      <span class="settings-card__status-ok"><i class="bi bi-check-circle-fill"></i> آماده بارگذاری</span>
-                    </div>
-                    <div class="settings-card__note">
-                      <i class="bi bi-lightning-charge-fill" aria-hidden="true"></i>
-                      <span>فرمت‌های مجاز: JPG، PNG و WebP — حداکثر ۲ مگابایت.</span>
+                      <p class="text-muted mb-0">بارگذاری تصویر از بخش «اطلاعات شخصی» در دسترس است. پس از انتخاب تصویر، دکمه «ذخیره پروفایل» را بزنید.</p>
                     </div>
                   </article>
                 </section>

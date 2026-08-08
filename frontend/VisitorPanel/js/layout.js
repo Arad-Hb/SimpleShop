@@ -78,14 +78,42 @@
       </form>`;
   }
 
-  function renderHeaderActions() {
+  function renderGuestHeaderActions() {
+    return `
+      <a href="auth.html" class="header-auth-btn">
+        <span class="header-auth-text">ورود <span class="header-auth-sep">|</span> ثبت‌نام</span>
+        <span class="header-auth-icon" aria-hidden="true"><i class="bi bi-box-arrow-in-left"></i></span>
+      </a>`;
+  }
+
+  function renderUserHeaderActions(session) {
+    const auth = Store.visitorAuth || {};
+    const name = escapeHtml(auth.displayName?.(session) || session.fullName || 'حساب من');
+    const href = auth.getProfileHref?.(session.role) || 'auth.html';
+    const avatar = auth.avatarSrc?.(session) || '';
+    const avatarMarkup = avatar
+      ? `<img src="${escapeHtml(avatar)}" alt="" class="header-user-avatar" width="32" height="32">`
+      : `<span class="header-user-avatar header-user-avatar--placeholder" aria-hidden="true"><i class="bi bi-person-fill"></i></span>`;
+
+    return `
+      <div class="header-user-wrap">
+        <a href="${escapeHtml(href)}" class="header-user-chip" title="پروفایل">
+          ${avatarMarkup}
+          <span class="header-user-name">${name}</span>
+        </a>
+        <button type="button" class="header-logout-btn" data-visitor-logout aria-label="خروج">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+          <span>خروج</span>
+        </button>
+      </div>`;
+  }
+
+  function renderHeaderActions(session) {
+    const authBlock = session ? renderUserHeaderActions(session) : renderGuestHeaderActions();
     return `
       <div class="header-actions">
         <div class="header-actions-group">
-          <a href="auth.html" class="header-auth-btn">
-            <span class="header-auth-text">ورود <span class="header-auth-sep">|</span> ثبت‌نام</span>
-            <span class="header-auth-icon" aria-hidden="true"><i class="bi bi-box-arrow-in-left"></i></span>
-          </a>
+          ${authBlock}
           <span class="header-actions-divider" aria-hidden="true"></span>
           <div class="header-cart-wrap">
             <button type="button" class="header-cart-btn" id="header-cart-toggle"
@@ -99,14 +127,14 @@
       </div>`;
   }
 
-  function renderMainHeader() {
+  function renderMainHeader(session) {
     return `
       <header class="main-header">
         <div class="container-xxl">
           <div class="header-row">
             ${renderBrandBlock(SHOP.tagline)}
             ${renderSearchForm()}
-            ${renderHeaderActions()}
+            ${renderHeaderActions(session)}
           </div>
         </div>
       </header>`;
@@ -208,8 +236,8 @@
       ${renderMobileCategoryDrawer()}`;
   }
 
-  function renderHeaderShell() {
-    return renderPreviewBanner() + renderMainHeader() + renderMegaNav();
+  function renderHeaderShell(session) {
+    return renderPreviewBanner() + renderMainHeader(session) + renderMegaNav();
   }
 
   function renderFooterLinkColumn(title, links) {
@@ -398,6 +426,32 @@
     });
 
     if (settings.faviconUrl) applyFavicon(settings.faviconUrl);
+
+    const seoTitle = (settings.defaultSeoTitle || '').trim();
+    const seoDesc = (settings.defaultSeoDescription || '').trim();
+    if (seoTitle) {
+      document.title = seoTitle;
+    } else if (name) {
+      document.title = name;
+    }
+    if (seoDesc) {
+      let meta = document.querySelector('meta[name="description"]');
+      if (!meta) {
+        meta = document.createElement('meta');
+        meta.setAttribute('name', 'description');
+        document.head.appendChild(meta);
+      }
+      meta.setAttribute('content', seoDesc);
+    }
+    if (settings.ogImageUrl) {
+      let og = document.querySelector('meta[property="og:image"]');
+      if (!og) {
+        og = document.createElement('meta');
+        og.setAttribute('property', 'og:image');
+        document.head.appendChild(og);
+      }
+      og.setAttribute('content', Store.api?.mediaUrl ? Store.api.mediaUrl(settings.ogImageUrl) : settings.ogImageUrl);
+    }
 
     const contactCol = document.querySelector('.footer-contact');
     if (contactCol) {
@@ -871,9 +925,31 @@
 
   // ─── Mount ─────────────────────────────────────────────────────────
 
-  function mountHeader() {
+  const initHeaderAuthEvents = () => {
+    document.querySelector('[data-visitor-logout]')?.addEventListener('click', () => {
+      Store.visitorAuth?.logout?.();
+    });
+  };
+
+  const refreshHeaderAuth = async () => {
+    let session = Store.visitorAuth?.getSession?.() || null;
+    if (session) {
+      Store.visitorAuth?.syncApiToken?.(session);
+      session = await Store.visitorAuth.enrichSessionProfile(session);
+    }
+
+    const actions = document.querySelector('.header-actions');
+    if (actions) {
+      actions.outerHTML = renderHeaderActions(session);
+      initHeaderAuthEvents();
+      initMiniCart();
+      syncCardBadge();
+    }
+  };
+
+  function mountHeader(session) {
     const host = document.getElementById('store-header');
-    if (host) host.innerHTML = renderHeaderShell();
+    if (host) host.innerHTML = renderHeaderShell(session);
   }
 
   function mountFooter() {
@@ -882,14 +958,17 @@
   }
 
   function mountLayout() {
-    mountHeader();
+    const session = Store.visitorAuth?.getSession?.() || null;
+    mountHeader(session);
     mountFooter();
     loadBrandingFromApi();
     initMegaMenuHover();
     initMegaMenuToggle();
     initSearchForms();
     initMiniCart();
+    initHeaderAuthEvents();
     syncCardBadge();
+    refreshHeaderAuth();
     const tree = Store.catalog?.CATEGORY_TREE?.length
       ? Store.catalog.CATEGORY_TREE
       : EMPTY_CATEGORY_TREE;
@@ -903,6 +982,7 @@
     applyBranding,
     loadBrandingFromApi,
     applyApiSettings,
+    refreshHeaderAuth,
     initMegaMenuHover,
     initMegaMenuToggle,
     openMegaMenu,

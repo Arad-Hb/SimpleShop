@@ -47,10 +47,67 @@
     return true;
   };
 
+  const readSessionRaw = (key) => {
+    if (!key) return null;
+    const raw = sessionStorage.getItem(key) || localStorage.getItem(key);
+    if (!raw) return null;
+    try {
+      const session = JSON.parse(raw);
+      if (session.expiresAt && new Date(session.expiresAt) < new Date()) {
+        sessionStorage.removeItem(key);
+        localStorage.removeItem(key);
+        return null;
+      }
+      return session;
+    } catch {
+      return null;
+    }
+  };
+
+  const getPanelSession = (role) => readSessionRaw(SESSION_KEYS[role]);
+
+  const getActivePanelSession = () => {
+    const sessions = Object.keys(SESSION_KEYS)
+      .map((role) => getPanelSession(role))
+      .filter(Boolean);
+    if (!sessions.length) return null;
+    sessions.sort((a, b) => new Date(b.loggedInAt || 0) - new Date(a.loggedInAt || 0));
+    return sessions[0];
+  };
+
+  const updatePanelSession = (role, updates = {}) => {
+    const key = SESSION_KEYS[role];
+    const current = getPanelSession(role);
+    if (!key || !current) return null;
+    const next = { ...current, ...updates };
+    sessionStorage.setItem(key, JSON.stringify(next));
+    if (current.rememberMe) localStorage.setItem(key, JSON.stringify(next));
+    return next;
+  };
+
+  const clearPanelSession = (role) => {
+    const key = SESSION_KEYS[role];
+    if (!key) return;
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  };
+
+  const clearAllPanelSessions = () => {
+    Object.values(SESSION_KEYS).forEach((key) => {
+      sessionStorage.removeItem(key);
+      localStorage.removeItem(key);
+    });
+  };
+
   global.SimpleShopPanelSession = {
     SESSION_KEYS,
     buildSession,
     savePanelSession,
-    normalizeAuthData
+    normalizeAuthData,
+    getPanelSession,
+    getActivePanelSession,
+    updatePanelSession,
+    clearPanelSession,
+    clearAllPanelSessions
   };
 })(window);

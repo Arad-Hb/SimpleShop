@@ -114,16 +114,39 @@
     }
   };
 
+  const enrichSessionFromProfile = async (role) => {
+    if (typeof Store.api?.getMyProfile !== 'function') return;
+    try {
+      const profile = await Store.api.getMyProfile();
+      const fullName = (pick(profile, 'fullName', 'FullName') || '').trim()
+        || `${pick(profile, 'firstName', 'FirstName') || ''} ${pick(profile, 'lastName', 'LastName') || ''}`.trim();
+      SimpleShopPanelSession?.updatePanelSession?.(role, {
+        fullName: fullName || undefined,
+        avatarUrl: pick(profile, 'avatarUrl', 'AvatarUrl'),
+        avatarThumbnailUrl: pick(profile, 'avatarThumbnailUrl', 'AvatarThumbnailUrl')
+      });
+    } catch {
+      /* profile fetch is optional before redirect */
+    }
+  };
+
   const redirectAfterAuth = (role) => {
     if (role === 'Supplier') {
       window.location.href = '../SupplierPanel/index.html';
       return;
     }
     if (role === 'Customer') {
-      window.location.href = '../CustomerPanel/index.html';
+      window.location.href = '../CustomerPanel/profile.html';
       return;
     }
     window.location.href = 'index.html';
+  };
+
+  const finishAuth = async (data, role) => {
+    const resolvedRole = pick(data, 'role', 'Role') || role;
+    saveAuthResult(data, resolvedRole);
+    await enrichSessionFromProfile(resolvedRole);
+    setTimeout(() => redirectAfterAuth(resolvedRole), 300);
   };
 
   const initTabs = () => {
@@ -198,8 +221,7 @@
         }
 
         const resolvedRole = pick(data, 'role', 'Role') || role;
-        saveAuthResult(data, resolvedRole);
-        setTimeout(() => redirectAfterAuth(resolvedRole), 300);
+        await finishAuth(data, resolvedRole);
       } catch (err) {
         showError(SimpleShopAuthApi?.formatError?.(err) || 'ورود ناموفق — موبایل یا رمز را بررسی کنید.');
         if (!supplierLoginMode && roleInput) roleInput.value = 'Customer';
@@ -251,8 +273,7 @@
         });
 
         const resolvedRole = pick(data, 'role', 'Role') || role;
-        saveAuthResult({ ...data, fullName: `${firstName} ${lastName}`.trim() }, resolvedRole);
-        setTimeout(() => redirectAfterAuth(resolvedRole), 300);
+        await finishAuth({ ...data, fullName: `${firstName} ${lastName}`.trim() }, resolvedRole);
       } catch (err) {
         showError(SimpleShopAuthApi?.formatError?.(err) || 'ثبت‌نام ناموفق بود.');
       } finally {

@@ -44,7 +44,9 @@
     address: settings.address || null,
     currency: settings.currency || 'تومان',
     lowStockThreshold: Number(settings.lowStockThreshold ?? 10),
-    shopVisibility: settings.shopVisibility === 'private' ? 'private' : 'public',
+    shopVisibility: ['public', 'private', 'maintenance'].includes(settings.shopVisibility)
+      ? settings.shopVisibility
+      : 'public',
     instagram: settings.instagram || null,
     telegram: settings.telegram || null,
     whatsapp: settings.whatsapp || null,
@@ -231,6 +233,8 @@
       panel.hidden = !match;
       panel.classList.toggle('is-active', match);
     });
+    const formActions = $('settings-form-actions');
+    if (formActions) formActions.hidden = tabId === 'banners';
     if (tabId === 'banners' && typeof ShopAdmin.settingsBanners?.load === 'function') {
       ShopAdmin.settingsBanners.load();
     }
@@ -338,14 +342,11 @@
         const payload = mapSettingsToApi(collectSettings());
         const saved = await ShopAdmin.api.updateSettings(payload);
         const merged = mapSettingsFromApi(saved);
+        await fillForm(merged);
 
         imageState.removedLogo = false;
         imageState.removedFavicon = false;
         imageState.removedOg = false;
-
-        setMediaPreview('logo', merged.logoUrl, null);
-        setMediaPreview('favicon', merged.faviconUrl, null);
-        setMediaPreview('og', merged.ogImageUrl, null);
 
         const shopNameEl = document.querySelector('[data-shop-name]');
         if (shopNameEl) shopNameEl.textContent = merged.shopName || DEFAULT_SHOP_NAME;

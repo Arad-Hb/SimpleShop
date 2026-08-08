@@ -315,98 +315,6 @@
             </div>
           </div>
 
-          <!-- Tab: Banners -->
-          <div class="settings-tab-panel" data-tab-panel="banners" hidden id="banners-admin-root">
-            <div class="settings-panel is-active">
-              <header class="settings-panel__header">
-                <h2>بنرهای تبلیغاتی</h2>
-                <p>اسلایدر اصلی، بنرهای کناری و ردیف تبلیغات صفحه اول VisitorPanel را مدیریت کنید.</p>
-              </header>
-
-              <div class="row g-4">
-                <div class="col-lg-7">
-                  <article class="settings-card">
-                    <div class="settings-card__top">
-                      <div class="settings-card__brand">
-                        <span class="settings-card__logo"><i class="bi bi-images"></i></span>
-                        <div>
-                          <h3 class="settings-card__title">لیست بنرها</h3>
-                          <p class="settings-card__subtitle">گروه‌بندی بر اساس محل نمایش</p>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="settings-card__body" id="banners-list"></div>
-                  </article>
-                </div>
-
-                <div class="col-lg-5">
-                  <article class="settings-card">
-                    <div class="settings-card__top">
-                      <div class="settings-card__brand">
-                        <span class="settings-card__logo settings-card__logo--soft"><i class="bi bi-plus-circle"></i></span>
-                        <div>
-                          <h3 class="settings-card__title" id="banner-form-title">بنر جدید</h3>
-                          <p class="settings-card__subtitle">تصویر را آپلود کنید سپس ذخیره کنید</p>
-                        </div>
-                      </div>
-                    </div>
-                    <form id="banner-form" class="settings-card__body" novalidate>
-                      <div class="mb-3">
-                        <label class="form-label">تصویر بنر *</label>
-                        <div class="settings-media-preview mb-2">
-                          <img src="" alt="" id="banner-image-preview" class="settings-media-preview__img" hidden>
-                          <div id="banner-image-placeholder" class="settings-media-preview__empty">
-                            <i class="bi bi-image"></i>
-                            <span>تصویر انتخاب نشده</span>
-                          </div>
-                        </div>
-                        <input type="file" class="form-control" id="banner-image-input" accept="image/jpeg,image/png,image/webp">
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label" for="banner-title">عنوان *</label>
-                        <input type="text" class="form-control" id="banner-title" required>
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label" for="banner-subtitle">زیرعنوان</label>
-                        <input type="text" class="form-control" id="banner-subtitle">
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label" for="banner-button">متن دکمه</label>
-                        <input type="text" class="form-control" id="banner-button" placeholder="مشاهده">
-                      </div>
-                      <div class="mb-3">
-                        <label class="form-label" for="banner-link">لینک</label>
-                        <input type="text" class="form-control" id="banner-link" dir="ltr" placeholder="category.html?id=digital">
-                      </div>
-                      <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                          <label class="form-label" for="banner-placement">محل نمایش</label>
-                          <select class="form-select" id="banner-placement">
-                            <option value="HeroSlider">اسلایدر اصلی</option>
-                            <option value="SideAd">بنر کناری</option>
-                            <option value="AdRow">ردیف تبلیغات</option>
-                          </select>
-                        </div>
-                        <div class="col-md-6">
-                          <label class="form-label" for="banner-sort">ترتیب</label>
-                          <input type="number" class="form-control" id="banner-sort" min="0" value="0">
-                        </div>
-                      </div>
-                      <div class="form-check form-switch mb-3">
-                        <input class="form-check-input" type="checkbox" id="banner-active" checked>
-                        <label class="form-check-label" for="banner-active">فعال</label>
-                      </div>
-                      <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">ذخیره بنر</button>
-                        <button type="button" class="btn btn-outline-secondary" id="banner-form-reset">جدید</button>
-                      </div>
-                    </form>
-                  </article>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <!-- Tab: SEO -->
           <div class="settings-tab-panel" data-tab-panel="seo" hidden>
             <div class="settings-panel is-active">
@@ -461,11 +369,103 @@
             </div>
           </div>
 
-          <div class="settings-page__actions">
+          <div class="settings-page__actions" id="settings-form-actions">
             <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره تنظیمات</button>
             <button type="reset" class="btn btn-outline-secondary">بازنشانی فرم</button>
           </div>
         </form>
+
+        <!-- Tab: Banners (outside settings-form — nested forms break submit/upload) -->
+        <div class="settings-tab-panel" data-tab-panel="banners" hidden id="banners-admin-root">
+          <div class="settings-panel is-active">
+            <header class="settings-panel__header">
+              <h2>بنرهای تبلیغاتی</h2>
+              <p>اسلایدر اصلی، بنرهای کناری و ردیف تبلیغات صفحه اول VisitorPanel را مدیریت کنید.</p>
+            </header>
+
+            <div class="row g-4">
+              <div class="col-lg-7">
+                <article class="settings-card">
+                  <div class="settings-card__top">
+                    <div class="settings-card__brand">
+                      <span class="settings-card__logo"><i class="bi bi-images"></i></span>
+                      <div>
+                        <h3 class="settings-card__title">لیست بنرها</h3>
+                        <p class="settings-card__subtitle">گروه‌بندی بر اساس محل نمایش</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="settings-card__body" id="banners-list"></div>
+                </article>
+              </div>
+
+              <div class="col-lg-5">
+                <article class="settings-card">
+                  <div class="settings-card__top">
+                    <div class="settings-card__brand">
+                      <span class="settings-card__logo settings-card__logo--soft"><i class="bi bi-plus-circle"></i></span>
+                      <div>
+                        <h3 class="settings-card__title" id="banner-form-title">بنر جدید</h3>
+                        <p class="settings-card__subtitle">تصویر را آپلود کنید سپس ذخیره کنید</p>
+                      </div>
+                    </div>
+                  </div>
+                  <form id="banner-form" class="settings-card__body" novalidate>
+                    <div class="mb-3">
+                      <label class="form-label">تصویر بنر *</label>
+                      <div class="settings-media-preview mb-2">
+                        <img src="" alt="" id="banner-image-preview" class="settings-media-preview__img" hidden>
+                        <div id="banner-image-placeholder" class="settings-media-preview__empty">
+                          <i class="bi bi-image"></i>
+                          <span>تصویر انتخاب نشده</span>
+                        </div>
+                      </div>
+                      <input type="file" class="form-control" id="banner-image-input" accept="image/jpeg,image/png,image/webp">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="banner-title">عنوان *</label>
+                      <input type="text" class="form-control" id="banner-title" required>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="banner-subtitle">زیرعنوان</label>
+                      <input type="text" class="form-control" id="banner-subtitle">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="banner-button">متن دکمه</label>
+                      <input type="text" class="form-control" id="banner-button" placeholder="مشاهده">
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label" for="banner-link">لینک</label>
+                      <input type="text" class="form-control" id="banner-link" dir="ltr" placeholder="category.html?id=digital">
+                    </div>
+                    <div class="row g-3 mb-3">
+                      <div class="col-md-6">
+                        <label class="form-label" for="banner-placement">محل نمایش</label>
+                        <select class="form-select" id="banner-placement">
+                          <option value="HeroSlider">اسلایدر اصلی</option>
+                          <option value="SideAd">بنر کناری</option>
+                          <option value="AdRow">ردیف تبلیغات</option>
+                        </select>
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label" for="banner-sort">ترتیب</label>
+                        <input type="number" class="form-control" id="banner-sort" min="0" value="0">
+                      </div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                      <input class="form-check-input" type="checkbox" id="banner-active" checked>
+                      <label class="form-check-label" for="banner-active">فعال</label>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-primary">ذخیره بنر</button>
+                      <button type="button" class="btn btn-outline-secondary" id="banner-form-reset">جدید</button>
+                    </div>
+                  </form>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   </div>

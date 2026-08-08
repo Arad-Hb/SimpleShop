@@ -70,7 +70,12 @@ public class ShopSettingsRepository(SimpleShopDbContext db) : IShopSettingsRepos
         entity.Address = string.IsNullOrWhiteSpace(model.Address) ? null : model.Address.Trim();
         entity.Currency = string.IsNullOrWhiteSpace(model.Currency) ? "تومان" : model.Currency.Trim();
         entity.LowStockThreshold = model.LowStockThreshold < 0 ? 0 : model.LowStockThreshold;
-        entity.ShopVisibility = model.ShopVisibility == "private" ? "private" : "public";
+        entity.ShopVisibility = model.ShopVisibility switch
+        {
+            "private" => "private",
+            "maintenance" => "maintenance",
+            _ => "public"
+        };
         entity.Instagram = string.IsNullOrWhiteSpace(model.Instagram) ? null : model.Instagram.Trim();
         entity.Telegram = string.IsNullOrWhiteSpace(model.Telegram) ? null : model.Telegram.Trim();
         entity.Whatsapp = string.IsNullOrWhiteSpace(model.Whatsapp) ? null : model.Whatsapp.Trim();

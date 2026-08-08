@@ -47,6 +47,10 @@
           </div>
         </div>`;
     }).join('');
+
+    const existing = bootstrap.Carousel.getInstance(carousel);
+    if (existing) existing.dispose();
+    new bootstrap.Carousel(carousel, { interval: 5000, ride: 'carousel' });
   };
 
   const renderSideAds = (banners) => {
