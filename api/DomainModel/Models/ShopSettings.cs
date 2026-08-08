@@ -21,4 +21,11 @@ public class ShopSettings
     public string? DefaultSeoTitle { get; set; }
     public string? DefaultSeoDescription { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    public int? LogoFileId { get; set; }
+    public FileManager? LogoFile { get; set; }
+    public int? FaviconFileId { get; set; }
+    public FileManager? FaviconFile { get; set; }
+    public int? OgImageFileId { get; set; }
+    public FileManager? OgImageFile { get; set; }
 }

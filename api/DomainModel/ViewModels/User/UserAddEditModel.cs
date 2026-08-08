@@ -29,4 +29,8 @@ public class UserAddEditModel
     public string? NationalId { get; set; }
     public bool IsActive { get; set; } = true;
     public DateTime? RegisterDate { get; set; }
+
+    public int? AvatarFileId { get; set; }
+    public string? AvatarUrl { get; set; }
+    public string? AvatarThumbnailUrl { get; set; }
 }

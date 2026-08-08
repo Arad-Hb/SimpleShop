@@ -5,13 +5,16 @@
   'use strict';
 
   const { formatDateTime } = ShopAdmin.utils;
-  const { validateRequired, validateEmail, validateMobile, validateForm } = ShopAdmin.validation;
+  const { validateRequired, validateEmail, validateMobile, validateForm, validateImageFile } = ShopAdmin.validation;
   const { parseError } = window.SimpleShopHttp || {};
   const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
   const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
   let currentProfile = {};
+  let avatarFileId = null;
+  let pendingAvatarFile = null;
+  let avatarRemoved = false;
 
   const $ = (id) => document.getElementById(id);
 
@@ -61,14 +64,42 @@
       email: pick(dto, 'email', 'Email') || '',
       mobile: pick(dto, 'phone', 'Phone') || pick(dto, 'username', 'Username') || '',
       isActive: pick(dto, 'isActive', 'IsActive') !== false,
-      registerDate: pick(dto, 'registerDate', 'RegisterDate') || null
+      registerDate: pick(dto, 'registerDate', 'RegisterDate') || null,
+      avatarFileId: pick(dto, 'avatarFileId', 'AvatarFileId') ?? null,
+      avatarUrl: pick(dto, 'avatarUrl', 'AvatarUrl') || pick(dto, 'avatarThumbnailUrl', 'AvatarThumbnailUrl') || null
     };
+  };
+
+  const showAvatarPreview = (url) => {
+    const preview = $('avatar-preview');
+    const placeholder = $('avatar-placeholder');
+    if (!url) {
+      preview.hidden = true;
+      placeholder?.classList.remove('d-none');
+      return;
+    }
+    preview.src = /^blob:|^data:/.test(url) ? url : ShopAdmin.api.mediaUrl(url);
+    preview.hidden = false;
+    placeholder?.classList.add('d-none');
+  };
+
+  const uploadPendingAvatar = async () => {
+    if (pendingAvatarFile) {
+      const result = await ShopAdmin.api.uploadFile(pendingAvatarFile, 'users');
+      avatarFileId = pick(result, 'id', 'Id');
+      avatarRemoved = false;
+      pendingAvatarFile = null;
+    }
   };
 
   const loadProfile = async () => {
     await ShopAdmin.api.ensureApiAuth();
     const dto = await ShopAdmin.api.getMyProfile();
     currentProfile = mapProfile(dto);
+    avatarFileId = currentProfile.avatarFileId;
+    avatarRemoved = false;
+    pendingAvatarFile = null;
+    showAvatarPreview(currentProfile.avatarUrl);
 
     const session = ShopAdmin.auth.getSession();
 
@@ -95,23 +126,25 @@
     const firstName = parts[0] || '';
     const lastName = parts.slice(1).join(' ');
 
+    await uploadPendingAvatar();
+
     const payload = {
       firstName,
       lastName,
       email: formData.email,
-      phone: formData.mobile
+      phone: formData.mobile,
+      avatarFileId: avatarRemoved ? null : avatarFileId
     };
 
-    await ShopAdmin.api.updateMyProfile(payload);
+    const updated = await ShopAdmin.api.updateMyProfile(payload);
 
     currentProfile = {
-      ...currentProfile,
+      ...mapProfile(updated),
       fullName: formData.fullName,
-      firstName,
-      lastName,
-      email: formData.email,
       mobile: formData.mobile
     };
+    avatarFileId = currentProfile.avatarFileId;
+    showAvatarPreview(currentProfile.avatarUrl);
 
     ShopAdmin.auth.updateSession({
       fullName: formData.fullName,
@@ -224,6 +257,28 @@
 
     $('change-password-btn')?.addEventListener('click', () => {
       changePassword();
+    });
+
+    $('avatar-upload')?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const err = validateImageFile(file);
+      if (err) {
+        ShopAdmin.ui.showToast('error', err);
+        e.target.value = '';
+        return;
+      }
+      pendingAvatarFile = file;
+      avatarRemoved = false;
+      showAvatarPreview(URL.createObjectURL(file));
+      e.target.value = '';
+    });
+
+    $('avatar-remove')?.addEventListener('click', () => {
+      avatarFileId = null;
+      pendingAvatarFile = null;
+      avatarRemoved = true;
+      showAvatarPreview(null);
     });
   };
 

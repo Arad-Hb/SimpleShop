@@ -26,12 +26,24 @@ public class ShopSettingsRepository(SimpleShopDbContext db) : IShopSettingsRepos
         WhatsappEnabled = s.WhatsappEnabled,
         DefaultSeoTitle = s.DefaultSeoTitle,
         DefaultSeoDescription = s.DefaultSeoDescription,
-        UpdatedAt = s.UpdatedAt
+        UpdatedAt = s.UpdatedAt,
+        LogoFileId = s.LogoFileId,
+        LogoUrl = s.LogoFile?.Url,
+        LogoThumbnailUrl = s.LogoFile?.ThumbnailUrl,
+        FaviconFileId = s.FaviconFileId,
+        FaviconUrl = s.FaviconFile?.Url,
+        OgImageFileId = s.OgImageFileId,
+        OgImageUrl = s.OgImageFile?.Url
     };
 
     private async Task<ShopSettings> GetOrCreateEntityAsync()
     {
-        var entity = await db.ShopSettings.OrderBy(x => x.Id).FirstOrDefaultAsync();
+        var entity = await db.ShopSettings
+            .Include(x => x.LogoFile)
+            .Include(x => x.FaviconFile)
+            .Include(x => x.OgImageFile)
+            .OrderBy(x => x.Id)
+            .FirstOrDefaultAsync();
         if (entity != null)
             return entity;
 
@@ -67,6 +79,9 @@ public class ShopSettingsRepository(SimpleShopDbContext db) : IShopSettingsRepos
         entity.WhatsappEnabled = model.WhatsappEnabled;
         entity.DefaultSeoTitle = string.IsNullOrWhiteSpace(model.DefaultSeoTitle) ? null : model.DefaultSeoTitle.Trim();
         entity.DefaultSeoDescription = string.IsNullOrWhiteSpace(model.DefaultSeoDescription) ? null : model.DefaultSeoDescription.Trim();
+        entity.LogoFileId = model.LogoFileId;
+        entity.FaviconFileId = model.FaviconFileId;
+        entity.OgImageFileId = model.OgImageFileId;
         entity.UpdatedAt = DateTime.UtcNow;
 
         await db.SaveChangesAsync();

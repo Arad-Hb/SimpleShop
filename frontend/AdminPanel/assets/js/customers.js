@@ -37,10 +37,12 @@
     postalCode: pick(dto, 'postalCode', 'PostalCode') || '',
     nationalId: pick(dto, 'nationalId', 'NationalId') || '',
     isActive: pick(dto, 'isActive', 'IsActive') !== false,
-    registerDate: pick(dto, 'registerDate', 'RegisterDate') || null
+    registerDate: pick(dto, 'registerDate', 'RegisterDate') || null,
+    avatarFileId: pick(dto, 'avatarFileId', 'AvatarFileId') ?? null,
+    avatarUrl: pick(dto, 'avatarUrl', 'AvatarUrl') || pick(dto, 'avatarThumbnailUrl', 'AvatarThumbnailUrl') || null
   });
 
-  const toApiPayload = (form, { includePassword = false } = {}) => {
+  const toApiPayload = (form, { includePassword = false, avatarFileId = undefined } = {}) => {
     const mobile = form.mobile.value.trim();
     const payload = {
       firstName: form.firstName.value.trim(),
@@ -54,6 +56,9 @@
       isActive: form.isActive ? form.isActive.checked : true,
       role: 'Customer'
     };
+    if (avatarFileId !== undefined) {
+      payload.avatarFileId = avatarFileId;
+    }
     if (includePassword) {
       payload.password = form.password?.value || '';
     }
@@ -281,6 +286,64 @@
     const passwordInput = document.getElementById('password');
     const isActiveField = document.getElementById('isActive-field');
     const metaInfo = document.getElementById('meta-info');
+    const avatarDropZone = document.getElementById('avatar-drop-zone');
+    const avatarFileInput = document.getElementById('avatar-file-input');
+    const avatarPreviewWrap = document.getElementById('avatar-preview-wrap');
+    const avatarPreview = document.getElementById('avatar-preview');
+
+    let avatarFileId = null;
+    let pendingAvatarFile = null;
+    let avatarRemoved = false;
+
+    const showAvatarPreview = (url) => {
+      if (!url) {
+        avatarPreviewWrap?.classList.add('d-none');
+        return;
+      }
+      avatarPreview.src = /^blob:|^data:/.test(url) ? url : ShopAdmin.api.mediaUrl(url);
+      avatarPreviewWrap?.classList.remove('d-none');
+    };
+
+    const uploadPendingAvatar = async () => {
+      if (pendingAvatarFile) {
+        const result = await ShopAdmin.api.uploadFile(pendingAvatarFile, 'users');
+        avatarFileId = pick(result, 'id', 'Id');
+        avatarRemoved = false;
+        pendingAvatarFile = null;
+      }
+    };
+
+    const handleAvatarFile = (file) => {
+      const err = ShopAdmin.validation.validateImageFile(file);
+      if (err) {
+        ShopAdmin.ui.showToast('error', err);
+        return;
+      }
+      pendingAvatarFile = file;
+      avatarRemoved = false;
+      showAvatarPreview(URL.createObjectURL(file));
+    };
+
+    avatarDropZone?.addEventListener('click', () => avatarFileInput?.click());
+    avatarFileInput?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) handleAvatarFile(file);
+      e.target.value = '';
+    });
+    avatarDropZone?.addEventListener('dragover', (e) => { e.preventDefault(); avatarDropZone.classList.add('drop-zone--active'); });
+    avatarDropZone?.addEventListener('dragleave', () => avatarDropZone.classList.remove('drop-zone--active'));
+    avatarDropZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      avatarDropZone.classList.remove('drop-zone--active');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleAvatarFile(file);
+    });
+    document.getElementById('btn-remove-avatar')?.addEventListener('click', () => {
+      avatarFileId = null;
+      pendingAvatarFile = null;
+      avatarRemoved = true;
+      avatarPreviewWrap?.classList.add('d-none');
+    });
 
     if (!form) return;
 
@@ -307,6 +370,9 @@
         document.getElementById('address').value = customer.address;
         document.getElementById('nationalId').value = customer.nationalId;
         document.getElementById('isActive').checked = customer.isActive;
+
+        avatarFileId = customer.avatarFileId;
+        showAvatarPreview(customer.avatarUrl);
 
         if (customer.registerDate && metaInfo) {
           document.getElementById('meta-created').textContent =
@@ -371,10 +437,16 @@
       if (!valid) return;
 
       const idVal = document.getElementById('customer-id')?.value || '';
-      const payload = toApiPayload(form, { includePassword: !idVal });
 
       try {
         await ShopAdmin.api.ensureApiAuth();
+        await uploadPendingAvatar();
+        const resolvedAvatarId = avatarRemoved ? null : avatarFileId;
+        const payload = toApiPayload(form, {
+          includePassword: !idVal,
+          avatarFileId: resolvedAvatarId
+        });
+
         if (idVal) {
           await ShopAdmin.api.updateCustomer(idVal, payload);
           ShopAdmin.ui.showToast('success', 'مشتری بروزرسانی شد.');

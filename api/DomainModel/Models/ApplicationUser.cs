@@ -12,6 +12,9 @@ public class ApplicationUser : IdentityUser
     public bool IsActive { get; set; } = true;
     public DateTime RegisterDate { get; set; } = DateTime.UtcNow;
 
+    public int? AvatarFileId { get; set; }
+    public FileManager? AvatarFile { get; set; }
+
     public ICollection<ApplicationUserRole> ApplicationUserRoles { get; set; } = new List<ApplicationUserRole>();
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 

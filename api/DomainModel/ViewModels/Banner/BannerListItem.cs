@@ -12,4 +12,5 @@ public class BannerListItem
     public bool IsActive { get; set; }
     public string ImageUrl { get; set; } = string.Empty;
     public string ThumbnailUrl { get; set; } = string.Empty;
+    public int FileManagerId { get; set; }
 }

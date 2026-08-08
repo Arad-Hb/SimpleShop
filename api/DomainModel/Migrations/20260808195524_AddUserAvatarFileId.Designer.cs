@@ -4,6 +4,7 @@ using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DomainModel.Migrations
 {
     [DbContext(typeof(SimpleShopDbContext))]
-    partial class SimpleShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260808195524_AddUserAvatarFileId")]
+    partial class AddUserAvatarFileId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -590,9 +593,6 @@ namespace DomainModel.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("FaviconFileId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Instagram")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -600,13 +600,7 @@ namespace DomainModel.Migrations
                     b.Property<bool>("InstagramEnabled")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("LogoFileId")
-                        .HasColumnType("int");
-
                     b.Property<int>("LowStockThreshold")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OgImageFileId")
                         .HasColumnType("int");
 
                     b.Property<string>("ShopDescription")
@@ -641,12 +635,6 @@ namespace DomainModel.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FaviconFileId");
-
-                    b.HasIndex("LogoFileId");
-
-                    b.HasIndex("OgImageFileId");
 
                     b.ToTable("ShopSettings");
                 });
@@ -943,30 +931,6 @@ namespace DomainModel.Migrations
                     b.Navigation("FileManager");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("DomainModel.Models.ShopSettings", b =>
-                {
-                    b.HasOne("DomainModel.Models.FileManager", "FaviconFile")
-                        .WithMany()
-                        .HasForeignKey("FaviconFileId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("DomainModel.Models.FileManager", "LogoFile")
-                        .WithMany()
-                        .HasForeignKey("LogoFileId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("DomainModel.Models.FileManager", "OgImageFile")
-                        .WithMany()
-                        .HasForeignKey("OgImageFileId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.Navigation("FaviconFile");
-
-                    b.Navigation("LogoFile");
-
-                    b.Navigation("OgImageFile");
                 });
 
             modelBuilder.Entity("DomainModel.Models.Supplier", b =>

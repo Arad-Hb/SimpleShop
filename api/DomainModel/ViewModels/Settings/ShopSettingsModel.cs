@@ -47,4 +47,12 @@ public class ShopSettingsModel
     public string? DefaultSeoDescription { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
+
+    public int? LogoFileId { get; set; }
+    public string? LogoUrl { get; set; }
+    public string? LogoThumbnailUrl { get; set; }
+    public int? FaviconFileId { get; set; }
+    public string? FaviconUrl { get; set; }
+    public int? OgImageFileId { get; set; }
+    public string? OgImageUrl { get; set; }
 }

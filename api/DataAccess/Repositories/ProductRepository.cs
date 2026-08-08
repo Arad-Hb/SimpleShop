@@ -172,13 +172,146 @@ public class ProductRepository(SimpleShopDbContext db) : IProductRepository
 
     public async Task<ProductListItem?> GetListItem(int id)
     {
-        return await ProjectList(
+        var item = await ProjectList(
                 db.Products.AsNoTracking()
                     .Include(p => p.Category)
                     .Include(p => p.Supplier)
                     .Include(p => p.PrimaryImage)
+                    .Include(p => p.OgImage)
                     .Where(p => p.Id == id))
             .FirstOrDefaultAsync();
+
+        if (item == null) return null;
+
+        item.Gallery = await db.ProductImages.AsNoTracking()
+            .Where(pi => pi.ProductId == id)
+            .OrderBy(pi => pi.SortOrder)
+            .Select(pi => new ProductImageItem
+            {
+                Id = pi.Id,
+                FileManagerId = pi.FileManagerId,
+                Url = pi.FileManager.Url,
+                ThumbnailUrl = pi.FileManager.ThumbnailUrl,
+                AltText = pi.AltText,
+                IsPrimary = pi.IsPrimary,
+                SortOrder = pi.SortOrder
+            })
+            .ToListAsync();
+
+        return item;
+    }
+
+    public async Task<OperationResult> AddProductImage(int productId, ProductImageAddModel model)
+    {
+        var op = new OperationResult("Add Product Image");
+        try
+        {
+            var productExists = await db.Products.AnyAsync(p => p.Id == productId);
+            if (!productExists)
+                return op.ToFailed("محصول پیدا نشد");
+
+            var fileExists = await db.FileManagers.AnyAsync(f => f.Id == model.FileManagerId);
+            if (!fileExists)
+                return op.ToFailed("فایل تصویر پیدا نشد");
+
+            if (model.IsPrimary)
+            {
+                var existingPrimary = await db.ProductImages
+                    .Where(pi => pi.ProductId == productId && pi.IsPrimary)
+                    .ToListAsync();
+                foreach (var img in existingPrimary)
+                    img.IsPrimary = false;
+
+                var product = await db.Products.FirstAsync(p => p.Id == productId);
+                product.PrimaryImageId = model.FileManagerId;
+            }
+
+            var entity = new ProductImage
+            {
+                ProductId = productId,
+                FileManagerId = model.FileManagerId,
+                AltText = model.AltText,
+                IsPrimary = model.IsPrimary,
+                SortOrder = model.SortOrder
+            };
+
+            db.ProductImages.Add(entity);
+            await db.SaveChangesAsync();
+            return op.ToSuccess("تصویر به گالری اضافه شد", entity.Id);
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed("خطا در افزودن تصویر: " + ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> UpdateProductImage(int productId, int imageId, ProductImageUpdateModel model)
+    {
+        var op = new OperationResult("Update Product Image");
+        try
+        {
+            var entity = await db.ProductImages
+                .FirstOrDefaultAsync(pi => pi.Id == imageId && pi.ProductId == productId);
+            if (entity == null)
+                return op.ToFailed("تصویر پیدا نشد");
+
+            if (model.AltText != null)
+                entity.AltText = model.AltText;
+
+            if (model.SortOrder.HasValue)
+                entity.SortOrder = model.SortOrder.Value;
+
+            if (model.IsPrimary == true)
+            {
+                var existingPrimary = await db.ProductImages
+                    .Where(pi => pi.ProductId == productId && pi.IsPrimary && pi.Id != imageId)
+                    .ToListAsync();
+                foreach (var img in existingPrimary)
+                    img.IsPrimary = false;
+
+                entity.IsPrimary = true;
+                var product = await db.Products.FirstAsync(p => p.Id == productId);
+                product.PrimaryImageId = entity.FileManagerId;
+            }
+            else if (model.IsPrimary == false)
+            {
+                entity.IsPrimary = false;
+            }
+
+            await db.SaveChangesAsync();
+            return op.ToSuccess("تصویر به‌روزرسانی شد", imageId);
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed("خطا در ویرایش تصویر: " + ex.Message);
+        }
+    }
+
+    public async Task<OperationResult> RemoveProductImage(int productId, int imageId)
+    {
+        var op = new OperationResult("Remove Product Image");
+        try
+        {
+            var entity = await db.ProductImages
+                .FirstOrDefaultAsync(pi => pi.Id == imageId && pi.ProductId == productId);
+            if (entity == null)
+                return op.ToFailed("تصویر پیدا نشد");
+
+            if (entity.IsPrimary)
+            {
+                var product = await db.Products.FirstOrDefaultAsync(p => p.Id == productId);
+                if (product != null && product.PrimaryImageId == entity.FileManagerId)
+                    product.PrimaryImageId = null;
+            }
+
+            db.ProductImages.Remove(entity);
+            await db.SaveChangesAsync();
+            return op.ToSuccess("تصویر از گالری حذف شد", imageId);
+        }
+        catch (Exception ex)
+        {
+            return op.ToFailed("خطا در حذف تصویر: " + ex.Message);
+        }
     }
 
     public async Task<ProductListComplex> Search(ProductSearchModel searchModel)

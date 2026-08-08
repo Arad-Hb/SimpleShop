@@ -68,4 +68,41 @@ public class ProductsController(IProductRepository products) : ControllerBase
         if (op.Message == "محصول پیدا نشد") return NotFound(new { message = op.Message });
         return BadRequest(new { message = op.Message });
     }
+
+    [HttpPost("{id:int}/images")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> AddImage(int id, [FromBody] ProductImageAddModel model)
+    {
+        var op = await products.AddProductImage(id, model);
+        if (!op.Success) return BadRequest(new { message = op.Message });
+        var item = await products.GetListItem(id);
+        return item == null ? NotFound() : Ok(item);
+    }
+
+    [HttpPut("{id:int}/images/{imageId:int}")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> UpdateImage(int id, int imageId, [FromBody] ProductImageUpdateModel model)
+    {
+        var op = await products.UpdateProductImage(id, imageId, model);
+        if (!op.Success)
+        {
+            if (op.Message == "تصویر پیدا نشد") return NotFound(new { message = op.Message });
+            return BadRequest(new { message = op.Message });
+        }
+        var item = await products.GetListItem(id);
+        return item == null ? NotFound() : Ok(item);
+    }
+
+    [HttpDelete("{id:int}/images/{imageId:int}")]
+    [Authorize(Roles = Roles.Admin)]
+    public async Task<IActionResult> RemoveImage(int id, int imageId)
+    {
+        var op = await products.RemoveProductImage(id, imageId);
+        if (!op.Success)
+        {
+            if (op.Message == "تصویر پیدا نشد") return NotFound(new { message = op.Message });
+            return BadRequest(new { message = op.Message });
+        }
+        return NoContent();
+    }
 }

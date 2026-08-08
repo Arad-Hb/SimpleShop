@@ -83,6 +83,21 @@
                 <label for="address" class="form-label">آدرس</label>
                 <textarea class="form-control" id="address" name="address" rows="2"></textarea>
               </div>
+              <div class="col-12">
+                <label class="form-label">تصویر پروفایل</label>
+                <div class="drop-zone mb-2" id="avatar-drop-zone" tabindex="0" style="max-width:420px">
+                  <i class="bi bi-person-circle display-6 d-block mb-2"></i>
+                  <p class="mb-1 small">تصویر را بکشید یا کلیک کنید</p>
+                  <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت</p>
+                  <input type="file" id="avatar-file-input" class="visually-hidden" accept="image/jpeg,image/png,image/webp">
+                </div>
+                <div id="avatar-preview-wrap" class="d-none mb-2">
+                  <img id="avatar-preview" class="img-thumbnail rounded-circle" style="width:96px;height:96px;object-fit:cover" alt="آواتار">
+                  <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="btn-remove-avatar">
+                    <i class="bi bi-trash"></i> حذف
+                  </button>
+                </div>
+              </div>
               <div class="col-md-6 d-none" id="isActive-field">
                 <div class="form-check form-switch mt-2">
                   <input class="form-check-input" type="checkbox" role="switch" id="isActive" name="isActive" checked>

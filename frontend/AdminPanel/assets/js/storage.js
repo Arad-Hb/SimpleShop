@@ -255,10 +255,11 @@
     const payload = {
       shopName: settings.shopName || DEFAULT_SHOP_NAME,
       shopDescription: settings.shopDescription || '',
+      logoUrl: settings.logoUrl || null,
       logoDataUrl: null,
       updatedAt: Date.now()
     };
-    if (settings.logoId) {
+    if (!payload.logoUrl && settings.logoId) {
       const blob = await imageStore.getImage(settings.logoId);
       if (blob) payload.logoDataUrl = await blobToDataUrl(blob);
     }

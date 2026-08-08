@@ -104,6 +104,28 @@
     return response.status === 204 ? null : response.data;
   };
 
+  const getFile = (id) => request(`/api/files/${id}`);
+
+  const replaceFile = async (id, file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await client.put(`/api/files/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  };
+
+  const deleteFile = (id) => request(`/api/files/${id}`, { method: 'DELETE' });
+
+  const updateProductImage = (productId, imageId, body) =>
+    request(`/api/products/${productId}/images/${imageId}`, { method: 'PUT', body });
+
+  const addProductImage = (productId, body) =>
+    request(`/api/products/${productId}/images`, { method: 'POST', body });
+
+  const removeProductImage = (productId, imageId) =>
+    request(`/api/products/${productId}/images/${imageId}`, { method: 'DELETE' });
+
   const createCategory = (body) => request('/api/categories', { method: 'POST', body });
 
   const updateCategory = (id, body) => request(`/api/categories/${id}`, { method: 'PUT', body });
@@ -218,6 +240,24 @@
 
   const updateSettings = (body) => request('/api/settings', { method: 'PUT', body });
 
+  const getBanners = (placement) => {
+    const qs = placement ? `?placement=${encodeURIComponent(placement)}` : '';
+    return request(`/api/banners${qs}`);
+  };
+
+  const getBannersManage = (placement) => {
+    const qs = placement ? `?placement=${encodeURIComponent(placement)}` : '';
+    return request(`/api/banners/manage${qs}`);
+  };
+
+  const getBanner = (id) => request(`/api/banners/${id}`);
+
+  const createBanner = (body) => request('/api/banners', { method: 'POST', body });
+
+  const updateBanner = (id, body) => request(`/api/banners/${id}`, { method: 'PUT', body });
+
+  const deleteBanner = (id) => request(`/api/banners/${id}`, { method: 'DELETE' });
+
   ShopAdmin.api = {
     request,
     mediaUrl,
@@ -231,6 +271,12 @@
     getCategory,
     searchCategories,
     uploadFile,
+    getFile,
+    replaceFile,
+    deleteFile,
+    addProductImage,
+    updateProductImage,
+    removeProductImage,
     createCategory,
     updateCategory,
     deleteCategory,
@@ -257,6 +303,12 @@
     getSalesReport,
     getSettings,
     updateSettings,
+    getBanners,
+    getBannersManage,
+    getBanner,
+    createBanner,
+    updateBanner,
+    deleteBanner,
     ensureApiAuth,
     ping,
     getToken,

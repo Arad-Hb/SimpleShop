@@ -20,5 +20,9 @@ public class ShopSettingsConfiguration : IEntityTypeConfiguration<ShopSettings>
         builder.Property(x => x.Whatsapp).HasMaxLength(200);
         builder.Property(x => x.DefaultSeoTitle).HasMaxLength(200);
         builder.Property(x => x.DefaultSeoDescription).HasMaxLength(500);
+
+        builder.HasOne(x => x.LogoFile).WithMany().HasForeignKey(x => x.LogoFileId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne(x => x.FaviconFile).WithMany().HasForeignKey(x => x.FaviconFileId).OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne(x => x.OgImageFile).WithMany().HasForeignKey(x => x.OgImageFileId).OnDelete(DeleteBehavior.NoAction);
     }
 }

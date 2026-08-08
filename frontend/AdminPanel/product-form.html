@@ -42,6 +42,9 @@
             <button class="nav-link active" id="tab-main-btn" data-bs-toggle="tab" data-bs-target="#tab-main" type="button" role="tab" data-tab="main">اطلاعات اصلی</button>
           </li>
           <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tab-image-btn" data-bs-toggle="tab" data-bs-target="#tab-image" type="button" role="tab" data-tab="image">تصویر</button>
+          </li>
+          <li class="nav-item" role="presentation">
             <button class="nav-link" id="tab-seo-btn" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab" data-tab="seo">تنظیمات SEO</button>
           </li>
           <li class="nav-item" role="presentation">
@@ -112,7 +115,24 @@
               </div>
             </div>
 
-            <!-- Tab 2: SEO -->
+            <!-- Tab 2: Image -->
+            <div class="tab-pane fade" id="tab-image" role="tabpanel">
+              <p class="text-muted small">تصویر اصلی محصول (برای نمایش در فروشگاه و لیست مدیریت)</p>
+              <div class="drop-zone mb-3" id="image-drop-zone" tabindex="0">
+                <i class="bi bi-cloud-upload display-6 d-block mb-2"></i>
+                <p class="mb-1">تصویر را اینجا بکشید و رها کنید یا کلیک کنید</p>
+                <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت</p>
+                <input type="file" id="image-file-input" class="visually-hidden" accept="image/jpeg,image/png,image/webp">
+              </div>
+              <div id="image-preview-wrap" class="d-none mb-3">
+                <img id="image-preview" class="img-thumbnail" style="max-height:160px" alt="پیش‌نمایش">
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" id="btn-remove-image">
+                  <i class="bi bi-trash"></i> حذف تصویر
+                </button>
+              </div>
+            </div>
+
+            <!-- Tab 3: SEO -->
             <div class="tab-pane fade" id="tab-seo" role="tabpanel">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -158,6 +178,13 @@
                   <div class="mb-3">
                     <label class="form-label" for="ogDescription">توضیحات Open Graph</label>
                     <input type="text" class="form-control" id="ogDescription" name="ogDescription" maxlength="200">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="mb-3">
+                    <label class="form-label" for="ogImageFile">تصویر Open Graph</label>
+                    <input type="file" class="form-control" id="ogImageFile" accept="image/jpeg,image/png,image/webp">
+                    <div id="og-image-preview" class="mt-2"></div>
                   </div>
                 </div>
                 <div class="col-md-6">

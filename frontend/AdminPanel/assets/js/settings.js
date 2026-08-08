@@ -4,10 +4,11 @@
 (function (ShopAdmin) {
   'use strict';
 
-  const { generateId } = ShopAdmin.utils;
   const { validateRequired, validateForm, validateImageFile } = ShopAdmin.validation;
-  const { getData, saveData, imageStore, syncPublicBranding, STORAGE_KEY } = ShopAdmin.storage;
+  const { syncPublicBranding, STORAGE_KEY } = ShopAdmin.storage;
   const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
+
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
   const mapSettingsFromApi = (data = {}) => ({
     shopName: data.shopName || '',
@@ -26,6 +27,12 @@
     whatsappEnabled: !!data.whatsappEnabled,
     defaultSeoTitle: data.defaultSeoTitle || '',
     defaultSeoDescription: data.defaultSeoDescription || '',
+    logoFileId: data.logoFileId ?? null,
+    logoUrl: data.logoUrl || null,
+    faviconFileId: data.faviconFileId ?? null,
+    faviconUrl: data.faviconUrl || null,
+    ogImageFileId: data.ogImageFileId ?? null,
+    ogImageUrl: data.ogImageUrl || null,
     updatedAt: data.updatedAt || null
   });
 
@@ -45,37 +52,25 @@
     telegramEnabled: !!settings.telegramEnabled,
     whatsappEnabled: !!settings.whatsappEnabled,
     defaultSeoTitle: settings.defaultSeoTitle || null,
-    defaultSeoDescription: settings.defaultSeoDescription || null
+    defaultSeoDescription: settings.defaultSeoDescription || null,
+    logoFileId: settings.logoFileId ?? null,
+    faviconFileId: settings.faviconFileId ?? null,
+    ogImageFileId: settings.ogImageFileId ?? null
   });
-
-  const loadLocalImageSettings = () => {
-    const local = getData().settings || {};
-    return {
-      logoId: local.logoId || null,
-      faviconId: local.faviconId || null,
-      ogImageId: local.ogImageId || null
-    };
-  };
-
-  const saveLocalImageSettings = (imageSettings) => {
-    const data = getData();
-    data.settings = { ...(data.settings || {}), ...imageSettings };
-    saveData(data);
-  };
 
   /** @type {Record<string, string|null>} */
   let objectUrls = {};
-  /** @type {Record<string, string|null>} */
-  let pendingImageIds = {
-    logoId: null,
-    faviconId: null,
-    ogImageId: null
-  };
-  /** @type {Record<string, boolean>} */
-  let removedImages = {
-    logoId: false,
-    faviconId: false,
-    ogImageId: false
+
+  const imageState = {
+    logoFileId: null,
+    faviconFileId: null,
+    ogImageFileId: null,
+    pendingLogoFile: null,
+    pendingFaviconFile: null,
+    pendingOgFile: null,
+    removedLogo: false,
+    removedFavicon: false,
+    removedOg: false
   };
 
   const $ = (id) => document.getElementById(id);
@@ -87,31 +82,61 @@
     }
   };
 
-  const setMediaPreview = async (kind, imageId) => {
+  const resolvePreviewSrc = (url, blobUrl) => {
+    if (blobUrl) return blobUrl;
+    if (!url) return '';
+    if (/^blob:|^data:/.test(url)) return url;
+    return ShopAdmin.api.mediaUrl(url);
+  };
+
+  const setMediaPreview = (kind, url, blobUrl) => {
     const img = $(`${kind}-preview`);
     const empty = $(`${kind}-placeholder`);
     if (!img || !empty) return;
 
     revokeUrl(kind);
 
-    if (!imageId) {
+    const src = resolvePreviewSrc(url, blobUrl);
+    if (!src) {
       img.hidden = true;
       img.removeAttribute('src');
       empty.hidden = false;
       return;
     }
 
-    const blob = await imageStore.getImage(imageId);
-    if (!blob) {
-      img.hidden = true;
-      empty.hidden = false;
-      return;
-    }
-
-    objectUrls[kind] = URL.createObjectURL(blob);
-    img.src = objectUrls[kind];
+    if (blobUrl) objectUrls[kind] = blobUrl;
+    img.src = src;
     img.hidden = false;
     empty.hidden = true;
+  };
+
+  const uploadPendingImages = async () => {
+    if (imageState.pendingLogoFile) {
+      const result = await ShopAdmin.api.uploadFile(imageState.pendingLogoFile, 'settings');
+      imageState.logoFileId = pick(result, 'id', 'Id');
+      imageState.removedLogo = false;
+      imageState.pendingLogoFile = null;
+    } else if (imageState.removedLogo) {
+      imageState.logoFileId = null;
+    }
+
+    if (imageState.pendingFaviconFile) {
+      const result = await ShopAdmin.api.uploadFile(imageState.pendingFaviconFile, 'settings');
+      imageState.faviconFileId = pick(result, 'id', 'Id');
+      imageState.removedFavicon = false;
+      imageState.pendingFaviconFile = null;
+    } else if (imageState.removedFavicon) {
+      imageState.faviconFileId = null;
+    }
+
+    if (imageState.pendingOgFile) {
+      const result = await ShopAdmin.api.uploadFile(imageState.pendingOgFile, 'settings');
+      imageState.ogImageFileId = pick(result, 'id', 'Id');
+      imageState.removedOg = false;
+      imageState.pendingOgFile = null;
+    } else if (imageState.removedOg) {
+      imageState.ogImageFileId = null;
+    }
   };
 
   const updateSeoPreview = () => {
@@ -153,51 +178,49 @@
     if ($('defaultSeoTitle')) $('defaultSeoTitle').value = s.defaultSeoTitle || s.seoTitle || '';
     if ($('defaultSeoDescription')) $('defaultSeoDescription').value = s.defaultSeoDescription || s.seoDescription || '';
 
-    pendingImageIds = {
-      logoId: s.logoId || null,
-      faviconId: s.faviconId || null,
-      ogImageId: s.ogImageId || null
-    };
-    removedImages = { logoId: false, faviconId: false, ogImageId: false };
+    imageState.logoFileId = s.logoFileId ?? null;
+    imageState.faviconFileId = s.faviconFileId ?? null;
+    imageState.ogImageFileId = s.ogImageFileId ?? null;
+    imageState.pendingLogoFile = null;
+    imageState.pendingFaviconFile = null;
+    imageState.pendingOgFile = null;
+    imageState.removedLogo = false;
+    imageState.removedFavicon = false;
+    imageState.removedOg = false;
 
     syncPublicToggleFromSelect();
     updateSeoPreview();
 
-    await setMediaPreview('logo', pendingImageIds.logoId);
-    await setMediaPreview('favicon', pendingImageIds.faviconId);
-    await setMediaPreview('og', pendingImageIds.ogImageId);
+    setMediaPreview('logo', s.logoUrl, null);
+    setMediaPreview('favicon', s.faviconUrl, null);
+    setMediaPreview('og', s.ogImageUrl, null);
 
     if (typeof ShopAdmin.ui.enhanceFormSelects === 'function') {
       ShopAdmin.ui.enhanceFormSelects(document.getElementById('settings-form') || document);
     }
   };
 
-  const collectSettings = (existing = {}) => {
-    const visibility = $('shopVisibility')?.value || 'public';
-    return {
-      ...existing,
-      shopName: ($('shopName')?.value || '').trim(),
-      shopDescription: ($('shopDescription')?.value || '').trim(),
-      contactPhone: ($('contactPhone')?.value || '').trim(),
-      contactEmail: ($('contactEmail')?.value || '').trim(),
-      address: ($('address')?.value || '').trim(),
-      currency: ($('currency')?.value || 'تومان').trim(),
-      lowStockThreshold: Number($('lowStockThreshold')?.value ?? 10),
-      shopVisibility: visibility,
-      instagram: ($('instagram')?.value || '').trim(),
-      telegram: ($('telegram')?.value || '').trim(),
-      whatsapp: ($('whatsapp')?.value || '').trim(),
-      instagramEnabled: !!$('socialInstagramEnabled')?.checked,
-      telegramEnabled: !!$('socialTelegramEnabled')?.checked,
-      whatsappEnabled: !!$('socialWhatsappEnabled')?.checked,
-      defaultSeoTitle: ($('defaultSeoTitle')?.value || '').trim(),
-      defaultSeoDescription: ($('defaultSeoDescription')?.value || '').trim(),
-      logoId: removedImages.logoId ? null : (pendingImageIds.logoId || existing.logoId || null),
-      faviconId: removedImages.faviconId ? null : (pendingImageIds.faviconId || existing.faviconId || null),
-      ogImageId: removedImages.ogImageId ? null : (pendingImageIds.ogImageId || existing.ogImageId || null),
-      updatedAt: new Date().toISOString()
-    };
-  };
+  const collectSettings = () => ({
+    shopName: ($('shopName')?.value || '').trim(),
+    shopDescription: ($('shopDescription')?.value || '').trim(),
+    contactPhone: ($('contactPhone')?.value || '').trim(),
+    contactEmail: ($('contactEmail')?.value || '').trim(),
+    address: ($('address')?.value || '').trim(),
+    currency: ($('currency')?.value || 'تومان').trim(),
+    lowStockThreshold: Number($('lowStockThreshold')?.value ?? 10),
+    shopVisibility: $('shopVisibility')?.value || 'public',
+    instagram: ($('instagram')?.value || '').trim(),
+    telegram: ($('telegram')?.value || '').trim(),
+    whatsapp: ($('whatsapp')?.value || '').trim(),
+    instagramEnabled: !!$('socialInstagramEnabled')?.checked,
+    telegramEnabled: !!$('socialTelegramEnabled')?.checked,
+    whatsappEnabled: !!$('socialWhatsappEnabled')?.checked,
+    defaultSeoTitle: ($('defaultSeoTitle')?.value || '').trim(),
+    defaultSeoDescription: ($('defaultSeoDescription')?.value || '').trim(),
+    logoFileId: imageState.logoFileId,
+    faviconFileId: imageState.faviconFileId,
+    ogImageFileId: imageState.ogImageFileId
+  });
 
   const switchTopTab = (tabId) => {
     document.querySelectorAll('[data-settings-tab]').forEach((btn) => {
@@ -208,6 +231,9 @@
       panel.hidden = !match;
       panel.classList.toggle('is-active', match);
     });
+    if (tabId === 'banners' && typeof ShopAdmin.settingsBanners?.load === 'function') {
+      ShopAdmin.settingsBanners.load();
+    }
   };
 
   const switchOrgPanel = (panelId) => {
@@ -221,8 +247,8 @@
     });
   };
 
-  const bindImageUpload = (inputId, kind, settingKey) => {
-    $(inputId)?.addEventListener('change', async (e) => {
+  const bindImageUpload = (inputId, kind, pendingKey, removedKey, fileIdKey) => {
+    $(inputId)?.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
 
@@ -233,17 +259,9 @@
         return;
       }
 
-      const oldPending = pendingImageIds[settingKey];
-      const savedId = getData().settings?.[settingKey] || null;
-      const newId = generateId(kind);
-      await imageStore.saveImage(newId, file);
-      if (oldPending && oldPending !== savedId && oldPending !== newId) {
-        await imageStore.deleteImage(oldPending).catch(() => {});
-      }
-
-      pendingImageIds[settingKey] = newId;
-      removedImages[settingKey] = false;
-      await setMediaPreview(kind, newId);
+      imageState[pendingKey] = file;
+      imageState[removedKey] = false;
+      setMediaPreview(kind, null, URL.createObjectURL(file));
       e.target.value = '';
       ShopAdmin.ui.showToast('success', 'تصویر آماده ذخیره است.');
     });
@@ -274,15 +292,32 @@
       $(id)?.addEventListener('input', updateSeoPreview);
     });
 
-    bindImageUpload('logo-upload', 'logo', 'logoId');
-    bindImageUpload('favicon-upload', 'favicon', 'faviconId');
-    bindImageUpload('og-upload', 'og', 'ogImageId');
+    bindImageUpload('logo-upload', 'logo', 'pendingLogoFile', 'removedLogo', 'logoFileId');
+    bindImageUpload('favicon-upload', 'favicon', 'pendingFaviconFile', 'removedFavicon', 'faviconFileId');
+    bindImageUpload('og-upload', 'og', 'pendingOgFile', 'removedOg', 'ogImageFileId');
 
-    $('logo-remove')?.addEventListener('click', async () => {
-      pendingImageIds.logoId = null;
-      removedImages.logoId = true;
-      await setMediaPreview('logo', null);
+    $('logo-remove')?.addEventListener('click', () => {
+      imageState.pendingLogoFile = null;
+      imageState.logoFileId = null;
+      imageState.removedLogo = true;
+      setMediaPreview('logo', null, null);
       ShopAdmin.ui.showToast('info', 'لوگو پس از ذخیره حذف می‌شود.');
+    });
+
+    $('favicon-remove')?.addEventListener('click', () => {
+      imageState.pendingFaviconFile = null;
+      imageState.faviconFileId = null;
+      imageState.removedFavicon = true;
+      setMediaPreview('favicon', null, null);
+      ShopAdmin.ui.showToast('info', 'فاویکون پس از ذخیره حذف می‌شود.');
+    });
+
+    $('og-remove')?.addEventListener('click', () => {
+      imageState.pendingOgFile = null;
+      imageState.ogImageFileId = null;
+      imageState.removedOg = true;
+      setMediaPreview('og', null, null);
+      ShopAdmin.ui.showToast('info', 'تصویر OG پس از ذخیره حذف می‌شود.');
     });
 
     const form = $('settings-form');
@@ -298,35 +333,19 @@
         return;
       }
 
-      const prev = data.settings || {};
-      const next = collectSettings(prev);
-
-      // Delete replaced / removed image blobs after a successful collect
-      const imageKeys = ['logoId', 'faviconId', 'ogImageId'];
-      for (const key of imageKeys) {
-        const prevId = prev[key];
-        const nextId = next[key];
-        if (prevId && prevId !== nextId) {
-          await imageStore.deleteImage(prevId).catch(() => {});
-        }
-      }
-
-      saveLocalImageSettings({
-        logoId: next.logoId,
-        faviconId: next.faviconId,
-        ogImageId: next.ogImageId
-      });
-      removedImages = { logoId: false, faviconId: false, ogImageId: false };
-
       try {
-        const saved = await ShopAdmin.api.updateSettings(mapSettingsToApi(next));
-        const merged = {
-          ...mapSettingsFromApi(saved),
-          logoId: next.logoId,
-          faviconId: next.faviconId,
-          ogImageId: next.ogImageId
-        };
-        saveLocalImageSettings(merged);
+        await uploadPendingImages();
+        const payload = mapSettingsToApi(collectSettings());
+        const saved = await ShopAdmin.api.updateSettings(payload);
+        const merged = mapSettingsFromApi(saved);
+
+        imageState.removedLogo = false;
+        imageState.removedFavicon = false;
+        imageState.removedOg = false;
+
+        setMediaPreview('logo', merged.logoUrl, null);
+        setMediaPreview('favicon', merged.faviconUrl, null);
+        setMediaPreview('og', merged.ogImageUrl, null);
 
         const shopNameEl = document.querySelector('[data-shop-name]');
         if (shopNameEl) shopNameEl.textContent = merged.shopName || DEFAULT_SHOP_NAME;
@@ -363,10 +382,9 @@
   const loadSettingsIntoForm = async () => {
     try {
       const apiSettings = mapSettingsFromApi(await ShopAdmin.api.getSettings());
-      const images = loadLocalImageSettings();
-      await fillForm({ ...apiSettings, ...images });
+      await fillForm(apiSettings);
     } catch {
-      await fillForm({ ...mapSettingsFromApi({}), ...loadLocalImageSettings() });
+      await fillForm(mapSettingsFromApi({}));
       ShopAdmin.ui.showToast('warning', 'بارگذاری تنظیمات از API ناموفق — فرم با مقادیر پیش‌فرض نمایش داده شد.');
     }
   };

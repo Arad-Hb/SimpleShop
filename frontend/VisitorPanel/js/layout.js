@@ -301,7 +301,7 @@
   function applyBrandingFromPayload(branding = {}) {
     const name = (branding.shopName || '').trim();
     const desc = (branding.shopDescription || '').trim();
-    const logo = branding.logoDataUrl;
+    const logo = branding.logoUrl || branding.logoDataUrl;
 
     if (name) {
       SHOP.name = name;
@@ -319,13 +319,28 @@
 
     document.querySelectorAll('[data-brand-mark]').forEach((mark) => {
       if (logo) {
+        const src = /^https?:|^data:|^blob:/.test(logo)
+          ? logo
+          : (typeof Store !== 'undefined' && Store.api?.mediaUrl ? Store.api.mediaUrl(logo) : logo);
         mark.classList.add('has-logo', 'brand-mark--logo');
-        mark.innerHTML = `<img src="${logo}" alt="${name || SHOP.name}" class="brand-logo-img">`;
+        mark.innerHTML = `<img src="${src}" alt="${name || SHOP.name}" class="brand-logo-img">`;
       } else {
         mark.classList.add('has-logo', 'brand-mark--logo');
         mark.innerHTML = `<img src="${SHOP.logoUrl}" alt="${name || SHOP.name}" class="brand-logo-img">`;
       }
     });
+  }
+
+  function applyFavicon(url) {
+    if (!url) return;
+    const href = typeof Store !== 'undefined' && Store.api?.mediaUrl ? Store.api.mediaUrl(url) : url;
+    let link = document.querySelector('link[rel="icon"]');
+    if (!link) {
+      link = document.createElement('link');
+      link.rel = 'icon';
+      document.head.appendChild(link);
+    }
+    link.href = href;
   }
 
   function applyBranding() {
@@ -339,6 +354,7 @@
       JSON.stringify({
         shopName: settings.shopName || cached.shopName || SHOP.name,
         shopDescription: settings.shopDescription || cached.shopDescription || '',
+        logoUrl: settings.logoUrl || cached.logoUrl || null,
         logoDataUrl: cached.logoDataUrl || null,
         updatedAt: Date.now()
       })
@@ -369,12 +385,19 @@
     }
     if (social.length) SHOP.socialLinks = social;
 
-    cachePublicBranding({ shopName: name, shopDescription: desc });
+    cachePublicBranding({
+      shopName: name,
+      shopDescription: desc,
+      logoUrl: settings.logoUrl || null
+    });
     applyBrandingFromPayload({
       shopName: name,
       shopDescription: desc,
+      logoUrl: settings.logoUrl || readBranding()?.logoUrl || null,
       logoDataUrl: readBranding()?.logoDataUrl || null
     });
+
+    if (settings.faviconUrl) applyFavicon(settings.faviconUrl);
 
     const contactCol = document.querySelector('.footer-contact');
     if (contactCol) {

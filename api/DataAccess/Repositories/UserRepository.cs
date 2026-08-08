@@ -26,7 +26,10 @@ public class UserRepository(
         NationalId = u.NationalId,
         IsActive = u.IsActive,
         RegisterDate = u.RegisterDate,
-        Password = null
+        Password = null,
+        AvatarFileId = u.AvatarFileId,
+        AvatarUrl = u.AvatarFile?.Url,
+        AvatarThumbnailUrl = u.AvatarFile?.ThumbnailUrl
     };
 
     private static LoginResultModel ToLoginSuccess(ApplicationUser user, string role) => new()
@@ -57,12 +60,14 @@ public class UserRepository(
         HasOrders = u.Orders.Count > 0,
         TotalPurchase = u.Orders
             .Where(o => o.Status.Equals("delivered", StringComparison.OrdinalIgnoreCase))
-            .Sum(o => o.TotalAmount)
+            .Sum(o => o.TotalAmount),
+        AvatarUrl = u.AvatarFile?.Url,
+        AvatarThumbnailUrl = u.AvatarFile?.ThumbnailUrl
     };
 
     private IQueryable<ApplicationUser> BuildSearchQuery(UserSearchModel searchModel)
     {
-        var query = db.Users.AsNoTracking().Include(u => u.Orders).AsQueryable();
+        var query = db.Users.AsNoTracking().Include(u => u.Orders).Include(u => u.AvatarFile).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchModel.Search))
         {
@@ -228,6 +233,7 @@ public class UserRepository(
                     if (!string.IsNullOrWhiteSpace(model.NationalId))
                         created.NationalId = model.NationalId.Trim();
                     created.IsActive = model.IsActive;
+                    created.AvatarFileId = model.AvatarFileId;
                     await userManager.UpdateAsync(created);
                 }
             }
@@ -255,6 +261,7 @@ public class UserRepository(
             user.PostalCode = model.PostalCode;
             user.NationalId = string.IsNullOrWhiteSpace(model.NationalId) ? null : model.NationalId.Trim();
             user.IsActive = model.IsActive;
+            user.AvatarFileId = model.AvatarFileId;
 
             var newMobile = IdentityUserNames.NormalizeMobile(model.Phone);
             if (!string.IsNullOrEmpty(newMobile))
@@ -305,7 +312,9 @@ public class UserRepository(
 
     public async Task<UserAddEditModel?> Get(string id)
     {
-        var user = await userManager.FindByIdAsync(id);
+        var user = await db.Users.AsNoTracking()
+            .Include(u => u.AvatarFile)
+            .FirstOrDefaultAsync(u => u.Id == id);
         if (user == null) return null;
         var role = await GetPrimaryRoleAsync(user) ?? Roles.Customer;
         return ToViewModel(user, role);
@@ -315,6 +324,7 @@ public class UserRepository(
     {
         var user = await db.Users.AsNoTracking()
             .Include(u => u.Orders)
+            .Include(u => u.AvatarFile)
             .FirstOrDefaultAsync(u => u.Id == id);
         if (user == null) return null;
 
@@ -515,7 +525,9 @@ public class UserRepository(
 
     public async Task<UserAddEditModel?> GetProfileAsync(string userId)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await db.Users.AsNoTracking()
+            .Include(u => u.AvatarFile)
+            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null) return null;
         var role = await GetPrimaryRoleAsync(user) ?? Roles.Admin;
         return ToViewModel(user, role);
@@ -536,6 +548,11 @@ public class UserRepository(
             var newMobile = IdentityUserNames.NormalizeMobile(model.Phone);
             if (!string.IsNullOrEmpty(newMobile) && !string.Equals(user.UserName, "admin", StringComparison.OrdinalIgnoreCase))
                 user.PhoneNumber = newMobile;
+
+            user.AvatarFileId = model.AvatarFileId;
+            user.Address = string.IsNullOrWhiteSpace(model.Address) ? user.Address : model.Address.Trim();
+            user.PostalCode = string.IsNullOrWhiteSpace(model.PostalCode) ? user.PostalCode : model.PostalCode.Trim();
+            user.NationalId = string.IsNullOrWhiteSpace(model.NationalId) ? user.NationalId : model.NationalId.Trim();
 
             var updateResult = await userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)

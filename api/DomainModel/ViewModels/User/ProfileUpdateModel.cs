@@ -14,4 +14,15 @@ public class ProfileUpdateModel
     public string Email { get; set; } = string.Empty;
 
     public string? Phone { get; set; }
+
+    public int? AvatarFileId { get; set; }
+
+    [StringLength(500)]
+    public string? Address { get; set; }
+
+    [StringLength(20)]
+    public string? PostalCode { get; set; }
+
+    [StringLength(10)]
+    public string? NationalId { get; set; }
 }

@@ -21,5 +21,10 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
             .WithOne(x => x.User)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(x => x.AvatarFile)
+            .WithMany()
+            .HasForeignKey(x => x.AvatarFileId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

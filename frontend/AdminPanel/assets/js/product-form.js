@@ -10,7 +10,7 @@
     escapeHtml, slugify, formatDateTime
   } = ShopAdmin.utils;
   const {
-    validateRequired, validateSlug, showFieldError, clearFieldErrors
+    validateRequired, validateSlug, validateImageFile, showFieldError, clearFieldErrors
   } = ShopAdmin.validation;
   const { parseError } = window.SimpleShopHttp || {};
   const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
@@ -18,11 +18,22 @@
   const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
   const form = document.getElementById('product-form');
+  const dropZone = document.getElementById('image-drop-zone');
+  const fileInput = document.getElementById('image-file-input');
+  const imagePreviewWrap = document.getElementById('image-preview-wrap');
+  const imagePreview = document.getElementById('image-preview');
+  const ogImagePreview = document.getElementById('og-image-preview');
 
   let editId = null;
   let slugManual = false;
   let isDirty = false;
   let isSubmitting = false;
+  let primaryImageId = null;
+  let ogImageId = null;
+  let imageRemoved = false;
+  let ogImageRemoved = false;
+  let pendingImageFile = null;
+  let pendingOgFile = null;
 
   const defaultSeo = () => ({
     metaTitle: '', metaDescription: '', keywords: '', canonicalUrl: '',
@@ -44,7 +55,9 @@
     metaKeywords: data.seo?.keywords || null,
     canonicalUrl: data.seo?.canonicalUrl || null,
     ogTitle: data.seo?.ogTitle || null,
-    ogDescription: data.seo?.ogDescription || null
+    ogDescription: data.seo?.ogDescription || null,
+    primaryImageId: imageRemoved ? null : primaryImageId,
+    ogImageId: ogImageRemoved ? null : ogImageId
   });
 
   const isAssignableProductCategory = (c) => {
@@ -101,6 +114,100 @@
   };
 
   const markDirty = () => { isDirty = true; };
+
+  const showImagePreview = (url) => {
+    if (!url) {
+      imagePreviewWrap?.classList.add('d-none');
+      return;
+    }
+    imagePreview.src = /^blob:|^data:/.test(url) ? url : ShopAdmin.api.mediaUrl(url);
+    imagePreviewWrap?.classList.remove('d-none');
+  };
+
+  const showOgImagePreview = (url) => {
+    if (!ogImagePreview) return;
+    if (!url) {
+      ogImagePreview.innerHTML = '';
+      return;
+    }
+    const src = /^blob:|^data:/.test(url) ? url : ShopAdmin.api.mediaUrl(url);
+    ogImagePreview.innerHTML = `<img src="${escapeHtml(src)}" class="img-thumbnail" style="max-height:120px" alt="OG">`;
+  };
+
+  const uploadPendingFiles = async () => {
+    if (pendingImageFile) {
+      const result = await ShopAdmin.api.uploadFile(pendingImageFile, 'products');
+      primaryImageId = pick(result, 'id', 'Id');
+      imageRemoved = false;
+      pendingImageFile = null;
+    }
+    if (pendingOgFile) {
+      const result = await ShopAdmin.api.uploadFile(pendingOgFile, 'products');
+      ogImageId = pick(result, 'id', 'Id');
+      ogImageRemoved = false;
+      pendingOgFile = null;
+    }
+  };
+
+  const handleImageFile = (file) => {
+    const err = validateImageFile(file);
+    if (err) {
+      ShopAdmin.ui.showToast('error', err);
+      return;
+    }
+    pendingImageFile = file;
+    imageRemoved = false;
+    markDirty();
+    showImagePreview(URL.createObjectURL(file));
+  };
+
+  const initImageDropZone = () => {
+    dropZone?.addEventListener('click', () => fileInput?.click());
+    dropZone?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        fileInput?.click();
+      }
+    });
+    fileInput?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (file) handleImageFile(file);
+      e.target.value = '';
+    });
+    dropZone?.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('drop-zone--active');
+    });
+    dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone--active'));
+    dropZone?.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drop-zone--active');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) handleImageFile(file);
+    });
+    document.getElementById('btn-remove-image')?.addEventListener('click', () => {
+      primaryImageId = null;
+      pendingImageFile = null;
+      imageRemoved = true;
+      imagePreviewWrap?.classList.add('d-none');
+      markDirty();
+    });
+    document.getElementById('ogImageFile')?.addEventListener('change', (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const err = validateImageFile(file);
+      if (err) {
+        ShopAdmin.ui.showToast('error', err);
+        e.target.value = '';
+        return;
+      }
+      pendingOgFile = file;
+      ogImageRemoved = false;
+      markDirty();
+      showOgImagePreview(URL.createObjectURL(file));
+      e.target.value = '';
+    });
+  };
 
   const mapApiToForm = (dto) => ({
     id: pick(dto, 'id', 'Id'),
@@ -263,6 +370,7 @@
     try {
       const data = collectFormData();
       await ShopAdmin.api.ensureApiAuth();
+      await uploadPendingFiles();
       const payload = toApiPayload(data);
 
       if (editId) {
@@ -338,6 +446,15 @@
     document.getElementById('btn-delete')?.classList.remove('d-none');
     document.getElementById('btn-deactivate')?.classList.add('d-none');
 
+    primaryImageId = pick(dto, 'primaryImageId', 'PrimaryImageId') ?? null;
+    ogImageId = pick(dto, 'ogImageId', 'OgImageId') ?? null;
+    imageRemoved = false;
+    ogImageRemoved = false;
+    pendingImageFile = null;
+    pendingOgFile = null;
+    showImagePreview(pick(dto, 'imageUrl', 'ImageUrl') || pick(dto, 'thumbnailUrl', 'ThumbnailUrl'));
+    showOgImagePreview(pick(dto, 'ogImageUrl', 'OgImageUrl'));
+
     updateSeoPreview();
     updateCharCount('metaTitle', 'metaTitle-count', 'metaTitle-warn', 30, 60);
     updateCharCount('metaDescription', 'metaDescription-count', 'metaDescription-warn', 120, 160);
@@ -408,6 +525,7 @@
     form.addEventListener('submit', handleSubmit);
     document.getElementById('btn-delete')?.addEventListener('click', handleDelete);
     document.getElementById('btn-deactivate')?.addEventListener('click', handleDeactivate);
+    initImageDropZone();
 
     window.addEventListener('beforeunload', (e) => {
       if (isDirty && !isSubmitting) {

@@ -1,17 +1,17 @@
 /**
- * product-gallery.js — مدیریت مستقل گالری محصولات
+ * product-gallery.js — مدیریت گالری محصولات (API)
  */
 (function (ShopAdmin) {
   'use strict';
 
   if (!ShopAdmin.auth.requireAuth()) return;
 
-  const { escapeHtml, generateId } = ShopAdmin.utils;
+  const { escapeHtml } = ShopAdmin.utils;
   const { validateImageFile } = ShopAdmin.validation;
+  const { parseError } = window.SimpleShopHttp || {};
+  const apiError = (err) => (parseError ? parseError(err) : (err?.message || 'خطا در ارتباط با سرور.'));
 
-  const productRepo = ShopAdmin.storage.createRepository('products');
-  const categoryRepo = ShopAdmin.storage.createRepository('categories');
-  const { imageStore } = ShopAdmin.storage;
+  const pick = (dto, camel, pascal) => dto?.[camel] ?? dto?.[pascal];
 
   const galleryGrid = document.getElementById('gallery-grid');
   const dropZone = document.getElementById('gallery-drop-zone');
@@ -21,25 +21,11 @@
   let selectedProductId = null;
   let galleryImages = [];
   let isDirty = false;
+  let isSaving = false;
   const objectUrls = new Set();
   let allProducts = [];
   let filteredProducts = [];
-
-  const normalizeProduct = (p) => {
-    const product = { ...p };
-    if (!Array.isArray(product.images)) {
-      product.images = product.imageId
-        ? [{ id: product.imageId, alt: product.name || '', isPrimary: true, sortOrder: 0 }]
-        : [];
-    }
-    return product;
-  };
-
-  const getCategoryMap = () => {
-    const map = new Map();
-    categoryRepo.getAll().forEach((c) => map.set(c.id, c.name));
-    return map;
-  };
+  let categoryMap = new Map();
 
   const revokeUrl = (url) => {
     if (url && objectUrls.has(url)) {
@@ -48,24 +34,22 @@
     }
   };
 
-  const API_BASE = ShopAdmin.config?.API_BASE_URL || 'http://localhost:5102';
-
   const resolveMediaUrl = (path) => {
     if (!path) return null;
     if (ShopAdmin.api?.mediaUrl) return ShopAdmin.api.mediaUrl(path) || null;
-    if (/^https?:\/\//i.test(path) || path.startsWith('blob:') || path.startsWith('data:')) return path;
-    return `${API_BASE}${path.startsWith('/') ? path : `/${path}`}`;
+    return path;
   };
 
-  const loadImagePreview = async (imageId, fallbackUrl) => {
-    const remote = resolveMediaUrl(fallbackUrl);
-    if (remote) return remote;
-    const blob = await imageStore.getImage(imageId);
-    if (!blob) return null;
-    const url = URL.createObjectURL(blob);
-    objectUrls.add(url);
-    return url;
-  };
+  const mapGalleryItem = (item, index = 0) => ({
+    id: pick(item, 'id', 'Id'),
+    fileManagerId: pick(item, 'fileManagerId', 'FileManagerId'),
+    alt: pick(item, 'altText', 'AltText') || '',
+    isPrimary: pick(item, 'isPrimary', 'IsPrimary') === true,
+    sortOrder: pick(item, 'sortOrder', 'SortOrder') ?? index,
+    previewUrl: resolveMediaUrl(pick(item, 'thumbnailUrl', 'ThumbnailUrl') || pick(item, 'url', 'Url')),
+    url: pick(item, 'url', 'Url'),
+    thumbnailUrl: pick(item, 'thumbnailUrl', 'ThumbnailUrl')
+  });
 
   const formatFileSize = (bytes) => {
     if (!bytes) return '';
@@ -74,48 +58,32 @@
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const getPrimaryImageId = (product) => {
-    const images = product.images || [];
-    const primary = images.find((img) => img.isPrimary);
-    return primary?.id ?? images[0]?.id ?? product.imageId ?? null;
-  };
-
   const matchesCategory = (product, categoryFilter) => {
     if (!categoryFilter && categoryFilter !== 0) return true;
-    const filterId = String(categoryFilter);
-    if (product.categoryId != null && String(product.categoryId) === filterId) return true;
-
-    // Fallback: match by category name when ids drift between local/API data
-    const cat = categoryRepo.getAll().find((c) => String(c.id) === filterId);
-    if (cat?.name && product.categoryName) {
-      return String(product.categoryName).trim() === String(cat.name).trim();
-    }
-    return false;
+    return String(pick(product, 'categoryId', 'CategoryId')) === String(categoryFilter);
   };
 
   const buildProductOptions = () =>
     filteredProducts.map((p) => ({
-      value: p.id,
-      label: `${p.name}${p.isActive === false ? ' — غیرفعال' : ''}`
+      value: pick(p, 'id', 'Id'),
+      label: `${pick(p, 'name', 'Name') || ''}${pick(p, 'isActive', 'IsActive') === false ? ' — غیرفعال' : ''}`
     }));
 
   const refreshProductList = () => {
     const categoryFilter = document.getElementById('gallery-category-filter')?.value ?? '';
     const search = document.getElementById('gallery-product-search')?.value?.trim().toLowerCase() || '';
 
-    allProducts = productRepo.getAll().map(normalizeProduct);
     filteredProducts = allProducts.filter((p) => matchesCategory(p, categoryFilter));
 
     if (search) {
       filteredProducts = filteredProducts.filter((p) =>
-        (p.name || '').toLowerCase().includes(search)
+        (pick(p, 'name', 'Name') || '').toLowerCase().includes(search)
       );
     }
 
-    // Drop selection if it no longer belongs to the filtered category
     if (
       selectedProductId != null &&
-      !filteredProducts.some((p) => String(p.id) === String(selectedProductId))
+      !filteredProducts.some((p) => String(pick(p, 'id', 'Id')) === String(selectedProductId))
     ) {
       selectedProductId = null;
     }
@@ -129,30 +97,47 @@
     );
   };
 
-  const populateCategoryFilter = () => {
+  const populateCategoryFilter = async () => {
     const sel = document.getElementById('gallery-category-filter');
     if (!sel) return;
     const current = sel.value;
     sel.innerHTML = '<option value="">همه دسته‌بندی‌ها</option>';
 
-    categoryRepo.getAll()
-      .slice()
-      .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0) || String(a.name).localeCompare(String(b.name), 'fa'))
-      .forEach((c) => {
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const cats = await ShopAdmin.api.getCategories();
+      categoryMap = new Map();
+      (Array.isArray(cats) ? cats : []).forEach((c) => {
+        const id = pick(c, 'id', 'Id');
+        const name = pick(c, 'name', 'Name') || '';
+        categoryMap.set(id, name);
         const opt = document.createElement('option');
-        opt.value = c.id;
-        opt.textContent = c.name;
+        opt.value = id;
+        opt.textContent = name;
         sel.appendChild(opt);
       });
+      if (current) sel.value = current;
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
+    }
+  };
 
-    if (current) sel.value = current;
+  const loadProducts = async () => {
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const page = await ShopAdmin.api.getProducts({ page: 1, pageSize: 500 });
+      allProducts = page?.items || page?.Items || [];
+    } catch (err) {
+      ShopAdmin.ui.showToast('error', apiError(err));
+      allProducts = [];
+    }
   };
 
   const renderGallery = () => {
     galleryImages.sort((a, b) => a.sortOrder - b.sortOrder);
 
     galleryGrid.innerHTML = galleryImages.map((img, index) => `
-      <div class="gallery-item ${img.isPrimary ? 'primary' : ''}" data-image-id="${escapeHtml(img.id)}">
+      <div class="gallery-item ${img.isPrimary ? 'primary' : ''}" data-image-id="${escapeHtml(String(img.id))}">
         <img src="${escapeHtml(img.previewUrl || '')}" alt="${escapeHtml(img.alt || '')}">
         ${img.isPrimary ? '<span class="badge bg-primary position-absolute top-0 start-0 m-1">اصلی</span>' : ''}
         <div class="gallery-item-actions">
@@ -163,13 +148,12 @@
         </div>
         <div class="p-1 bg-white">
           <input type="text" class="form-control form-control-sm gallery-alt" placeholder="Alt Text" value="${escapeHtml(img.alt || '')}" maxlength="200">
-          ${img.fileName ? `<div class="small text-muted text-truncate">${escapeHtml(img.fileName)} (${formatFileSize(img.fileSize)})</div>` : ''}
         </div>
       </div>
     `).join('');
 
     galleryGrid.querySelectorAll('.gallery-item').forEach((el) => {
-      const id = el.dataset.imageId;
+      const id = Number(el.dataset.imageId);
       el.querySelector('.btn-set-primary')?.addEventListener('click', () => setPrimary(id));
       el.querySelector('.btn-move-up')?.addEventListener('click', () => moveImage(id, -1));
       el.querySelector('.btn-move-down')?.addEventListener('click', () => moveImage(id, 1));
@@ -201,17 +185,24 @@
   };
 
   const removeImage = (id) => {
-    ShopAdmin.ui.showConfirmModal('حذف تصویر', 'آیا این تصویر از گالری حذف شود؟', () => {
-      const img = galleryImages.find((i) => i.id === id);
-      if (img?.previewUrl) revokeUrl(img.previewUrl);
-      galleryImages = galleryImages.filter((i) => i.id !== id);
-      if (galleryImages.length && !galleryImages.some((i) => i.isPrimary)) {
-        galleryImages[0].isPrimary = true;
+    ShopAdmin.ui.showConfirmModal('حذف تصویر', 'آیا این تصویر از گالری حذف شود؟', async () => {
+      try {
+        await ShopAdmin.api.ensureApiAuth();
+        await ShopAdmin.api.removeProductImage(selectedProductId, id);
+        const img = galleryImages.find((i) => i.id === id);
+        if (img?.previewUrl?.startsWith('blob:')) revokeUrl(img.previewUrl);
+        galleryImages = galleryImages.filter((i) => i.id !== id);
+        if (galleryImages.length && !galleryImages.some((i) => i.isPrimary)) {
+          galleryImages[0].isPrimary = true;
+          isDirty = true;
+        }
+        galleryImages.forEach((item, i) => { item.sortOrder = i; });
+        renderGallery();
+        updateProductInfoPanel();
+        ShopAdmin.ui.showToast('success', 'تصویر حذف شد.');
+      } catch (err) {
+        ShopAdmin.ui.showToast('error', apiError(err));
       }
-      galleryImages.forEach((item, i) => { item.sortOrder = i; });
-      isDirty = true;
-      renderGallery();
-      updateProductInfoPanel();
     });
   };
 
@@ -235,66 +226,72 @@
     let processed = 0;
     showUploadProgress(5);
 
-    for (const file of list) {
-      const err = validateImageFile(file);
-      if (err) {
-        ShopAdmin.ui.showToast('error', `${file.name}: ${err}`);
-        continue;
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const product = allProducts.find((p) => String(pick(p, 'id', 'Id')) === String(selectedProductId));
+      const productName = pick(product, 'name', 'Name') || '';
+
+      for (const file of list) {
+        const err = validateImageFile(file);
+        if (err) {
+          ShopAdmin.ui.showToast('error', `${file.name}: ${err}`);
+          continue;
+        }
+
+        const upload = await ShopAdmin.api.uploadFile(file, 'products');
+        const fileManagerId = pick(upload, 'id', 'Id');
+        const isPrimary = galleryImages.length === 0;
+        const result = await ShopAdmin.api.addProductImage(selectedProductId, {
+          fileManagerId,
+          altText: productName || file.name.replace(/\.[^.]+$/, ''),
+          isPrimary,
+          sortOrder: galleryImages.length
+        });
+
+        const gallery = pick(result, 'gallery', 'Gallery') || [];
+        const added = gallery.find((g) => pick(g, 'fileManagerId', 'FileManagerId') === fileManagerId)
+          || gallery[gallery.length - 1];
+        if (added) {
+          galleryImages.push(mapGalleryItem(added, galleryImages.length));
+        }
+
+        processed += 1;
+        showUploadProgress(Math.round((processed / list.length) * 90));
       }
 
-      const id = generateId('img');
-      const previewUrl = URL.createObjectURL(file);
-      objectUrls.add(previewUrl);
-      const product = productRepo.getById(selectedProductId);
-
-      galleryImages.push({
-        id,
-        alt: product?.name || file.name.replace(/\.[^.]+$/, ''),
-        isPrimary: galleryImages.length === 0,
-        sortOrder: galleryImages.length,
-        fileName: file.name,
-        fileSize: file.size,
-        previewUrl,
-        isNew: true,
-        blob: file
-      });
-
-      processed += 1;
-      showUploadProgress(Math.round((processed / list.length) * 90));
+      showUploadProgress(100);
+      setTimeout(() => showUploadProgress(0), 400);
+      renderGallery();
+      updateProductInfoPanel();
+      ShopAdmin.ui.showToast('success', 'تصاویر به گالری اضافه شد.');
+    } catch (err) {
+      showUploadProgress(0);
+      ShopAdmin.ui.showToast('error', apiError(err));
     }
-
-    showUploadProgress(100);
-    setTimeout(() => showUploadProgress(0), 400);
-    isDirty = true;
-    renderGallery();
-    updateProductInfoPanel();
   };
 
-  const updateProductInfoPanel = async () => {
-    const product = normalizeProduct(productRepo.getById(selectedProductId));
+  const updateProductInfoPanel = () => {
+    const product = allProducts.find((p) => String(pick(p, 'id', 'Id')) === String(selectedProductId));
     if (!product) return;
 
-    const categories = getCategoryMap();
-    document.getElementById('selected-product-name').textContent = product.name;
-    document.getElementById('selected-product-category').textContent = categories.get(product.categoryId) || '—';
+    document.getElementById('selected-product-name').textContent = pick(product, 'name', 'Name') || '—';
+    document.getElementById('selected-product-category').textContent =
+      categoryMap.get(pick(product, 'categoryId', 'CategoryId')) || pick(product, 'categoryName', 'CategoryName') || '—';
     document.getElementById('selected-image-count').textContent =
       galleryImages.length.toLocaleString('fa-IR');
 
     const thumb = document.getElementById('selected-primary-thumb');
-    const primaryId = galleryImages.find((i) => i.isPrimary)?.id || getPrimaryImageId(product);
-    if (primaryId) {
-      const url = galleryImages.find((i) => i.id === primaryId)?.previewUrl || await loadImagePreview(primaryId);
-      if (url) {
-        thumb.src = url;
-        thumb.hidden = false;
-      }
+    const primary = galleryImages.find((i) => i.isPrimary) || galleryImages[0];
+    if (primary?.previewUrl) {
+      thumb.src = primary.previewUrl;
+      thumb.hidden = false;
     } else {
       thumb.hidden = true;
     }
   };
 
   const clearWorkspace = () => {
-    galleryImages.forEach((img) => { if (img.previewUrl) revokeUrl(img.previewUrl); });
+    galleryImages.forEach((img) => { if (img.previewUrl?.startsWith('blob:')) revokeUrl(img.previewUrl); });
     galleryImages = [];
     selectedProductId = null;
     isDirty = false;
@@ -317,7 +314,6 @@
           refreshProductList();
         }
       );
-      // Keep dropdown label on the currently loaded product until confirmed
       refreshProductList();
       return;
     }
@@ -326,99 +322,74 @@
   };
 
   const loadProductGallery = async (productId) => {
-    const product = normalizeProduct(productRepo.getById(productId));
-    if (!product) {
+    try {
+      await ShopAdmin.api.ensureApiAuth();
+      const dto = await ShopAdmin.api.getProduct(productId);
+      if (!dto) throw new Error('not found');
+
+      selectedProductId = productId;
+      galleryImages.forEach((img) => { if (img.previewUrl?.startsWith('blob:')) revokeUrl(img.previewUrl); });
+
+      const gallery = pick(dto, 'gallery', 'Gallery') || [];
+      galleryImages = gallery.map((item, i) => mapGalleryItem(item, i));
+
+      if (!galleryImages.length) {
+        const imageUrl = pick(dto, 'imageUrl', 'ImageUrl') || pick(dto, 'thumbnailUrl', 'ThumbnailUrl');
+        if (imageUrl) {
+          galleryImages = [{
+            id: pick(dto, 'primaryImageId', 'PrimaryImageId') || 'primary',
+            fileManagerId: pick(dto, 'primaryImageId', 'PrimaryImageId'),
+            alt: pick(dto, 'name', 'Name') || '',
+            isPrimary: true,
+            sortOrder: 0,
+            previewUrl: resolveMediaUrl(pick(dto, 'thumbnailUrl', 'ThumbnailUrl') || imageUrl),
+            url: imageUrl
+          }];
+        }
+      }
+
+      document.getElementById('product-info-panel')?.classList.remove('d-none');
+      document.getElementById('gallery-workspace')?.classList.remove('d-none');
+      document.getElementById('gallery-empty')?.classList.add('d-none');
+
+      renderGallery();
+      updateProductInfoPanel();
+      isDirty = false;
+    } catch {
       ShopAdmin.ui.showToast('error', 'محصول یافت نشد.');
       clearWorkspace();
       refreshProductList();
-      return;
     }
-
-    selectedProductId = productId;
-    galleryImages.forEach((img) => { if (img.previewUrl) revokeUrl(img.previewUrl); });
-    galleryImages = await Promise.all((product.images || []).map(async (img, i) => {
-      const previewUrl = await loadImagePreview(img.id, img.thumbnailUrl || img.url || img.previewUrl);
-      return {
-        id: img.id,
-        alt: img.alt || '',
-        isPrimary: img.isPrimary === true,
-        sortOrder: img.sortOrder ?? i,
-        previewUrl,
-        url: img.url || null,
-        thumbnailUrl: img.thumbnailUrl || null
-      };
-    }));
-
-    // If product has API primary image but empty gallery, show it
-    if (!galleryImages.length && (product.imageUrl || product.thumbnailUrl)) {
-      const previewUrl = resolveMediaUrl(product.thumbnailUrl || product.imageUrl);
-      galleryImages = [{
-        id: product.imageId || 'remote-primary',
-        alt: product.name || '',
-        isPrimary: true,
-        sortOrder: 0,
-        previewUrl,
-        url: product.imageUrl,
-        thumbnailUrl: product.thumbnailUrl
-      }];
-    }
-
-    document.getElementById('product-info-panel')?.classList.remove('d-none');
-    document.getElementById('gallery-workspace')?.classList.remove('d-none');
-    document.getElementById('gallery-empty')?.classList.add('d-none');
-
-    renderGallery();
-    await updateProductInfoPanel();
-    isDirty = false;
   };
 
   const saveGallery = async () => {
-    if (!selectedProductId) return;
+    if (!selectedProductId || isSaving) return;
 
     if (galleryImages.length && !galleryImages.some((i) => i.isPrimary)) {
       galleryImages[0].isPrimary = true;
     }
 
+    isSaving = true;
     try {
-      const product = normalizeProduct(productRepo.getById(selectedProductId));
-      const previousIds = new Set((product.images || []).map((i) => i.id));
-      const keepIds = new Set(galleryImages.map((i) => i.id));
-
-      for (const oldId of previousIds) {
-        if (!keepIds.has(oldId)) {
-          await imageStore.deleteImage(oldId).catch(() => {});
-        }
-      }
-
-      for (const img of galleryImages) {
-        if (img.isNew && img.blob) {
-          await imageStore.saveImage(img.id, img.blob);
-        }
-      }
-
+      await ShopAdmin.api.ensureApiAuth();
       galleryImages.sort((a, b) => a.sortOrder - b.sortOrder);
-      const images = galleryImages.map((img, i) => ({
-        id: img.id,
-        alt: img.alt || '',
-        isPrimary: img.isPrimary,
-        sortOrder: i
-      }));
-      const primary = images.find((i) => i.isPrimary);
 
-      productRepo.update(selectedProductId, {
-        images,
-        imageId: primary?.id ?? null,
-        updatedAt: new Date().toISOString()
-      });
+      for (let i = 0; i < galleryImages.length; i += 1) {
+        const img = galleryImages[i];
+        if (typeof img.id !== 'number') continue;
+        await ShopAdmin.api.updateProductImage(selectedProductId, img.id, {
+          altText: img.alt || '',
+          sortOrder: i,
+          isPrimary: img.isPrimary
+        });
+      }
 
-      galleryImages.forEach((img) => { img.isNew = false; delete img.blob; });
-      isDirty = false;
-      refreshProductList();
+      await loadProductGallery(selectedProductId);
       ShopAdmin.ui.showToast('success', 'گالری محصول ذخیره شد.');
-      await updateProductInfoPanel();
     } catch (err) {
-      ShopAdmin.ui.showToast('error', 'خطا در ذخیره گالری.');
-      console.error(err);
+      ShopAdmin.ui.showToast('error', apiError(err));
+    } finally {
+      isSaving = false;
     }
   };
 
@@ -447,11 +418,8 @@
       { label: 'گالری محصولات' }
     ]);
 
-    if (typeof ShopAdmin.sync?.syncCatalogFromApi === 'function') {
-      await ShopAdmin.sync.syncCatalogFromApi();
-    }
-
-    populateCategoryFilter();
+    await populateCategoryFilter();
+    await loadProducts();
     refreshProductList();
     initDropZone();
 
@@ -470,7 +438,8 @@
 
     const params = ShopAdmin.utils.parseQuery();
     if (params.productId) {
-      loadProductGallery(Number(params.productId));
+      await loadProductGallery(Number(params.productId));
+      refreshProductList();
     }
   };
 

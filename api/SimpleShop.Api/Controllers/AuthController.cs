@@ -50,7 +50,7 @@ public class AuthController(IUserRepository users, JwtTokenService jwt) : Contro
     }
 
     [HttpGet("me")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize]
     public async Task<IActionResult> GetProfile()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -62,7 +62,7 @@ public class AuthController(IUserRepository users, JwtTokenService jwt) : Contro
     }
 
     [HttpPut("me")]
-    [Authorize(Roles = Roles.Admin)]
+    [Authorize]
     public async Task<IActionResult> UpdateProfile([FromBody] ProfileUpdateModel model)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

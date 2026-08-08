@@ -16,4 +16,6 @@ public class UserListItem
     public int OrderCount { get; set; }
     public bool HasOrders { get; set; }
     public decimal TotalPurchase { get; set; }
+    public string? AvatarUrl { get; set; }
+    public string? AvatarThumbnailUrl { get; set; }
 }
