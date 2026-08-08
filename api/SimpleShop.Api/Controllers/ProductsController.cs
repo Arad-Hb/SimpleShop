@@ -10,7 +10,7 @@ namespace SimpleShop.Api.Controllers;
 [Route("api/[controller]")]
 public class ProductsController(IProductRepository products) : ControllerBase
 {
-    /// <summary>VisitorPanel-compatible list (maps 1-based page → PageIndex).</summary>
+    // GET /api/products?page=1&pageSize=12&search=...&categoryId=...&isActive=true
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult<ProductListComplex>> GetAll(
@@ -64,6 +64,8 @@ public class ProductsController(IProductRepository products) : ControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         var op = await products.Delete(id);
-        return op.Success ? NoContent() : NotFound(new { message = op.Message });
+        if (op.Success) return NoContent();
+        if (op.Message == "محصول پیدا نشد") return NotFound(new { message = op.Message });
+        return BadRequest(new { message = op.Message });
     }
 }

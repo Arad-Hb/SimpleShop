@@ -20,7 +20,7 @@
     let products = apiProducts.slice();
     if (q) {
       products = products.filter((p) =>
-        [p.name, p.sku, p.brandName].join(' ').toLowerCase().includes(q)
+        [p.name, p.categoryId, p.brandName].join(' ').toLowerCase().includes(q)
       );
     }
     if (brandFilter) products = products.filter((p) => p.brandId === brandFilter);
@@ -57,7 +57,7 @@
       <tr data-id="${escapeHtml(p.id)}">
         <td>
           <div class="fw-semibold">${escapeHtml(p.name)}</div>
-          <div class="small text-muted">${escapeHtml(p.sku || '')}</div>
+          <div class="small text-muted">${p.categoryId != null ? `[${p.categoryId}]` : ''}</div>
         </td>
         <td>${escapeHtml(p.brandName || '—')}</td>
         <td>${formatPrice(p.price)}</td>

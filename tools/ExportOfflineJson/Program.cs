@@ -62,7 +62,6 @@ var products = await db.Products.AsNoTracking()
         p.SupplierId,
         SupplierName = p.Supplier != null ? p.Supplier.Name : null,
         p.Slug,
-        p.Sku,
         p.BrandName,
         p.IsActive,
         p.CreatedAt,
@@ -134,6 +133,6 @@ Console.WriteLine($"  orders:     {orders.Count}");
 async Task WriteBundleAsync<T>(string name, List<T> items, DateTime at)
 {
     var path = Path.Combine(outDir, $"{name}.json");
-    var payload = new { version = "legacy-catalog-v1", exportedAt = at, count = items.Count, items };
+    var payload = new { version = "legacy-catalog-v4", exportedAt = at, count = items.Count, items };
     await File.WriteAllTextAsync(path, JsonSerializer.Serialize(payload, jsonOptions));
 }

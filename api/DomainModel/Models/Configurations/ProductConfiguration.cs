@@ -17,10 +17,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         e.Property(p => p.CanonicalUrl).HasMaxLength(500);
         e.Property(p => p.OgTitle).HasMaxLength(200);
         e.Property(p => p.OgDescription).HasMaxLength(500);
-        e.Property(p => p.Sku).HasMaxLength(64);
         e.Property(p => p.BrandName).HasMaxLength(120);
+        e.Property(p => p.MinimumStock).HasDefaultValue(5);
         e.HasIndex(p => p.Slug);
-        e.HasIndex(p => p.Sku);
 
         e.HasOne(p => p.Category)
             .WithMany(c => c.Products)

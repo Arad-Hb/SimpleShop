@@ -34,13 +34,31 @@
     return `${base}${path.startsWith('/') ? path : `/${path}`}`;
   };
 
-  const getProducts = async ({ page = 1, pageSize = 100, sortBy = 'name', sortDir = 'asc' } = {}) => {
+  const getProducts = async ({
+    page = 1,
+    pageSize = 100,
+    sortBy = 'name',
+    sortDir = 'asc',
+    search = '',
+    categoryId = undefined,
+    supplierId = undefined,
+    minPrice = undefined,
+    maxPrice = undefined,
+    isActive = undefined
+  } = {}) => {
     const params = new URLSearchParams({
       page: String(page),
       pageSize: String(pageSize),
       sortBy,
       sortDir
     });
+    if (search) params.set('search', search);
+    if (categoryId != null && categoryId !== '') params.set('categoryId', String(categoryId));
+    if (supplierId != null && supplierId !== '') params.set('supplierId', String(supplierId));
+    if (minPrice != null && minPrice !== '') params.set('minPrice', String(minPrice));
+    if (maxPrice != null && maxPrice !== '') params.set('maxPrice', String(maxPrice));
+    if (isActive === true) params.set('isActive', 'true');
+    else if (isActive === false) params.set('isActive', 'false');
     return request(`/api/products?${params}`);
   };
 

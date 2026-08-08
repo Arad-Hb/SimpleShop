@@ -61,9 +61,17 @@ def emit_categories(cats: list) -> str:
 
 
 def emit_products(prods: list) -> str:
-    lines = ["    public static readonly ProductSeed[] Products =", "    ["]
-    for prod_id, name, price, _alt, cat_id, supplier_id in prods:
+    seen: set[str] = set()
+    unique = []
+    for prod_id, name, price, _alt, cat_id, supplier_id in sorted(prods, key=lambda x: int(x[0])):
         name = unescape_sql(name).strip()
+        if name in seen:
+            continue
+        seen.add(name)
+        unique.append((prod_id, name, price, cat_id, supplier_id))
+
+    lines = ["    public static readonly ProductSeed[] Products =", "    ["]
+    for prod_id, name, price, cat_id, supplier_id in unique:
         lines.append(
             f"        new({prod_id}, {cs_string(name)}, {price}m, {cat_id}, {supplier_id}),"
         )

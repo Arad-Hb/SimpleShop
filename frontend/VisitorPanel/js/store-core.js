@@ -74,29 +74,19 @@
     const stock = Number(dto.stock) || 0;
     let tag = '';
     let amazing = false;
-    let discount = 0;
-    let old = null;
     if (stock > 0 && stock <= 5) {
       tag = 'amazing';
       amazing = true;
-      discount = 15;
-      old = Math.round(price * 1.15);
     } else if (price >= 10000000) {
       tag = 'special';
-      discount = 10;
-      old = Math.round(price * 1.1);
     } else if (stock === 0) {
       tag = 'sale';
-      discount = 20;
-      old = Math.round(price * 1.2);
     }
 
     return {
       id: String(dto.id),
       title: dto.name || 'محصول',
       price,
-      old,
-      discount,
       icon: ICONS[index % ICONS.length],
       imageUrl: dto.imageUrl || dto.ImageUrl || '',
       thumbnailUrl: dto.thumbnailUrl || dto.ThumbnailUrl || dto.imageUrl || dto.ImageUrl || '',
@@ -360,7 +350,6 @@
     categoryName: p.categoryName || '',
     categoryId: p.category || '',
     stock: p.stock ?? 0,
-    discount: p.discount || 0,
     icon: p.icon || 'bi-box-seam'
   });
 
@@ -431,7 +420,6 @@
           categoryName: row.categoryName || '',
           categoryId: row.categoryId || '',
           stock: row.stock ?? 0,
-          discount: row.discount || 0,
           icon: row.icon || 'bi-box-seam'
         }))
       };
@@ -612,13 +600,7 @@
       ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(p.title)}" loading="lazy">`
       : `<i class="bi ${escapeHtml(p.icon || 'bi-box-seam')} product-thumb-fallback" aria-hidden="true"></i>`;
 
-    const hasDiscount = Number(p.discount) > 0 && p.old;
-    const priceTop = hasDiscount
-      ? `<div class="product-price-top">
-          <span class="product-price-old">${formatPriceNumber(p.old)}</span>
-          <span class="product-discount-badge">${p.discount}%</span>
-        </div>`
-      : '<div class="product-price-top product-price-top--empty" aria-hidden="true"></div>';
+    const priceTop = '<div class="product-price-top product-price-top--empty" aria-hidden="true"></div>';
 
     return `
     <article class="product-card" data-product-id="${escapeHtml(p.id)}">

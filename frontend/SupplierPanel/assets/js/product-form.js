@@ -31,7 +31,6 @@
       }
       title.textContent = 'ویرایش محصول';
       document.getElementById('name').value = product.name || '';
-      document.getElementById('sku').value = product.sku || '';
       document.getElementById('brandId').value = product.brandId || '';
       document.getElementById('price').value = product.price ?? '';
       document.getElementById('stock').value = product.stock ?? 0;
@@ -73,7 +72,6 @@
       const product = {
         id: existing?.id || generateId('prod'),
         name,
-        sku: document.getElementById('sku').value.trim(),
         brandId,
         brandName: brand?.name || '',
         price,

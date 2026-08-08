@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <script>
@@ -42,9 +42,6 @@
             <button class="nav-link active" id="tab-main-btn" data-bs-toggle="tab" data-bs-target="#tab-main" type="button" role="tab" data-tab="main">اطلاعات اصلی</button>
           </li>
           <li class="nav-item" role="presentation">
-            <button class="nav-link" id="tab-gallery-btn" data-bs-toggle="tab" data-bs-target="#tab-gallery" type="button" role="tab" data-tab="gallery">گالری تصاویر</button>
-          </li>
-          <li class="nav-item" role="presentation">
             <button class="nav-link" id="tab-seo-btn" data-bs-toggle="tab" data-bs-target="#tab-seo" type="button" role="tab" data-tab="seo">تنظیمات SEO</button>
           </li>
           <li class="nav-item" role="presentation">
@@ -62,12 +59,6 @@
                   <div class="mb-3">
                     <label class="form-label" for="name">نام محصول <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="name" name="name" required maxlength="200">
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="mb-3">
-                    <label class="form-label" for="sku">کد محصول (SKU) <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="sku" name="sku" required maxlength="50">
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -90,13 +81,6 @@
                   <div class="mb-3">
                     <label class="form-label" for="price">قیمت فروش (تومان) <span class="text-danger">*</span></label>
                     <input type="number" class="form-control" id="price" name="price" min="0" step="1000" required>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="mb-3">
-                    <label class="form-label" for="discountPrice">قیمت با تخفیف</label>
-                    <input type="number" class="form-control" id="discountPrice" name="discountPrice" min="0" step="1000">
-                    <div class="form-text">اختیاری — باید کمتر از قیمت اصلی باشد</div>
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -128,23 +112,7 @@
               </div>
             </div>
 
-            <!-- Tab 2: Gallery -->
-            <div class="tab-pane fade" id="tab-gallery" role="tabpanel">
-              <div id="gallery-error" class="alert alert-danger d-none" role="alert"></div>
-              <div class="drop-zone mb-3" id="gallery-drop-zone" tabindex="0">
-                <i class="bi bi-cloud-upload display-6 d-block mb-2"></i>
-                <p class="mb-1">تصاویر را اینجا بکشید و رها کنید یا کلیک کنید</p>
-                <p class="small text-muted mb-0">JPG، PNG، WebP — حداکثر ۲ مگابایت — چند تصویر</p>
-                <input type="file" id="gallery-file-input" class="visually-hidden" accept="image/jpeg,image/png,image/webp" multiple>
-              </div>
-              <div id="gallery-upload-progress" class="progress mb-3 d-none" style="height: 6px;">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
-              </div>
-              <div class="gallery-grid" id="gallery-grid"></div>
-              <p class="text-muted small mt-2" id="gallery-hint">حداقل یک تصویر اصلی الزامی است.</p>
-            </div>
-
-            <!-- Tab 3: SEO -->
+            <!-- Tab 2: SEO -->
             <div class="tab-pane fade" id="tab-seo" role="tabpanel">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -193,13 +161,6 @@
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="mb-3">
-                    <label class="form-label" for="ogImageFile">تصویر Open Graph</label>
-                    <input type="file" class="form-control" id="ogImageFile" accept="image/jpeg,image/png,image/webp">
-                    <div id="og-image-preview" class="mt-2"></div>
-                  </div>
-                </div>
-                <div class="col-md-6">
                   <div class="mb-3 pt-2">
                     <div class="form-check mb-2">
                       <input class="form-check-input" type="checkbox" id="seoIndex" name="seoIndex" checked>
@@ -222,7 +183,6 @@
                 <div class="col-md-6">
                   <div class="seo-preview mb-3">
                     <div class="small text-muted mb-1">پیش‌نمایش Open Graph</div>
-                    <div id="og-preview-image" class="bg-light rounded mb-2 text-center py-4 text-muted small">بدون تصویر</div>
                     <div class="fw-semibold" id="og-preview-title">عنوان OG</div>
                     <div class="text-muted small" id="og-preview-desc">توضیحات OG</div>
                   </div>

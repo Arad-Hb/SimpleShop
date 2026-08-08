@@ -60,9 +60,13 @@ foreach ($m in $catMatches) {
 [void]$sb.AppendLine('    public static readonly ProductSeed[] Products =')
 [void]$sb.AppendLine('    [')
 
-foreach ($m in $prodMatches) {
-    $id = $m.Groups[1].Value
+$seenNames = @{}
+$sortedProds = $prodMatches | Sort-Object { [int]$_.Groups[1].Value }
+foreach ($m in $sortedProds) {
     $name = ($m.Groups[2].Value -replace "''","'").Trim()
+    if ($seenNames.ContainsKey($name)) { continue }
+    $seenNames[$name] = $true
+    $id = $m.Groups[1].Value
     $price = $m.Groups[3].Value
     $catId = $m.Groups[5].Value
     $supplierId = $m.Groups[6].Value
@@ -74,4 +78,4 @@ foreach ($m in $prodMatches) {
 
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText($output, $sb.ToString(), $utf8NoBom)
-Write-Host "Wrote $output ($($catMatches.Count) categories, $($prodMatches.Count) products)"
+Write-Host "Wrote $output ($($catMatches.Count) categories, $($seenNames.Count) unique products from $($prodMatches.Count) rows)"

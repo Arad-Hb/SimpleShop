@@ -33,9 +33,7 @@
                 category: String(dto.categoryId ?? base.category ?? ''),
                 brand: dto.supplierName || dto.categoryName || base.brand || ((window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده'),
                 tag: base.tag || '',
-                amazing: base.amazing || false,
-                discount: base.discount || 0,
-                old: base.old || null
+                amazing: base.amazing || false
               };
             })();
           product = mapped;
@@ -94,7 +92,6 @@
       <div class="product-detail">
         <div class="product-gallery">
           ${tagHtml(product)}
-          ${product.discount ? `<span class="product-badge" style="position:absolute;top:16px;left:16px">٪${product.discount}</span>` : ''}
           ${galleryHtml}
         </div>
         <div class="product-detail-info panel-card">
@@ -107,8 +104,6 @@
           </div>
           <div class="detail-price">
             <span class="now">${formatPrice(product.price)}</span>
-            ${product.old ? `<span class="old">${formatPrice(product.old)}</span>` : ''}
-            ${product.discount ? `<span class="off">${product.discount}٪ تخفیف</span>` : ''}
           </div>
           <p class="text-muted">${escapeHtml(product.description)}</p>
           <div class="qty-row">

@@ -491,15 +491,6 @@ img { max-width: 100%; display: block; }
   color: #c0c2c5;
   text-decoration: line-through;
 }
-.mini-cart-discount-badge {
-  background: #ef394e;
-  color: #fff;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  line-height: 1.5;
-  padding: 0 6px;
-  border-radius: 999px;
-}
 .mini-cart-price-now {
   display: flex;
   align-items: flex-end;
@@ -1722,16 +1713,6 @@ body.mobile-cat-open {
   color: #c0c2c5;
   text-decoration: line-through;
   font-weight: 400;
-}
-.product-discount-badge {
-  background: #ef394e;
-  color: #fff;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  line-height: 1.6;
-  padding: 0 6px;
-  border-radius: 999px;
-  white-space: nowrap;
 }
 .product-price-now {
   display: flex;

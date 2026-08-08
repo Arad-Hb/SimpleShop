@@ -1,70 +1,40 @@
 /**
  * sync.js — همگام‌سازی کاتالوگ Admin با دیتابیس API
- * محصولات / دسته‌ها / تأمین‌کننده‌ها + URL تصویر و بندانگشتی
  */
 (function (ShopAdmin) {
   'use strict';
 
-  const mapApiProduct = (dto) => {
-    const gallery = Array.isArray(dto.gallery) ? dto.gallery : (Array.isArray(dto.Gallery) ? dto.Gallery : []);
-    const imageUrl = dto.imageUrl || dto.ImageUrl || '';
-    const thumbnailUrl = dto.thumbnailUrl || dto.ThumbnailUrl || imageUrl || '';
-    const images = gallery.length
-      ? gallery.map((g, i) => ({
-          id: `api-img-${dto.id}-${g.id || g.Id || i}`,
-          alt: g.altText || g.AltText || dto.name || '',
-          isPrimary: g.isPrimary === true || g.IsPrimary === true || i === 0,
-          sortOrder: g.sortOrder ?? g.SortOrder ?? i,
-          url: g.url || g.Url || imageUrl,
-          thumbnailUrl: g.thumbnailUrl || g.ThumbnailUrl || thumbnailUrl
-        }))
-      : (imageUrl || thumbnailUrl
-        ? [{
-            id: `api-img-${dto.id}-primary`,
-            alt: dto.name || '',
-            isPrimary: true,
-            sortOrder: 0,
-            url: imageUrl,
-            thumbnailUrl
-          }]
-        : []);
-
-    return {
-      id: dto.id,
-      name: dto.name || 'محصول',
-      sku: dto.sku || `API-${String(dto.id).padStart(4, '0')}`,
-      categoryId: dto.categoryId ?? null,
-      categoryName: dto.categoryName || '',
-      supplierId: dto.supplierId ?? null,
-      supplierName: dto.supplierName || '',
-      price: Number(dto.price) || 0,
-      discountPrice: null,
-      stock: Number(dto.stock) || 0,
-      minimumStock: 5,
-      isActive: true,
-      description: dto.description || '',
-      imageId: images[0]?.id || null,
-      imageUrl,
-      thumbnailUrl,
-      images,
-      rating: 0,
-      reviewCount: 0,
-      createdAt: dto.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      source: 'api',
-      seo: {
-        metaTitle: dto.metaTitle || '',
-        metaDescription: dto.metaDescription || '',
-        keywords: dto.metaKeywords || '',
-        canonicalUrl: dto.canonicalUrl || '',
-        ogTitle: dto.ogTitle || '',
-        ogDescription: dto.ogDescription || '',
-        ogImageId: null,
-        index: true,
-        follow: true
-      }
-    };
-  };
+  const mapApiProduct = (dto) => ({
+    id: dto.id,
+    name: dto.name || 'محصول',
+    categoryId: dto.categoryId ?? null,
+    categoryName: dto.categoryName || '',
+    supplierId: dto.supplierId ?? null,
+    supplierName: dto.supplierName || '',
+    price: Number(dto.price) || 0,
+    stock: Number(dto.stock) || 0,
+    minimumStock: Number(dto.minimumStock) || 5,
+    hasOrders: dto.hasOrders === true || dto.HasOrders === true,
+    isActive: dto.isActive !== false,
+    description: dto.description || '',
+    imageUrl: dto.imageUrl || dto.ImageUrl || '',
+    thumbnailUrl: dto.thumbnailUrl || dto.ThumbnailUrl || dto.imageUrl || dto.ImageUrl || '',
+    rating: 0,
+    reviewCount: 0,
+    createdAt: dto.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: 'api',
+    seo: {
+      metaTitle: dto.metaTitle || '',
+      metaDescription: dto.metaDescription || '',
+      keywords: dto.metaKeywords || '',
+      canonicalUrl: dto.canonicalUrl || '',
+      ogTitle: dto.ogTitle || '',
+      ogDescription: dto.ogDescription || '',
+      index: true,
+      follow: true
+    }
+  });
 
   const mapApiCategory = (dto, index) => ({
     id: dto.id,
@@ -112,12 +82,11 @@
       page += 1;
     }
 
-    // Enrich first page of details for gallery URLs when list lacks gallery
     return all;
   };
 
   /**
-   * Pull catalog from API into LocalStorage so all Admin pages see DB data + photos.
+   * Pull catalog from API into LocalStorage so all Admin pages see DB data.
    * @returns {Promise<{ok:boolean, products:number, categories:number, suppliers:number, message?:string}>}
    */
   const syncCatalogFromApi = async ({ force = false } = {}) => {

@@ -7,6 +7,10 @@ public class ProductListItem
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int Stock { get; set; }
+    public bool IsActive { get; set; } = true;
+    public int MinimumStock { get; set; } = 5;
+    public bool HasOrders { get; set; }
+    public DateTime CreatedAt { get; set; }
     public int CategoryId { get; set; }
     public string CategoryName { get; set; } = string.Empty;
     public int? SupplierId { get; set; }

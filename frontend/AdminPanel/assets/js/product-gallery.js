@@ -96,7 +96,7 @@
   const buildProductOptions = () =>
     filteredProducts.map((p) => ({
       value: p.id,
-      label: `${p.name} (${p.sku || '—'})${p.isActive === false ? ' — غیرفعال' : ''}`
+      label: `${p.name}${p.isActive === false ? ' — غیرفعال' : ''}`
     }));
 
   const refreshProductList = () => {
@@ -108,8 +108,7 @@
 
     if (search) {
       filteredProducts = filteredProducts.filter((p) =>
-        (p.name || '').toLowerCase().includes(search) ||
-        (p.sku || '').toLowerCase().includes(search)
+        (p.name || '').toLowerCase().includes(search)
       );
     }
 
@@ -277,7 +276,6 @@
 
     const categories = getCategoryMap();
     document.getElementById('selected-product-name').textContent = product.name;
-    document.getElementById('selected-product-sku').textContent = product.sku;
     document.getElementById('selected-product-category').textContent = categories.get(product.categoryId) || '—';
     document.getElementById('selected-image-count').textContent =
       galleryImages.length.toLocaleString('fa-IR');

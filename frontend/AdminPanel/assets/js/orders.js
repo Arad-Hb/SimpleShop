@@ -68,7 +68,6 @@
       items,
       subtotal,
       shippingCost: Number(pick(dto, 'shippingCost', 'ShippingCost')) || 0,
-      discount: Number(pick(dto, 'discount', 'Discount')) || 0,
       statusHistory: pick(dto, 'statusHistory', 'StatusHistory') || []
     };
   };
@@ -308,7 +307,6 @@
       tfoot.innerHTML = `
         <tr><td colspan="3" class="text-end">جمع جزء</td><td>${escapeHtml(formatPrice(order.subtotal))}</td></tr>
         <tr><td colspan="3" class="text-end">هزینه ارسال</td><td>${escapeHtml(formatPrice(order.shippingCost))}</td></tr>
-        <tr><td colspan="3" class="text-end">تخفیف</td><td class="text-danger">-${escapeHtml(formatPrice(order.discount))}</td></tr>
         <tr class="fw-bold"><td colspan="3" class="text-end">مبلغ کل</td><td>${escapeHtml(formatPrice(order.total))}</td></tr>
       `;
     }

@@ -9,7 +9,7 @@
   const mapApiProduct = (dto) => ({
     id: String(pick(dto, 'id', 'Id')),
     name: pick(dto, 'name', 'Name') || 'محصول',
-    sku: pick(dto, 'sku', 'Sku') || `API-${String(pick(dto, 'id', 'Id')).padStart(4, '0')}`,
+    categoryId: pick(dto, 'categoryId', 'CategoryId') ?? null,
     brandName: pick(dto, 'supplierName', 'SupplierName') || pick(dto, 'categoryName', 'CategoryName') || '—',
     brandId: String(pick(dto, 'supplierId', 'SupplierId') || ''),
     price: Number(pick(dto, 'price', 'Price')) || 0,

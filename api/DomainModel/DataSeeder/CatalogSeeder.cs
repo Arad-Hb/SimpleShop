@@ -8,7 +8,7 @@ namespace DomainModel.DataSeeder;
 /// </summary>
 public static class CatalogSeeder
 {
-    public const string SeedVersion = "legacy-catalog-v1";
+    public const string SeedVersion = "legacy-catalog-v4";
 
     /// <returns>True when catalog was reset and reseeded.</returns>
     public static async Task<bool> ResetIfNeededAsync(SimpleShopDbContext context, bool forceReset = false)
@@ -182,8 +182,14 @@ public static class CatalogSeeder
     private static async Task SeedProductsAsync(SimpleShopDbContext context)
     {
         var now = DateTime.UtcNow;
-        var entities = CatalogSeedData.Products
+        var seedRows = CatalogSeedData.Products
+            .Concat(CatalogProductSeedBuilder.Build(CatalogSeedData.Categories))
+            .GroupBy(p => p.Id)
+            .Select(g => g.First())
             .OrderBy(p => p.Id)
+            .ToList();
+
+        var entities = seedRows
             .Select(p => new Product
             {
                 Id = p.Id,

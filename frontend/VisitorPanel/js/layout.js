@@ -602,23 +602,9 @@
     Store.card?.updateCardUI?.();
   }
 
-  const getRowOldUnit = (row) => {
-    const product = Store.catalog?.getProduct?.(row.productId);
-    if (product?.old) return product.old;
-    if (row.discount > 0 && row.unitPrice) {
-      return Math.round(row.unitPrice / (1 - row.discount / 100));
-    }
-    return null;
-  };
-
   const formatPriceNumber = (n) => Number(n || 0).toLocaleString('fa-IR');
 
   const renderMiniCartItem = (row) => {
-    const oldUnit = getRowOldUnit(row);
-    const hasDiscount = oldUnit && oldUnit > row.unitPrice;
-    const discountPct = hasDiscount
-      ? Math.round((1 - row.unitPrice / oldUnit) * 100)
-      : (row.discount || 0);
     const thumb = row.imageUrl
       ? `<img src="${escapeHtml(row.imageUrl)}" alt="">`
       : `<i class="bi ${escapeHtml(row.icon || 'bi-box-seam')}"></i>`;
@@ -639,11 +625,6 @@
           </div>
         </div>
         <div class="mini-cart-item-price">
-          ${hasDiscount || discountPct ? `
-            <div class="mini-cart-item-price-top">
-              <span class="mini-cart-price-old">${formatPriceNumber(oldUnit * row.quantity)}</span>
-              <span class="mini-cart-discount-badge">${discountPct}%</span>
-            </div>` : ''}
           <div class="mini-cart-price-now">
             <span class="mini-cart-price-amount">${formatPriceNumber(row.lineTotal)}</span>
             <span class="mini-cart-price-unit">تومان</span>
@@ -660,13 +641,6 @@
     const items = entity.cardItems || [];
     const count = items.reduce((s, i) => s + i.quantity, 0);
     const total = entity.itemsTotal || 0;
-
-    let totalOld = 0;
-    items.forEach((row) => {
-      const oldUnit = getRowOldUnit(row);
-      totalOld += (oldUnit && oldUnit > row.unitPrice ? oldUnit : row.unitPrice) * row.quantity;
-    });
-    const totalDiscount = totalOld > total ? Math.round((1 - total / totalOld) * 100) : 0;
 
     if (!items.length) {
       panel.innerHTML = `
@@ -686,11 +660,6 @@
       <div class="mini-cart-items">${items.map(renderMiniCartItem).join('')}</div>
       <div class="mini-cart-footer">
         <div class="mini-cart-footer-total">
-          ${totalDiscount ? `
-            <div class="mini-cart-footer-top">
-              <span class="mini-cart-price-old">${formatPriceNumber(totalOld)}</span>
-              <span class="mini-cart-discount-badge">${totalDiscount}%</span>
-            </div>` : ''}
           <div class="mini-cart-price-now">
             <span class="mini-cart-price-amount">${formatPriceNumber(total)}</span>
             <span class="mini-cart-price-unit">تومان</span>

@@ -21,7 +21,7 @@
 
   const getProductPrice = (product) => {
     if (!product) return 0;
-    return Number(product.discountPrice ?? product.price) || 0;
+    return Number(product.price) || 0;
   };
 
   const calcCartTotal = (items, products) => {
@@ -136,7 +136,6 @@
       return `
         <tr>
           <td>${escapeHtml(product?.name || `محصول #${item.productId}`)}</td>
-          <td>${escapeHtml(product?.sku || '—')}</td>
           <td>${qty.toLocaleString('fa-IR')}</td>
           <td>${escapeHtml(formatPrice(unitPrice))}</td>
           <td>${escapeHtml(formatPrice(lineTotal))}</td>
@@ -157,7 +156,6 @@
           <thead>
             <tr>
               <th>محصول</th>
-              <th>SKU</th>
               <th>تعداد</th>
               <th>قیمت واحد</th>
               <th>جمع</th>
@@ -166,7 +164,7 @@
           <tbody>${rows}</tbody>
           <tfoot>
             <tr>
-              <td colspan="4" class="text-end fw-bold">مجموع تقریبی</td>
+              <td colspan="3" class="text-end fw-bold">مجموع تقریبی</td>
               <td class="fw-bold">${escapeHtml(formatPrice(total))}</td>
             </tr>
           </tfoot>

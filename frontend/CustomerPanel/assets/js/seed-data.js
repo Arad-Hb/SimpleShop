@@ -4,7 +4,7 @@
 (function (ShopCustomer) {
   'use strict';
 
-  const OFFLINE_SEED_VERSION = 'legacy-catalog-v1';
+  const OFFLINE_SEED_VERSION = 'legacy-catalog-v4';
 
   const hasRole = (user, role) =>
     (user.roles || []).some((r) => String(r).toLowerCase() === String(role).toLowerCase());
@@ -17,7 +17,6 @@
     paymentMethod: 'online',
     subtotal: (o.items || []).reduce((sum, line) => sum + (Number(line.total) || 0), 0),
     shippingCost: 0,
-    discount: 0,
     total: Number(o.totalAmount) || 0,
     items: (o.items || []).map((line) => ({
       productId: String(line.productId),

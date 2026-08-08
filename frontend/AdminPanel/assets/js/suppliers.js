@@ -118,7 +118,6 @@
           .filter((p) => (pick(p, 'supplierId', 'SupplierId')) === id)
           .map((p) => ({
             id: pick(p, 'id', 'Id'),
-            sku: pick(p, 'sku', 'Sku') || '—',
             name: pick(p, 'name', 'Name') || '—',
             price: Number(pick(p, 'price', 'Price')) || 0,
             stock: Number(pick(p, 'stock', 'Stock')) || 0,
@@ -143,7 +142,6 @@
           .map((p, i) => `
             <tr>
               <td>${(i + 1).toLocaleString('fa-IR')}</td>
-              <td>${escapeHtml(p.sku || '—')}</td>
               <td><a href="product-form.html?id=${p.id}">${escapeHtml(p.name || '—')}</a></td>
               <td>${escapeHtml(formatPrice(p.price))}</td>
               <td>${(Number(p.stock) || 0).toLocaleString('fa-IR')}</td>
@@ -163,7 +161,6 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>کد</th>
                   <th>نام</th>
                   <th>قیمت</th>
                   <th>موجودی</th>

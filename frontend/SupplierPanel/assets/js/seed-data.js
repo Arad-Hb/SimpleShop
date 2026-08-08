@@ -4,7 +4,7 @@
 (function (ShopSupplier) {
   'use strict';
 
-  const OFFLINE_SEED_VERSION = 'legacy-catalog-v1';
+  const OFFLINE_SEED_VERSION = 'legacy-catalog-v4';
 
   const hasRole = (user, role) =>
     (user.roles || []).some((r) => String(r).toLowerCase() === String(role).toLowerCase());
@@ -48,7 +48,6 @@
         name: p.name || 'محصول',
         brandId: brand?.id || null,
         brandName: p.brandName || brand?.name || '',
-        sku: p.sku || `SKU-${p.id}`,
         price: Number(p.price) || 0,
         stock: Number(p.stock) || 0,
         lowStockThreshold: 5,

@@ -18,6 +18,11 @@ public class ProductAddEditModel
     [Range(0, int.MaxValue)]
     public int Stock { get; set; }
 
+    public bool IsActive { get; set; } = true;
+
+    [Range(0, int.MaxValue)]
+    public int MinimumStock { get; set; } = 5;
+
     [Required]
     public int CategoryId { get; set; }
 

@@ -10,9 +10,9 @@ public class Product
     public int CategoryId { get; set; }
     public int? SupplierId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public string? Sku { get; set; }
     public string? BrandName { get; set; }
     public bool IsActive { get; set; } = true;
+    public int MinimumStock { get; set; } = 5;
 
     // SEO
     public string? Slug { get; set; }

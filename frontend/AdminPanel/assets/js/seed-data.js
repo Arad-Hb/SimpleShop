@@ -5,7 +5,7 @@
   'use strict';
 
   const { saveData } = ShopAdmin.storage;
-  const OFFLINE_SEED_VERSION = 'legacy-catalog-v1';
+  const OFFLINE_SEED_VERSION = 'legacy-catalog-v4';
   const DEFAULT_SHOP_NAME = (window.SimpleShopSite && window.SimpleShopSite.name) || 'فروشگاه ساده تحلیل داده';
 
   const hasRole = (user, role) =>
@@ -28,13 +28,11 @@
     id: p.id,
     name: p.name || 'محصول',
     slug: p.slug || `product-${p.id}`,
-    sku: p.sku || `SKU-${String(p.id).padStart(4, '0')}`,
     categoryId: p.categoryId ?? null,
     categoryName: p.categoryName || '',
     supplierId: p.supplierId ?? null,
     supplierName: p.supplierName || '',
     price: Number(p.price) || 0,
-    discountPrice: null,
     stock: Number(p.stock) || 0,
     minimumStock: 5,
     isActive: p.isActive !== false,
@@ -91,7 +89,6 @@
         paymentStatus: normalizePaymentStatus(o.paymentStatus),
         subtotal,
         shippingCost,
-        discount: 0,
         total,
         shippingAddress: o.shippingAddress || customer?.address || '',
         recipientName: customer ? `${customer.firstName} ${customer.lastName}`.trim() : '',

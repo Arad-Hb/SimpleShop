@@ -1076,13 +1076,12 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
 }
 .admin-table--products .col-img { width: 48px; text-align: center; }
 .admin-table--products .col-id { width: 48px; text-align: center; font-variant-numeric: tabular-nums; }
-.admin-table--products .col-sku { width: 78px; }
 .admin-table--products .col-name { width: 16%; max-width: 160px; }
 .admin-table--products .col-cat { width: 100px; }
 .admin-table--products .col-supplier { width: 100px; }
 .admin-table--products .col-price { width: 96px; }
 .admin-table--products .col-stock { width: 58px; text-align: center; }
-.admin-table--products .col-min { width: 52px; text-align: center; }
+.admin-table--products .col-order-usage { width: 72px; text-align: center; white-space: normal; }
 .admin-table--products .col-stock-status { width: 92px; text-align: center; white-space: normal; }
 .admin-table--products .col-publish { width: 72px; text-align: center; white-space: normal; }
 .admin-table--products .col-actions { width: 108px; text-align: center; overflow: visible; white-space: nowrap; }
@@ -1107,16 +1106,13 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   .admin-table--products .col-supplier,
   .admin-table--products th.col-supplier,
   .admin-table--products td.col-supplier,
-  .admin-table--products .col-min,
-  .admin-table--products th.col-min,
-  .admin-table--products td.col-min {
+  .admin-table--products .col-order-usage,
+  .admin-table--products th.col-order-usage,
+  .admin-table--products td.col-order-usage {
     display: none;
   }
 }
 @media (max-width: 1199.98px) {
-  .admin-table--products .col-sku,
-  .admin-table--products th.col-sku,
-  .admin-table--products td.col-sku,
   .admin-table--products .col-stock-status,
   .admin-table--products th.col-stock-status,
   .admin-table--products td.col-stock-status {
