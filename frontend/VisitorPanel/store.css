@@ -73,6 +73,7 @@ img { max-width: 100%; display: block; }
 /* Main header */
 .main-header {
   background: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
   position: sticky;
@@ -319,7 +320,7 @@ img { max-width: 100%; display: block; }
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.45rem 0.7rem;
+  padding: 1rem 0.7rem;
   background: #fff;
   border: 1px solid #e0e0e2;
   border-radius: 8px;

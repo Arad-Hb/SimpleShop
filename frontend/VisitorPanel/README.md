@@ -1,29 +1,7 @@
-# VisitorPanel
+# Visitor storefront
 
-Customer storefront for SimpleShop.
+Public HTML/CSS for SimpleShop. Page scripts live in `../shared/js/pages/`.
 
-## Pages
+Pages: home, category, product, search, cart, checkout, login, register.
 
-- `index.html` — home
-- `product.html?id=` — product detail
-- `card.html` — virtual shopping card
-- `checkout.html` — guest or logged-in checkout
-- `category.html` / `search.html` — browse and search
-- `auth.html` — login / register (Admin-style UI)
-- `login.html` — redirect stub to `auth.html?tab=login`
-
-## API sync
-
-`js/config.js` → `API_BASE_URL`  
-`js/api-client.js` → fetch helpers  
-`js/store-core.js` → loads `/api/products` + `/api/categories` when API is up, otherwise loads shared JSON from `../shared/files/`.
-
-## Auth handoff
-
-Visitor login/register saves:
-- `simpleShopVisitorToken` for storefront API calls
-- `shopCustomerSession` or `shopSupplierSession` for panel redirect after auth
-
-## Offer tags
-
-Bold **orange/red** labels for پیشنهاد شگفت‌انگیز, پیشنهاد ویژه, فروش ویژه.
+Checkout requires a Customer login. The API must be running at `http://localhost:5102`.

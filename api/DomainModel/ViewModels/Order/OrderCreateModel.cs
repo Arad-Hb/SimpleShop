@@ -4,23 +4,27 @@ namespace DomainModel.ViewModels.Order;
 
 public class OrderCreateModel
 {
-    public int Id { get; set; }
+    [Required(ErrorMessage = "نام گیرنده الزامی است.")]
+    [StringLength(120)]
+    public string ShippingFullName { get; set; } = string.Empty;
 
-    public string UserId { get; set; } = string.Empty;
+    [Required(ErrorMessage = "موبایل گیرنده الزامی است.")]
+    [StringLength(15)]
+    public string ShippingMobile { get; set; } = string.Empty;
 
-    public string? Status { get; set; }
+    [Required(ErrorMessage = "آدرس ارسال الزامی است.")]
+    [StringLength(400)]
+    public string ShippingAddress { get; set; } = string.Empty;
+
+    [StringLength(80)]
+    public string? ShippingCity { get; set; }
+
+    [StringLength(20)]
+    public string? ShippingPostalCode { get; set; }
 
     [StringLength(500)]
-    public string? ShippingAddress { get; set; }
+    public string? CustomerNote { get; set; }
 
-    public string PaymentStatus { get; set; } = "Unpaid";
-
-    [MinLength(1)]
-    public List<OrderLineCreateModel> Items { get; set; } = new();
-}
-
-public class OrderLineCreateModel
-{
-    public int ProductId { get; set; }
-    public int Quantity { get; set; }
+    [MinLength(1, ErrorMessage = "سبد خرید خالی است.")]
+    public List<CheckoutItemModel> Items { get; set; } = [];
 }

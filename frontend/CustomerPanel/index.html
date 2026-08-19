@@ -1,21 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <script>
-(function () {
-  var path = location.pathname || '';
-  if (/\/(AdminPanel|SupplierPanel|CustomerPanel)$/i.test(path)) {
-    location.replace(path + '/' + location.search + location.hash);
-    return;
-  }
-  try {
-    var raw = sessionStorage.getItem('shopCustomerSession') || localStorage.getItem('shopCustomerSession');
-    if (!raw) location.replace('login.html');
-  } catch (e) {
-    location.replace('login.html');
-  }
-})();
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>داشبورد — پنل مشتری</title>
@@ -24,7 +9,7 @@
   <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
   <link rel="stylesheet" href="assets/css/customer.css">
 </head>
-<body data-page="dashboard">
+<body data-panel-role="Customer" data-page="dashboard">
 <div class="admin-wrapper">
   <aside id="sidebar" class="admin-sidebar" data-sidebar>
     <div class="sidebar-brand customer-sidebar-brand">
@@ -58,16 +43,16 @@
           <div>
             <div class="customer-hero__eyebrow"><i class="bi bi-sun" aria-hidden="true"></i> خوش آمدید</div>
             <h1>سلام <span id="dash-greet">مشتری</span>، خوش اومدید!</h1>
-            <p>از اینجا سفارش‌ها، سبدهای ناتمام و اطلاعات حسابتان را راحت و رنگی مدیریت کنید — برای هر سلیقه و هر سن.</p>
+            <p>از اینجا سفارش‌ها و اطلاعات حسابتان را راحت مدیریت کنید.</p>
             <div class="customer-hero__tags">
               <span class="fun-tag"><i class="bi bi-bag-heart"></i> خرید آسان</span>
               <span class="fun-tag"><i class="bi bi-truck"></i> پیگیری سفارش</span>
-              <span class="fun-tag"><i class="bi bi-wallet2"></i> کیف پول من</span>
+              <span class="fun-tag"><i class="bi bi-person-heart"></i> پروفایل من</span>
             </div>
           </div>
           <div class="customer-hero__actions">
             <a href="orders.html" class="btn btn-light"><i class="bi bi-bag-check"></i> سفارش‌های من</a>
-            <a href="carts.html" class="btn btn-outline-light"><i class="bi bi-cart3"></i> سبدهای ناتمام</a>
+            <a href="../VisitorPanel/card.html" class="btn btn-outline-light"><i class="bi bi-cart3"></i> سبد خرید</a>
           </div>
         </div>
       </section>
@@ -78,20 +63,10 @@
           <span class="dash-shortcut__title">سفارش‌ها</span>
           <span class="dash-shortcut__desc">تاریخچه خرید و وضعیت ارسال</span>
         </a>
-        <a class="dash-shortcut dash-shortcut--carts" href="carts.html">
-          <span class="dash-shortcut__icon"><i class="bi bi-cart3"></i></span>
-          <span class="dash-shortcut__title">سبدهای باز</span>
-          <span class="dash-shortcut__desc">چیزهایی که هنوز پرداخت نشدند</span>
-        </a>
         <a class="dash-shortcut dash-shortcut--profile" href="profile.html">
           <span class="dash-shortcut__icon"><i class="bi bi-person-heart"></i></span>
           <span class="dash-shortcut__title">پروفایل</span>
           <span class="dash-shortcut__desc">نام، تماس و آدرس شما</span>
-        </a>
-        <a class="dash-shortcut dash-shortcut--money" href="financial.html">
-          <span class="dash-shortcut__icon"><i class="bi bi-wallet2"></i></span>
-          <span class="dash-shortcut__title">اطلاعات مالی</span>
-          <span class="dash-shortcut__desc">کارت و شبا برای بازگشت وجه</span>
         </a>
       </div>
 
@@ -112,7 +87,7 @@
           <div class="stat-card stat-card--mint">
             <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
             <div class="stat-value" id="stat-paid">—</div>
-            <div class="stat-label">پرداخت‌شده</div>
+            <div class="stat-label">تحویل‌شده</div>
           </div>
         </div>
         <div class="col-6 col-md-4 col-xl-2">
@@ -133,7 +108,7 @@
           <div class="stat-card stat-card--coral">
             <div class="stat-icon"><i class="bi bi-cart3"></i></div>
             <div class="stat-value" id="stat-carts">—</div>
-            <div class="stat-label">سبد ناتمام</div>
+            <div class="stat-label">اقلام سبد</div>
           </div>
         </div>
         <div class="col-6 col-md-4 col-xl-2">
@@ -173,15 +148,16 @@
 </div>
 
 <script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/storage.js"></script>
-<script src="../shared/js/sidebar-brand.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="../shared/js/offline-data.js"></script>
-
-<script src="assets/js/seed-data.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/dashboard.js"></script>
+<script src="../shared/vendor/axios.min.js"></script>
+<script src="../shared/js/config.js"></script>
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth.js"></script>
+<script src="../shared/js/cart.js"></script>
+<script src="../shared/js/common.js"></script>
+<script src="../shared/js/toast.js"></script>
+<script src="../shared/js/panel-ui.js"></script>
+<script src="../shared/js/panel-layout.js"></script>
+<script src="../shared/js/customer/dashboard.js"></script>
 </body>
 </html>
+

@@ -74,7 +74,6 @@ body[data-page] .sidebar-brand.customer-sidebar-brand {
   gap: 0.55rem;
   padding: 1.35rem 1rem 1.1rem;
   text-align: center;
-  min-height: auto;
   position: relative;
   z-index: 1;
 }
@@ -177,6 +176,7 @@ body.sidebar-collapsed .customer-sidebar-brand > span[data-customer-brand] {
 
 body[data-page] .admin-header {
   background: rgba(255, 255, 255, 0.78);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
 }

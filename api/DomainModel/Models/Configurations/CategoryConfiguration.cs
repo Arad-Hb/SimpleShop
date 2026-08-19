@@ -1,3 +1,4 @@
+using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,33 +6,24 @@ namespace DomainModel.Models.Configurations;
 
 public class CategoryConfiguration : IEntityTypeConfiguration<Category>
 {
-    public void Configure(EntityTypeBuilder<Category> e)
+    public void Configure(EntityTypeBuilder<Category> builder)
     {
-        e.Property(c => c.Name).HasMaxLength(100).IsRequired();
-        e.Property(c => c.Description).HasMaxLength(500);
-        e.Property(c => c.Slug).HasMaxLength(150);
-        e.Property(c => c.MetaTitle).HasMaxLength(200);
-        e.Property(c => c.MetaDescription).HasMaxLength(500);
-        e.Property(c => c.MetaKeywords).HasMaxLength(500);
-        e.Property(c => c.CanonicalUrl).HasMaxLength(500);
-        e.Property(c => c.OgTitle).HasMaxLength(200);
-        e.Property(c => c.OgDescription).HasMaxLength(500);
-        e.HasIndex(c => c.Slug);
-        e.HasIndex(c => new { c.ParentId, c.SortOrder });
+        builder.ToTable("Categories");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Name).HasMaxLength(120).IsRequired();
+        builder.Property(x => x.Description).HasMaxLength(500);
+        builder.Property(x => x.Slug).HasMaxLength(160);
+        builder.Property(x => x.MetaTitle).HasMaxLength(180);
+        builder.Property(x => x.MetaDescription).HasMaxLength(320);
+        builder.Property(x => x.ImagePath).HasMaxLength(500);
+        builder.Property(x => x.ThumbnailPath).HasMaxLength(500);
 
-        e.HasOne(c => c.ImageFile)
-            .WithMany()
-            .HasForeignKey(c => c.ImageFileId)
-            .OnDelete(DeleteBehavior.SetNull);
+        builder.HasIndex(x => x.Slug).IsUnique().HasFilter("[Slug] IS NOT NULL");
+        builder.HasIndex(x => new { x.ParentId, x.SortOrder });
 
-        e.HasOne(c => c.OgImage)
-            .WithMany()
-            .HasForeignKey(c => c.OgImageId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        e.HasOne(c => c.Parent)
-            .WithMany(c => c.Children)
-            .HasForeignKey(c => c.ParentId)
+        builder.HasOne(x => x.Parent)
+            .WithMany(x => x.Children)
+            .HasForeignKey(x => x.ParentId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

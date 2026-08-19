@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SimpleShop API",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/api/SimpleShop.Api/bin/Debug/net10.0/SimpleShop.Api.dll",
+      "cwd": "${workspaceFolder}/api/SimpleShop.Api",
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Visitor storefront",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:5500/frontend/VisitorPanel/index.html",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}

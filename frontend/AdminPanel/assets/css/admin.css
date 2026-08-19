@@ -78,7 +78,7 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-a { text-decoration: none; color: inherit; }
+body a { text-decoration: none; color: inherit; }
 
 /* ─── Scrollbars ───
    Page scroll sits on the left; sidebar scroll on the right (outer edge). */
@@ -474,6 +474,7 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
 .admin-header {
   height: var(--header-height);
   background: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
   display: flex;
@@ -703,6 +704,7 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   box-shadow: var(--shadow);
   border: 1px solid var(--line);
   transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  overflow: hidden;
 }
 
 .stat-card:hover {
@@ -723,11 +725,11 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
 }
 
 .stat-card .stat-value {
-  font-size: 1.75rem;
+  font-size: 1rem;
   font-weight: 800;
   line-height: 1.2;
   color: var(--text);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .stat-card .stat-label {
@@ -735,6 +737,7 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
+
 
 .stat-icon.primary { background: var(--primary-soft); color: var(--primary); }
 .stat-icon.success { background: #d1fae5; color: var(--success); }
@@ -749,6 +752,8 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   box-shadow: var(--shadow);
   overflow: hidden;
 }
+
+
 
 /* Allow searchable dropdown menus to extend outside the card */
 .content-card--dropdown,
@@ -1285,7 +1290,7 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   font-variant-numeric: tabular-nums;
 }
 .admin-table--categories .col-img {
-  width: 2.75rem;
+  width: 3rem;
   text-align: center;
 }
 .admin-table--categories .col-img img {
@@ -1304,20 +1309,21 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   white-space: nowrap;
 }
 .admin-table--categories .col-slug {
-  width: 8%;
-  max-width: 6.5rem;
+  width: 15%;
+  max-width: 7rem;
 }
 .admin-table--categories .col-slug code {
   font-size: 0.72rem;
 }
 .admin-table--categories .col-desc {
-  width: auto;
-  min-width: 6rem;
+  /* width: auto;
+  min-width: 5rem; */
+    width: 20%;
   white-space: normal;
-  line-height: 1.35;
-  display: -webkit-box;
+  /* line-height: 1.75; */
+  /* display: -webkit-box; */
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  /* -webkit-line-clamp: 2; */
   overflow: hidden;
 }
 .admin-table--categories .col-sort {
@@ -1338,11 +1344,11 @@ body.sidebar-collapsed .sidebar-collapse-btn i {
   text-align: center;
 }
 .admin-table--categories .col-parent {
-  width: 9%;
-  max-width: 7rem;
+   width: 3.25rem;
+  /* max-width: 7rem; */
 }
 .admin-table--categories .col-depth {
-  width: 2.75rem;
+   width: 4.25rem;
   text-align: center;
   font-variant-numeric: tabular-nums;
 }
@@ -1874,6 +1880,7 @@ html:has(body.login-page) {
   gap: 0.4rem;
   color: #2f3a50;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
   font-weight: 500;
   margin: 0;
@@ -3013,6 +3020,7 @@ body.sidebar-collapsed [data-sidebar-toggle] i {
     position: fixed;
     inset: 0;
     background: rgba(27, 37, 75, 0.42);
+    -webkit-backdrop-filter: blur(3px);
     backdrop-filter: blur(3px);
     z-index: 1035;
   }

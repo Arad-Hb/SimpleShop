@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Restore
+        run: dotnet restore SimpleShop.slnx
+      - name: Build
+        run: dotnet build SimpleShop.slnx --no-restore --configuration Release
+      - name: Test
+        run: dotnet test SimpleShop.slnx --no-build --configuration Release
+      - name: JavaScript syntax
+        shell: pwsh
+        run: |
+          Get-ChildItem -Path frontend/shared/js -Recurse -Filter *.js |
+            ForEach-Object { node --check $_.FullName }
+      - name: HTML script sources
+        shell: pwsh
+        run: |
+          $hits = Get-ChildItem -Path frontend -Recurse -Filter *.html |
+            Select-String -Pattern "offline-data\.js|seed-data\.js|SupplierPanel"
+          if ($hits) {
+            $hits | ForEach-Object { Write-Output $_.Path }
+            throw "HTML still references removed offline/supplier scripts."
+          }

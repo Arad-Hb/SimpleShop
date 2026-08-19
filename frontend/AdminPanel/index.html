@@ -1,21 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <script>
-(function () {
-  var path = location.pathname || '';
-  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
-    location.replace(path + '/' + location.search + location.hash);
-    return;
-  }
-  try {
-    var raw = sessionStorage.getItem('shopAdminSession') || localStorage.getItem('shopAdminSession');
-    if (!raw) location.replace('login.html');
-  } catch (e) {
-    location.replace('login.html');
-  }
-})();
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>داشبورد — پنل مدیریت فروشگاه</title>
@@ -23,7 +8,7 @@
   <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
   <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body data-page="dashboard">
+<body data-panel-role="Admin" data-page="dashboard">
 <div class="admin-wrapper">
   <aside id="sidebar" class="admin-sidebar" data-sidebar>
     <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه ساده تحلیل داده</span></div>
@@ -96,8 +81,11 @@
         </div>
         <div class="col-6 col-md-4 col-xl-2">
           <div class="stat-card">
-            <div class="stat-icon success"><i class="bi bi-currency-exchange"></i></div>
-            <div class="stat-value" data-stat="totalSales" style="font-size:1.25rem">—</div>
+            <div class="stat-icon success">
+              <i class="bi bi-currency-exchange"></i>
+              
+            </div>
+            <div class="stat-value" data-stat="totalSales">—</div>
             <div class="stat-label">فروش کل (تحویل‌شده)</div>
           </div>
         </div>
@@ -235,23 +223,15 @@
 <div id="confirm-modal-root"></div>
 
 <script src="assets/vendor/bootstrap.bundle.min.js"></script>
-<script src="assets/js/storage.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/validation.js"></script>
-<script src="assets/js/pagination.js"></script>
-<script src="../shared/js/sidebar-brand.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="../shared/js/api-config.js"></script>
-<script src="assets/js/config.js"></script>
 <script src="../shared/vendor/axios.min.js"></script>
-<script src="../shared/js/http-client.js"></script>
-<script src="assets/js/api-client.js"></script>
-<script src="../shared/js/offline-data.js"></script>
-
-<script src="assets/js/seed-data.js"></script>
-<script src="assets/js/sync.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/dashboard.js"></script>
+<script src="../shared/js/config.js"></script>
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth.js"></script>
+<script src="../shared/js/common.js"></script>
+<script src="../shared/js/toast.js"></script>
+<script src="../shared/js/panel-ui.js"></script>
+<script src="../shared/js/panel-layout.js"></script>
+<script src="../shared/js/admin/dashboard.js"></script>
 </body>
 </html>
+

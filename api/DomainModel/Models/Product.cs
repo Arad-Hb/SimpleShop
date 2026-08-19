@@ -7,32 +7,18 @@ public class Product
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public int Stock { get; set; }
+    public int MinimumStock { get; set; } = 5;
     public int CategoryId { get; set; }
-    public int? SupplierId { get; set; }
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public string? BrandName { get; set; }
     public bool IsActive { get; set; } = true;
-    public int MinimumStock { get; set; } = 5;
-
-    // SEO
     public string? Slug { get; set; }
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
-    public string? MetaKeywords { get; set; }
-    public string? CanonicalUrl { get; set; }
-    public string? OgTitle { get; set; }
-    public string? OgDescription { get; set; }
-
-    /// <summary>Primary display image (FileManager).</summary>
-    public int? PrimaryImageId { get; set; }
-    public FileManager? PrimaryImage { get; set; }
-
-    /// <summary>Open Graph / social share image.</summary>
-    public int? OgImageId { get; set; }
-    public FileManager? OgImage { get; set; }
+    public string? ImagePath { get; set; }
+    public string? ThumbnailPath { get; set; }
+    public DateTime CreateDate { get; set; } = DateTime.Now;
+    public DateTime? UpdateDate { get; set; }
 
     public Category Category { get; set; } = null!;
-    public Supplier? Supplier { get; set; }
-    public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

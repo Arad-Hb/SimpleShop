@@ -4,6 +4,7 @@ namespace DomainModel.ViewModels.Order;
 
 public class OrderSearchModel : PageModel
 {
-    public string? UserId { get; set; }
+    public string? Term { get; set; }
     public string? Status { get; set; }
+    public string? UserId { get; set; }
 }

@@ -1,85 +1,105 @@
-# SimpleShop
+# SimpleShop — educational layered shop
 
-Educational e-commerce project split into **frontend** and a **layered teaching API**.
+Beginner-friendly full-stack shop for teaching, modeled after AdvertisePlaceMarket-v1.
+
+Students can trace one operation from an HTML button to SQL Server:
+
+HTML page → page JavaScript → Axios → Controller → Service → Repository → EF Core → SQL Server
+
+This is **not** Clean Architecture and not a production enterprise system. It is a Course-1 layered monolith.
+
+## Projects
 
 ```
 SimpleShop/
-├── frontend/                 # All UI panels (HTML / CSS / Bootstrap 5 / JS)
-│   ├── VisitorPanel/         # Customer storefront (JWT in localStorage)
-│   ├── AdminPanel/           # Admin offline panel (LocalStorage + IndexedDB images)
-│   └── SupplierPanel/        # Supplier portal (LocalStorage)
-├── api/
-│   ├── Framework/            # OperationResult, PageModel, base repo contracts
-│   ├── DomainModel/          # Entities, DbContext, ViewModels, seeder, migrations
-│   ├── DataAccess/           # Repository interfaces + implementations
-│   └── SimpleShop.Api/       # Thin Web API host (JWT, CORS, controllers)
-├── SimpleShop.slnx
-└── README.md
+  api/Framework/         OperationResult, pagination, constants, helpers
+  api/DomainModel/       Entities, ViewModels, EF configurations, DbContext
+  api/DataAccess/        Feature repositories, mappers, services
+  api/SimpleShop.Api/    Controllers, JWT, FileManager, seeder, Swagger
+  frontend/              VisitorPanel, CustomerPanel, AdminPanel, shared JS
+  tests/                 Beginner unit and hygiene tests
 ```
 
-Legacy duplicate trees (root AdminPanel / StorefrontPreview / flat `api` Controllers) were removed.
+Dependencies: DomainModel → Framework; DataAccess → DomainModel + Framework; Api → DataAccess + DomainModel + Framework; Frontend → HTTP API.
 
-## Run the API
+There is no generic repository, CQRS, MediatR, AutoMapper, FluentValidation, or C# enums.
 
-Default URL: `http://localhost:5102`  
-Database: `SimpleShopLayeredDb` (migrated + seeded on startup)
+## Prerequisites
 
-### Visual Studio
+- .NET 10 SDK
+- SQL Server (local instance `Server=.` is the educational default)
+- A static file server for `frontend/` (Live Server / any static host)
 
-1. Open **`SimpleShop.slnx`** (repo root).
-2. In **Solution Explorer**, right-click **`SimpleShop.Api`** → **Set as Startup Project**.
-3. In the toolbar profile dropdown, pick **`http`** (uses `http://localhost:5102`).
-4. Press **F5** (debug) or **Ctrl+F5** (run without debugger).
+## Configuration (educational)
 
-On startup the API migrates the database and seeds data if needed.
+Connection string, JWT signing key, and seed passwords live in `api/SimpleShop.Api/appsettings.json`.
 
-**If it doesn’t start**
+These values are **development-only**. Do not use them in production.
 
-- Install the **.NET 10 SDK** (project targets `net10.0`).
-- Make sure SQL Server is running locally (connection string uses `Server=.;...Trusted_Connection=True`).
-- If port `5102` is busy, stop the other process or change the URL in `api/SimpleShop.Api/Properties/launchSettings.json`.
+Default seeded users:
 
-**Quick check:** open `http://localhost:5102/api/categories`
+| Role | Mobile | Password |
+|------|--------|----------|
+| Admin | 09120000001 | Admin@123456 |
+| Customer | 09120000002 | Customer@123456 |
+| Customer | 09120000003 | Demo@123456 |
 
-### Command line
+Database name: `SimpleShopEducationalDb`  
+Created with `EnsureCreated` (teaching shortcut, not migrations).
+
+CORS policy `Frontend` allows any origin in this course.
+
+## Run
 
 ```bash
-cd api/SimpleShop.Api
-dotnet run --launch-profile http
+dotnet restore SimpleShop.slnx
+dotnet build SimpleShop.slnx
+dotnet run --project api/SimpleShop.Api/SimpleShop.Api.csproj
 ```
 
-### Demo accounts (API)
+API: `http://localhost:5102`  
+Swagger (Development): `http://localhost:5102/swagger`
 
-| Role | Username | Password |
-|------|----------|----------|
-| Admin | `admin` | `Admin123!` |
-| Customer | `customer` / `customer02`… | `Customer123!` |
-| Supplier user | `supplier01`…`supplier15` | `Supplier123!` |
+Open `frontend/VisitorPanel/index.html` with Live Server.
 
-Seed targets on API startup: **10 categories**, **100 products**, **100 users** (admin + customers + supplier users), plus **15** supplier companies.
+## Features in this course
 
-## Run the frontend
+- Visitor catalog, cart (local product id + quantity), login/register, checkout
+- Customer orders and profile
+- Admin categories, products (one image), customers, orders, settings, reports
+- Checkout requires a Customer JWT
+- Order statuses: pending → processing → shipped → delivered, plus cancelled
 
-Open any panel with Live Server (or a static file server). Keep `frontend/` as the web root when possible.
+Removed on purpose: Supplier, banners, product gallery, reviews, saved carts, financial module, guest checkout, offline JSON.
 
-| Panel | Entry |
-|-------|--------|
-| Visitor store | `frontend/VisitorPanel/index.html` |
-| Admin | `frontend/AdminPanel/login.html` |
-| Supplier | `frontend/SupplierPanel/login.html` |
+## Teaching boundaries
 
-VisitorPanel talks to the API via `js/config.js` (`API_BASE_URL`).  
-If the API is offline, it falls back to local demo catalog data.
+- `EnsureCreated` instead of EF migrations
+- Permissive CORS
+- JWT key in Development settings
+- Local file storage and thumbnail generation
+- Simulated store catalog from the seeder (no live `.bak` import in this recovery)
 
-## Sync status
+## Publish
 
-- **VisitorPanel → API**: `/api/products`, `/api/categories`, `/api/auth/login`
-- **Admin logo → VisitorPanel**: Settings → لوگوی فروشگاه writes `simpleShopPublicBranding` in localStorage (serve both panels from `frontend/` so they share origin)
-- AdminPanel / SupplierPanel data: LocalStorage demos (product gallery, customer avatar, admin profile avatar)
+```bash
+dotnet publish api/SimpleShop.Api/SimpleShop.Api.csproj -c Release -o ./publish
+```
 
-## Notes
+Do not copy project DLLs by hand. Do not commit `bin`, `obj`, DLL, PDB, or publish output.
 
-- No ASP.NET Identity — JWT + BCrypt only.
-- Controllers call repositories; they never use `DbContext` directly.
-- API CORS allows any origin so frontend can run on another port.
-- SupplierPanel shares Bootstrap assets from `../AdminPanel/assets/`.
+## Tests
+
+```bash
+dotnet test SimpleShop.slnx
+```
+
+## Smoke checklist (run locally)
+
+1. Start the API, then open Visitor `index.html` with Live Server.
+2. Register a new customer (or log in as `09120000002` / `Customer@123456`).
+3. Add a product to the cart; checkout requires the Customer JWT.
+4. Confirm a second checkout cannot oversell remaining stock.
+5. Customer can cancel a `pending` order and stock returns.
+6. Admin (`09120000001` / `Admin@123456`) can CRUD categories and products (one image), edit customers, change order status, save settings/hero, and open reports.
+7. Customer JWT cannot call `/api/admin/...`; Admin JWT cannot checkout.

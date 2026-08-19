@@ -1,14 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <script>
-(function () {
-  var path = location.pathname || '';
-  if (/\/(AdminPanel|SupplierPanel|CustomerPanel)$/i.test(path)) {
-    location.replace(path + '/' + location.search + location.hash);
-  }
-})();
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>پروفایل — پنل مشتری</title>
@@ -17,7 +9,7 @@
   <link rel="stylesheet" href="../AdminPanel/assets/css/admin.css">
   <link rel="stylesheet" href="assets/css/customer.css">
 </head>
-<body data-page="profile">
+<body data-panel-role="Customer" data-page="profile">
 <div class="admin-wrapper">
   <aside id="sidebar" class="admin-sidebar" data-sidebar>
     <div class="sidebar-brand customer-sidebar-brand">
@@ -76,6 +68,7 @@
                 </div>
               </div>
               <div class="settings-media-actions">
+                <label for="avatar-upload" class="form-label d-none">آپلود تصویر پروفایل</label>
                 <input type="file" class="form-control" id="avatar-upload" accept="image/jpeg,image/png,image/webp">
                 <button type="button" class="btn btn-outline-danger settings-card__action" id="avatar-remove">حذف تصویر</button>
               </div>
@@ -142,7 +135,7 @@
 
           <div class="settings-page__actions">
             <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> ذخیره پروفایل</button>
-            <a href="financial.html" class="btn btn-outline-secondary">اطلاعات مالی</a>
+            <a href="index.html" class="btn btn-outline-secondary">بازگشت به داشبورد</a>
           </div>
         </form>
       </div>
@@ -151,20 +144,15 @@
 </div>
 
 <script src="../AdminPanel/assets/vendor/bootstrap.bundle.min.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/storage.js"></script>
-<script src="../shared/js/sidebar-brand.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/config.js"></script>
 <script src="../shared/vendor/axios.min.js"></script>
-<script src="../shared/js/api-config.js"></script>
-<script src="../shared/js/http-client.js"></script>
-<script src="assets/js/api-client.js"></script>
-<script src="../shared/js/offline-data.js"></script>
-
-<script src="assets/js/seed-data.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/profile.js"></script>
+<script src="../shared/js/config.js"></script>
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth.js"></script>
+<script src="../shared/js/common.js"></script>
+<script src="../shared/js/toast.js"></script>
+<script src="../shared/js/panel-ui.js"></script>
+<script src="../shared/js/panel-layout.js"></script>
+<script src="../shared/js/customer/profile.js"></script>
 </body>
 </html>
+

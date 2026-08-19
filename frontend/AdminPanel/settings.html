@@ -1,14 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <script>
-(function () {
-  var path = location.pathname || '';
-  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
-    location.replace(path + '/' + location.search + location.hash);
-  }
-})();
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>سازمان فروش — پنل مدیریت</title>
@@ -16,7 +8,7 @@
   <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
   <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body data-page="settings">
+<body data-panel-role="Admin" data-page="settings">
 <div class="admin-wrapper">
   <aside id="sidebar" class="admin-sidebar" data-sidebar>
     <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه ساده تحلیل داده</span></div>
@@ -50,7 +42,7 @@
 
         <nav class="settings-page__tabs" aria-label="بخش‌های تنظیمات">
           <button type="button" class="settings-page__tab is-active" data-settings-tab="organization">سازمان فروش</button>
-          <button type="button" class="settings-page__tab" data-settings-tab="banners">بنرهای تبلیغاتی</button>
+          <button type="button" class="settings-page__tab d-none" data-settings-tab="banners" hidden>بنرهای تبلیغاتی</button>
           <button type="button" class="settings-page__tab" data-settings-tab="seo">سئو و نمایش</button>
           <button type="button" class="settings-page__tab" data-settings-tab="advanced">تنظیمات پیشرفته</button>
         </nav>
@@ -215,8 +207,8 @@
                       <div class="settings-card__brand">
                         <span class="settings-card__logo"><i class="bi bi-share"></i></span>
                         <div>
-                          <h3 class="settings-card__title">تصویر OG</h3>
-                          <p class="settings-card__subtitle">پیش‌نمایش هنگام اشتراک‌گذاری لینک</p>
+                          <h3 class="settings-card__title">تصویر اصلی فروشگاه</h3>
+                          <p class="settings-card__subtitle">تصویر هدر صفحه اصلی فروشگاه</p>
                         </div>
                       </div>
                     </div>
@@ -475,23 +467,15 @@
 <div id="confirm-modal-root"></div>
 
 <script src="assets/vendor/bootstrap.bundle.min.js"></script>
-<script src="assets/js/storage.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/validation.js"></script>
-<script src="assets/js/pagination.js"></script>
-<script src="../shared/js/sidebar-brand.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/config.js"></script>
 <script src="../shared/vendor/axios.min.js"></script>
-<script src="../shared/js/http-client.js"></script>
-<script src="assets/js/api-client.js"></script>
-<script src="../shared/js/offline-data.js"></script>
-
-<script src="assets/js/seed-data.js"></script>
-<script src="assets/js/sync.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/settings-banners.js"></script>
-<script src="assets/js/settings.js"></script>
+<script src="../shared/js/config.js"></script>
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth.js"></script>
+<script src="../shared/js/common.js"></script>
+<script src="../shared/js/toast.js"></script>
+<script src="../shared/js/panel-ui.js"></script>
+<script src="../shared/js/panel-layout.js"></script>
+<script src="../shared/js/admin/settings.js"></script>
 </body>
 </html>
+

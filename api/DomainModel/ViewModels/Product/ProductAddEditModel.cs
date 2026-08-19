@@ -1,54 +1,37 @@
 using System.ComponentModel.DataAnnotations;
+using Framework.Common.Seo;
 
 namespace DomainModel.ViewModels.Product;
 
 public class ProductAddEditModel
 {
-    public int Id { get; set; }
-
-    [Required, StringLength(200, MinimumLength = 2)]
+    [Required(ErrorMessage = "نام محصول الزامی است.")]
+    [StringLength(180, ErrorMessage = "نام محصول حداکثر ۱۸۰ کاراکتر است.")]
     public string Name { get; set; } = string.Empty;
 
     [StringLength(2000)]
     public string? Description { get; set; }
 
-    [Range(0, double.MaxValue)]
+    [Range(0, double.MaxValue, ErrorMessage = "قیمت نمی‌تواند منفی باشد.")]
     public decimal Price { get; set; }
 
-    [Range(0, int.MaxValue)]
+    [Range(0, int.MaxValue, ErrorMessage = "موجودی نمی‌تواند منفی باشد.")]
     public int Stock { get; set; }
 
-    public bool IsActive { get; set; } = true;
-
-    [Range(0, int.MaxValue)]
+    [Range(0, int.MaxValue, ErrorMessage = "حداقل موجودی نمی‌تواند منفی باشد.")]
     public int MinimumStock { get; set; } = 5;
 
-    [Required]
+    [Required(ErrorMessage = "دسته‌بندی الزامی است.")]
+    [Range(1, int.MaxValue, ErrorMessage = "دسته‌بندی را انتخاب کنید.")]
     public int CategoryId { get; set; }
 
-    public int? SupplierId { get; set; }
+    [StringLength(80)]
+    public string? BrandName { get; set; }
 
-    [StringLength(220)]
+    public bool IsActive { get; set; } = true;
     public string? Slug { get; set; }
-
-    [StringLength(200)]
     public string? MetaTitle { get; set; }
-
-    [StringLength(500)]
     public string? MetaDescription { get; set; }
 
-    [StringLength(500)]
-    public string? MetaKeywords { get; set; }
-
-    [StringLength(500)]
-    public string? CanonicalUrl { get; set; }
-
-    [StringLength(200)]
-    public string? OgTitle { get; set; }
-
-    [StringLength(500)]
-    public string? OgDescription { get; set; }
-
-    public int? PrimaryImageId { get; set; }
-    public int? OgImageId { get; set; }
+    public string ResolvedSlug => SeoHelper.ToSlug(Slug) ?? SeoHelper.ToSlug(Name) ?? string.Empty;
 }

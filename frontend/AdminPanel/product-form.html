@@ -1,14 +1,6 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <script>
-(function () {
-  var path = location.pathname || '';
-  if (/\/(AdminPanel|SupplierPanel)$/i.test(path)) {
-    location.replace(path + '/' + location.search + location.hash);
-  }
-})();
-</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>فرم محصول — پنل مدیریت فروشگاه</title>
@@ -16,7 +8,7 @@
   <link rel="stylesheet" href="assets/css/bootstrap-icons.min.css">
   <link rel="stylesheet" href="assets/css/admin.css">
 </head>
-<body data-page="products">
+<body data-panel-role="Admin" data-page="products">
 <div class="admin-wrapper">
   <aside id="sidebar" class="admin-sidebar" data-sidebar>
     <div class="sidebar-brand"><i class="bi bi-shop"></i><span data-shop-name>فروشگاه ساده تحلیل داده</span></div>
@@ -72,10 +64,10 @@
                     </select>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 d-none">
                   <div class="mb-3">
-                    <label class="form-label" for="supplierId">تأمین‌کننده <span class="text-danger">*</span></label>
-                    <select class="form-select" id="supplierId" name="supplierId" required>
+                    <label class="form-label" for="supplierId">تأمین‌کننده</label>
+                    <select class="form-select" id="supplierId" name="supplierId">
                       <option value="">انتخاب کنید...</option>
                     </select>
                   </div>
@@ -96,6 +88,12 @@
                   <div class="mb-3">
                     <label class="form-label" for="minimumStock">حداقل موجودی (هشدار)</label>
                     <input type="number" class="form-control" id="minimumStock" name="minimumStock" min="0" value="5">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="mb-3">
+                    <label class="form-label" for="brandName">برند</label>
+                    <input type="text" class="form-control" id="brandName" name="brandName" maxlength="80">
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -137,8 +135,8 @@
               <div class="row g-3">
                 <div class="col-md-6">
                   <div class="mb-3">
-                    <label class="form-label" for="slug">شناسه URL (Slug) <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="slug" name="slug" dir="ltr" required>
+                    <label class="form-label" for="slug">شناسه URL (Slug)</label>
+                    <input type="text" class="form-control" id="slug" name="slug" dir="ltr">
                     <div class="form-text">به‌صورت خودکار از نام محصول ساخته می‌شود</div>
                   </div>
                 </div>
@@ -168,19 +166,19 @@
                     <input type="url" class="form-control" id="canonicalUrl" name="canonicalUrl" dir="ltr" placeholder="https://...">
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 d-none">
                   <div class="mb-3">
                     <label class="form-label" for="ogTitle">عنوان Open Graph</label>
                     <input type="text" class="form-control" id="ogTitle" name="ogTitle" maxlength="100">
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 d-none">
                   <div class="mb-3">
                     <label class="form-label" for="ogDescription">توضیحات Open Graph</label>
                     <input type="text" class="form-control" id="ogDescription" name="ogDescription" maxlength="200">
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-6 d-none">
                   <div class="mb-3">
                     <label class="form-label" for="ogImageFile">تصویر Open Graph</label>
                     <input type="file" class="form-control" id="ogImageFile" accept="image/jpeg,image/png,image/webp">
@@ -265,22 +263,15 @@
 <div id="confirm-modal-root"></div>
 
 <script src="assets/vendor/bootstrap.bundle.min.js"></script>
-<script src="assets/js/storage.js"></script>
-<script src="assets/js/utils.js"></script>
-<script src="assets/js/validation.js"></script>
-<script src="assets/js/pagination.js"></script>
-<script src="../shared/js/sidebar-brand.js"></script>
-<script src="assets/js/ui.js"></script>
-<script src="assets/js/auth.js"></script>
-<script src="assets/js/config.js"></script>
 <script src="../shared/vendor/axios.min.js"></script>
-<script src="../shared/js/http-client.js"></script>
-<script src="assets/js/api-client.js"></script>
-<script src="../shared/js/offline-data.js"></script>
-
-<script src="assets/js/seed-data.js"></script>
-<script src="assets/js/sync.js"></script>
-<script src="assets/js/app.js"></script>
-<script src="assets/js/product-form.js"></script>
+<script src="../shared/js/config.js"></script>
+<script src="../shared/js/api.js"></script>
+<script src="../shared/js/auth.js"></script>
+<script src="../shared/js/common.js"></script>
+<script src="../shared/js/toast.js"></script>
+<script src="../shared/js/panel-ui.js"></script>
+<script src="../shared/js/panel-layout.js"></script>
+<script src="../shared/js/admin/product-form.js"></script>
 </body>
 </html>
+

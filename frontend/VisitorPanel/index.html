@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -20,9 +20,9 @@
         <div class="hero-grid">
           <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
             <div class="carousel-indicators">
-              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true"></button>
-              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="اسلاید 1" title="اسلاید 1"></button>
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="اسلاید 2" title="اسلاید 2"></button>
+              <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="اسلاید 3" title="اسلاید 3"></button>
             </div>
             <div class="carousel-inner">
               <div class="carousel-item active">
@@ -56,10 +56,10 @@
                 </div>
               </div>
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="اسلاید قبلی" title="اسلاید قبلی">
               <span class="carousel-control-prev-icon"></span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="اسلاید بعدی" title="اسلاید بعدی">
               <span class="carousel-control-next-icon"></span>
             </button>
           </div>
@@ -220,17 +220,15 @@
   <div id="store-footer"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/config.js"></script>
   <script src="../shared/vendor/axios.min.js"></script>
-<script src="../shared/js/http-client.js"></script>
-  <script src="js/api-client.js"></script>
-  <script src="../shared/js/site-brand.js"></script>
-  <script src="../shared/js/offline-data.js"></script>
-
-  <script src="js/store-core.js"></script>
-  <script src="../shared/js/panel-session.js"></script>
-  <script src="js/visitor-auth.js"></script>
-  <script src="js/layout.js"></script>
-  <script src="js/home.js"></script>
+  <script src="../shared/js/config.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/cart.js"></script>
+  <script src="../shared/js/common.js"></script>
+  <script src="../shared/js/toast.js"></script>
+  <script src="../shared/js/layout.js"></script>
+  <script src="../shared/js/pages/home.js"></script>
 </body>
 </html>
+

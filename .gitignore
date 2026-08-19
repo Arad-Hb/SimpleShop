@@ -9,6 +9,23 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.bak
+*.dll
+*.exe
+
+# Nested editor settings — keep a single portable root .vscode
+frontend/.vscode/
+
+# Test / publish output
+[Tt]est[Rr]esult*/
+publish/
+artifacts/
+
+# Runtime uploaded images
+api/SimpleShop.Api/wwwroot/images/**
+!api/SimpleShop.Api/wwwroot/images/.gitkeep
+api/SimpleShop.Api/wwwroot/uploads/**
+!api/SimpleShop.Api/wwwroot/uploads/.gitkeep
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

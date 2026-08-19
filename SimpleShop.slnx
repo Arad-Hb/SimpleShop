@@ -5,4 +5,7 @@
     <Project Path="api/DataAccess/DataAccess.csproj" />
     <Project Path="api/SimpleShop.Api/SimpleShop.Api.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SimpleShop.Tests/SimpleShop.Tests.csproj" />
+  </Folder>
 </Solution>

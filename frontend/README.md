@@ -1,21 +1,16 @@
-# SimpleShop Frontend
+# Frontend
 
-Static frontend layer (no bundler): **HTML + CSS + Bootstrap 5 + vanilla ECMAScript**.
+Vanilla HTML, CSS, Bootstrap 5 RTL, Axios. No React/Vue/TypeScript bundler.
 
-## Panels
+Shared scripts in `shared/js/`:
 
-| Folder | Purpose | Entry |
-|--------|---------|--------|
-| `VisitorPanel/` | Customer shopping UI | `VisitorPanel/index.html` |
-| `AdminPanel/` | Store admin (offline demo) | `AdminPanel/login.html` |
-| `SupplierPanel/` | Supplier portal (offline demo) | `SupplierPanel/login.html` |
+- `config.js` API host and endpoints
+- `api.js` Axios + JWT interceptor
+- `auth.js` login and roles
+- `cart.js` local `{ productId, quantity }`
+- `toast.js` Persian toasts
+- `layout.js` visitor chrome
+- `panel-layout.js` customer/admin chrome
+- page scripts under `pages/`, `customer/`, `admin/`
 
-## VisitorPanel ↔ API
-
-1. Start the API (`../api` → `dotnet run`).
-2. Open `VisitorPanel/index.html` with Live Server.
-3. Confirm `VisitorPanel/js/config.js` points at your API, e.g. `http://localhost:5102`.
-
-## Design system
-
-Cobalt palette shared across panels. Visitor offer tags use bold orange/red for **پیشنهاد شگفت‌انگیز** and sales.
+Every catalog, order, and settings value comes from the API. Local storage keeps only JWT session, cart ids/qty, and UI prefs.

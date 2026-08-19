@@ -1,31 +1,24 @@
 namespace DomainModel.Models;
 
-/// <summary>Single-row shop configuration (Id = 1).</summary>
 public class ShopSettings
 {
     public int Id { get; set; }
-    public string ShopName { get; set; } = "فروشگاه ساده تحلیل داده";
-    public string? ShopDescription { get; set; }
+    public string StoreName { get; set; } = "فروشگاه ساده تحلیل داده";
+    public string? StoreDescription { get; set; }
     public string? ContactPhone { get; set; }
     public string? ContactEmail { get; set; }
     public string? Address { get; set; }
     public string Currency { get; set; } = "تومان";
-    public int LowStockThreshold { get; set; } = 10;
-    public string ShopVisibility { get; set; } = "public";
-    public string? Instagram { get; set; }
-    public string? Telegram { get; set; }
-    public string? Whatsapp { get; set; }
-    public bool InstagramEnabled { get; set; }
-    public bool TelegramEnabled { get; set; }
-    public bool WhatsappEnabled { get; set; }
+    public int LowStockThreshold { get; set; } = 5;
+    public string? InstagramUrl { get; set; }
+    public string? TelegramUrl { get; set; }
+    public string? WhatsAppUrl { get; set; }
     public string? DefaultSeoTitle { get; set; }
     public string? DefaultSeoDescription { get; set; }
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
-    public int? LogoFileId { get; set; }
-    public FileManager? LogoFile { get; set; }
-    public int? FaviconFileId { get; set; }
-    public FileManager? FaviconFile { get; set; }
-    public int? OgImageFileId { get; set; }
-    public FileManager? OgImageFile { get; set; }
+    public string? LogoPath { get; set; }
+    public string? FaviconPath { get; set; }
+    public string? HeroImagePath { get; set; }
+    public string? HeroTitle { get; set; }
+    public string? HeroSubtitle { get; set; }
+    public DateTime UpdateDate { get; set; } = DateTime.Now;
 }

@@ -1,3 +1,4 @@
+using DomainModel.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,40 +6,30 @@ namespace DomainModel.Models.Configurations;
 
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
-    public void Configure(EntityTypeBuilder<Product> e)
+    public void Configure(EntityTypeBuilder<Product> builder)
     {
-        e.Property(p => p.Name).HasMaxLength(200).IsRequired();
-        e.Property(p => p.Description).HasMaxLength(2000);
-        e.Property(p => p.Price).HasPrecision(18, 2);
-        e.Property(p => p.Slug).HasMaxLength(220);
-        e.Property(p => p.MetaTitle).HasMaxLength(200);
-        e.Property(p => p.MetaDescription).HasMaxLength(500);
-        e.Property(p => p.MetaKeywords).HasMaxLength(500);
-        e.Property(p => p.CanonicalUrl).HasMaxLength(500);
-        e.Property(p => p.OgTitle).HasMaxLength(200);
-        e.Property(p => p.OgDescription).HasMaxLength(500);
-        e.Property(p => p.BrandName).HasMaxLength(120);
-        e.Property(p => p.MinimumStock).HasDefaultValue(5);
-        e.HasIndex(p => p.Slug);
+        builder.ToTable("Products");
+        builder.HasKey(x => x.Id);
+        builder.Property(x => x.Name).HasMaxLength(180).IsRequired();
+        builder.Property(x => x.Description).HasMaxLength(2000);
+        builder.Property(x => x.BrandName).HasMaxLength(80);
+        builder.Property(x => x.Slug).HasMaxLength(200);
+        builder.Property(x => x.MetaTitle).HasMaxLength(180);
+        builder.Property(x => x.MetaDescription).HasMaxLength(320);
+        builder.Property(x => x.ImagePath).HasMaxLength(500);
+        builder.Property(x => x.ThumbnailPath).HasMaxLength(500);
+        builder.Property(x => x.Price).HasPrecision(18, 0);
+        builder.ToTable(t => t.HasCheckConstraint("CK_Products_Price", "[Price] >= 0"));
+        builder.ToTable(t => t.HasCheckConstraint("CK_Products_Stock", "[Stock] >= 0"));
+        builder.ToTable(t => t.HasCheckConstraint("CK_Products_MinimumStock", "[MinimumStock] >= 0"));
 
-        e.HasOne(p => p.Category)
-            .WithMany(c => c.Products)
-            .HasForeignKey(p => p.CategoryId)
+        builder.HasIndex(x => x.Slug).IsUnique().HasFilter("[Slug] IS NOT NULL");
+        builder.HasIndex(x => x.CategoryId);
+        builder.HasIndex(x => x.IsActive);
+
+        builder.HasOne(x => x.Category)
+            .WithMany(x => x.Products)
+            .HasForeignKey(x => x.CategoryId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        e.HasOne(p => p.Supplier)
-            .WithMany(s => s.Products)
-            .HasForeignKey(p => p.SupplierId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        e.HasOne(p => p.PrimaryImage)
-            .WithMany()
-            .HasForeignKey(p => p.PrimaryImageId)
-            .OnDelete(DeleteBehavior.SetNull);
-
-        e.HasOne(p => p.OgImage)
-            .WithMany()
-            .HasForeignKey(p => p.OgImageId)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }
