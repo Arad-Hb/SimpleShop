@@ -51,7 +51,7 @@ public class ProductService(
     public async Task<OperationResult> AddAsync(ProductAddEditModel model)
     {
         var result = new OperationResult("افزودن محصول");
-        var categoryError = await ValidateChildCategoryAsync(model.CategoryId);
+        var categoryError = await ValidateLeafCategoryAsync(model.CategoryId);
         if (categoryError is not null)
             return result.ToFailed(categoryError);
 
@@ -69,7 +69,7 @@ public class ProductService(
         if (entity is null)
             return result.ToFailed("محصول پیدا نشد.");
 
-        var categoryError = await ValidateChildCategoryAsync(model.CategoryId);
+        var categoryError = await ValidateLeafCategoryAsync(model.CategoryId);
         if (categoryError is not null)
             return result.ToFailed(categoryError);
 
@@ -132,9 +132,8 @@ public class ProductService(
 
         if (model.CategoryId.HasValue)
         {
-            var categoryId = model.CategoryId.Value;
-            query = query.Where(x =>
-                x.CategoryId == categoryId || x.Category.ParentId == categoryId);
+            var categoryIds = await categoryRepository.GetSelfAndDescendantIdsAsync(model.CategoryId.Value);
+            query = query.Where(x => categoryIds.Contains(x.CategoryId));
         }
 
         if (model.IsActive.HasValue && !publicOnly)
@@ -165,15 +164,15 @@ public class ProductService(
         };
     }
 
-    private async Task<string?> ValidateChildCategoryAsync(int categoryId)
+    private async Task<string?> ValidateLeafCategoryAsync(int categoryId)
     {
         var category = await categoryRepository.GetByIdAsync(categoryId, tracking: false);
         if (category is null)
             return "دسته‌بندی پیدا نشد.";
         if (!category.IsActive)
             return "دسته‌بندی انتخاب‌شده غیرفعال است.";
-        if (category.ParentId is null)
-            return "محصول باید در یک دسته سطح دوم قرار بگیرد.";
+        if (await categoryRepository.HasChildrenAsync(categoryId))
+            return "محصول فقط می‌تواند به دسته برگ (بدون زیرمجموعه) اختصاص داده شود.";
         return null;
     }
 

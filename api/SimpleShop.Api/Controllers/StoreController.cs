@@ -22,10 +22,13 @@ public class StoreController(
     [HttpGet("categories/menu")]
     public async Task<IActionResult> CategoryMenu() => Ok(await categories.GetMenuAsync());
 
+    [HttpGet("categories")]
+    public async Task<IActionResult> Categories() => Ok(await categories.GetMenuAsync());
+
     [HttpGet("categories/{id:int}")]
     public async Task<IActionResult> Category(int id)
     {
-        var item = await categories.GetDetailsAsync(id);
+        var item = await categories.GetDetailsAsync(id, publicOnly: true);
         return item is null ? NotFound() : Ok(item);
     }
 

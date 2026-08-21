@@ -11,7 +11,6 @@ public static class CategoryMapper
             Name = model.Name.Trim(),
             Description = TrimOrNull(model.Description),
             ParentId = model.ParentId,
-            SortOrder = model.SortOrder,
             Slug = model.ResolvedSlug,
             MetaTitle = TrimOrNull(model.MetaTitle) ?? model.Name.Trim(),
             MetaDescription = TrimOrNull(model.MetaDescription),
@@ -24,7 +23,6 @@ public static class CategoryMapper
         entity.Name = model.Name.Trim();
         entity.Description = TrimOrNull(model.Description);
         entity.ParentId = model.ParentId;
-        entity.SortOrder = model.SortOrder;
         entity.Slug = model.ResolvedSlug;
         entity.MetaTitle = TrimOrNull(model.MetaTitle) ?? model.Name.Trim();
         entity.MetaDescription = TrimOrNull(model.MetaDescription);
@@ -32,7 +30,7 @@ public static class CategoryMapper
         entity.UpdateDate = DateTime.Now;
     }
 
-    public static CategoryListItem ToListItem(CategoryEntity entity)
+    public static CategoryListItem ToListItem(CategoryEntity entity, int depth, int productCount, int childCount = 0)
         => new()
         {
             Id = entity.Id,
@@ -42,12 +40,21 @@ public static class CategoryMapper
             SortOrder = entity.SortOrder,
             Slug = entity.Slug,
             IsActive = entity.IsActive,
-            ProductCount = entity.Products?.Count ?? 0,
+            Depth = depth,
+            ProductCount = productCount,
+            ChildCount = childCount,
             ImagePath = entity.ImagePath,
             ThumbnailPath = entity.ThumbnailPath
         };
 
-    public static CategoryDetailsModel ToDetails(CategoryEntity entity)
+    public static CategoryDetailsModel ToDetails(
+        CategoryEntity entity,
+        int depth,
+        int productCount,
+        int inclusiveProductCount,
+        bool canHaveChildren,
+        List<CategoryListItem> breadcrumb,
+        List<CategoryListItem> children)
         => new()
         {
             Id = entity.Id,
@@ -62,25 +69,32 @@ public static class CategoryMapper
             ImagePath = entity.ImagePath,
             ThumbnailPath = entity.ThumbnailPath,
             IsActive = entity.IsActive,
-            ProductCount = entity.Products?.Count ?? 0,
-            Children = entity.Children
-                .OrderBy(x => x.SortOrder)
-                .Select(ToListItem)
-                .ToList()
+            Depth = depth,
+            ProductCount = productCount,
+            InclusiveProductCount = inclusiveProductCount,
+            ChildCount = children.Count,
+            CanHaveChildren = canHaveChildren,
+            Breadcrumb = breadcrumb,
+            Children = children
         };
 
-    public static CategoryMenuItem ToMenuItem(CategoryEntity entity)
+    public static CategoryMenuItem ToMenuItem(
+        CategoryEntity entity,
+        int depth,
+        int productCount,
+        int inclusiveProductCount)
         => new()
         {
             Id = entity.Id,
             Name = entity.Name,
             Slug = entity.Slug,
             ImagePath = entity.ImagePath,
-            Children = entity.Children
-                .Where(x => x.IsActive)
-                .OrderBy(x => x.SortOrder)
-                .Select(ToMenuItem)
-                .ToList()
+            ParentId = entity.ParentId,
+            SortOrder = entity.SortOrder,
+            IsActive = entity.IsActive,
+            Depth = depth,
+            ProductCount = productCount,
+            InclusiveProductCount = inclusiveProductCount
         };
 
     private static string? TrimOrNull(string? value)

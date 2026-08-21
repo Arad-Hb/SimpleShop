@@ -14,6 +14,11 @@ public class CategoryDetailsModel
     public string? ImagePath { get; set; }
     public string? ThumbnailPath { get; set; }
     public bool IsActive { get; set; }
+    public int Depth { get; set; }
     public int ProductCount { get; set; }
+    public int InclusiveProductCount { get; set; }
+    public int ChildCount { get; set; }
+    public bool CanHaveChildren { get; set; }
+    public List<CategoryListItem> Breadcrumb { get; set; } = [];
     public List<CategoryListItem> Children { get; set; } = [];
 }

@@ -42,5 +42,26 @@ internal sealed class ShopTestHost : IDisposable
         return (parent, child);
     }
 
+    public async Task<(Category Root, Category Depth1, Category Depth2, Category Depth3)> SeedFourLevelCategoryAsync()
+    {
+        var root = new Category { Name = "ریشه", IsActive = true, Slug = "root", SortOrder = 1 };
+        Db.Categories.Add(root);
+        await Db.SaveChangesAsync();
+
+        var depth1 = new Category { Name = "سطح یک", ParentId = root.Id, IsActive = true, Slug = "d1", SortOrder = 1 };
+        Db.Categories.Add(depth1);
+        await Db.SaveChangesAsync();
+
+        var depth2 = new Category { Name = "سطح دو", ParentId = depth1.Id, IsActive = true, Slug = "d2", SortOrder = 1 };
+        Db.Categories.Add(depth2);
+        await Db.SaveChangesAsync();
+
+        var depth3 = new Category { Name = "سطح سه", ParentId = depth2.Id, IsActive = true, Slug = "d3", SortOrder = 1 };
+        Db.Categories.Add(depth3);
+        await Db.SaveChangesAsync();
+
+        return (root, depth1, depth2, depth3);
+    }
+
     public void Dispose() => Db.Dispose();
 }
